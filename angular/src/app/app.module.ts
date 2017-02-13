@@ -12,11 +12,14 @@ import { MemberService } from './member.service';
 
 import { AppRoutingModule } from './app-routing.module';
 
+import { MaterialModule } from '@angular/material';
+
 @NgModule({
 	imports: [ 
 		BrowserModule,
 		FormsModule,
-		AppRoutingModule
+		AppRoutingModule,
+		MaterialModule.forRoot(),
 	],
 	declarations: [ 
 		AppComponent,

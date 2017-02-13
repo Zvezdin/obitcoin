@@ -18,6 +18,7 @@ var dashboard_component_1 = require('./dashboard.component');
 var member_search_component_1 = require('./member-search.component');
 var member_service_1 = require('./member.service');
 var app_routing_module_1 = require('./app-routing.module');
+var material_1 = require('@angular/material');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -26,7 +27,8 @@ var AppModule = (function () {
             imports: [
                 platform_browser_1.BrowserModule,
                 forms_1.FormsModule,
-                app_routing_module_1.AppRoutingModule
+                app_routing_module_1.AppRoutingModule,
+                material_1.MaterialModule.forRoot(),
             ],
             declarations: [
                 app_component_1.AppComponent,

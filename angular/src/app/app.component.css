@@ -12,10 +12,15 @@ nav a {
   padding: 5px 10px;
   text-decoration: none;
   margin-top: 10px;
+  width: 100px;
   display: inline-block;
   background-color: #eee;
   border-radius: 4px;
 }
+nav a md-icon, span {
+  display: inline-block;
+}
+
 nav a:visited, a:link {
   color: #607D8B;
 }

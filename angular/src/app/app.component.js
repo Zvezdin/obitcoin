@@ -17,7 +17,7 @@ var AppComponent = (function () {
         core_1.Component({
             moduleId: module.id,
             selector: 'my-app',
-            template: "\n\t\t<h1>{{title}}</h1>\n\t\t<nav>\n\t\t\t<a routerLink=\"/dashboard\" routerLinkActive=\"active\">Dashboard</a>\n\t\t\t<a routerLink=\"/members\" routerLinkActive=\"active\">Members</a>\n\t\t</nav>\n\t\t<router-outlet></router-outlet>\n\t",
+            template: "\n\n\t<md-sidenav-container class=\"navigation-container\">\n\n\t\t<h1>{{title}}</h1>\n\t\t<button md-button (click)=\"sidenav.open()\">Menu</button>\n\n\t\t<md-sidenav #sidenav class=\"navigation\">\n\t\t\t<nav>\n\t\t\t\t<a routerLink=\"/dashboard\" routerLinkActive=\"active\">\n\t\t\t\t\t<md-icon>dialpad</md-icon>\n\t\t\t\t\t<span>Dashboard</span>\n\t\t\t\t</a><br>\n\t\t\t\t<a routerLink=\"/members\" routerLinkActive=\"active\">Members</a><br>\n\t\t\t\t<a routerLink=\"/dashboard\" routerLinkActive=\"active\">Pools</a><br>\n\t\t\t\t<a routerLink=\"/members\" routerLinkActive=\"active\">Transactions</a><br>\n\t\t\t</nav>\n\t\t</md-sidenav>\n\n\t\t<router-outlet></router-outlet>\n\t</md-sidenav-container>\n\t",
             styleUrls: ['./app.component.css'],
         }), 
         __metadata('design:paramtypes', [])
