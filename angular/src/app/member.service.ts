@@ -20,4 +20,9 @@ export class MemberService {
 		return this.getMembers()
 			.then(members => members.find(member => member.address === address));
 	}
+
+	search(term: string): Promise<Member[]> {
+		return this.getMembers()
+			.then(members => members.filter(member => member.name.includes(term)));
+	}
 }

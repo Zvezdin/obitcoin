@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
 
 @Component({
+	moduleId: module.id,
 	selector: 'my-app',
 	template: `
 		<h1>{{title}}</h1>
 		<nav>
-			<a routerLink="/dashboard">Dashboard</a>
-			<a routerLink="/members">Members</a>
+			<a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+			<a routerLink="/members" routerLinkActive="active">Members</a>
 		</nav>
 		<router-outlet></router-outlet>
 	` ,
+	styleUrls: ['./app.component.css'],
 })
 
 export class AppComponent {

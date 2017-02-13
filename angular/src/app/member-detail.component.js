@@ -12,7 +12,6 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var common_1 = require('@angular/common');
 require('rxjs/add/operator/switchMap');
-var member_1 = require('./member');
 var member_service_1 = require('./member.service');
 var MemberDetailComponent = (function () {
     function MemberDetailComponent(memberService, route, location) {
@@ -31,15 +30,12 @@ var MemberDetailComponent = (function () {
     MemberDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
     };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', member_1.Member)
-    ], MemberDetailComponent.prototype, "member", void 0);
     MemberDetailComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'member-detail',
-            templateUrl: './member-detail.component.html'
+            templateUrl: './member-detail.component.html',
+            styleUrls: ['./member-detail.component.css'],
         }), 
         __metadata('design:paramtypes', [member_service_1.MemberService, router_1.ActivatedRoute, common_1.Location])
     ], MemberDetailComponent);

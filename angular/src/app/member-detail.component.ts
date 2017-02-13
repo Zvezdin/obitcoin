@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -11,11 +11,11 @@ import { MemberService } from './member.service';
 	moduleId: module.id,
 	selector: 'member-detail',
 	
-	templateUrl: './member-detail.component.html'
+	templateUrl: './member-detail.component.html',
+	styleUrls: ['./member-detail.component.css'],
 })
 
 export class MemberDetailComponent implements OnInit {
-	@Input()
 	member: Member;
 	
 	constructor(

@@ -23,7 +23,8 @@ var DashboardComponent = (function () {
         core_1.Component({
             moduleId: module.id,
             selector: 'dashboard',
-            templateUrl: './dashboard.component.html'
+            templateUrl: './dashboard.component.html',
+            styleUrls: ['./dashboard.component.css']
         }), 
         __metadata('design:paramtypes', [member_service_1.MemberService])
     ], DashboardComponent);

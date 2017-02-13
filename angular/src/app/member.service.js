@@ -26,6 +26,10 @@ var MemberService = (function () {
         return this.getMembers()
             .then(function (members) { return members.find(function (member) { return member.address === address; }); });
     };
+    MemberService.prototype.search = function (term) {
+        return this.getMembers()
+            .then(function (members) { return members.filter(function (member) { return member.name.includes(term); }); });
+    };
     MemberService = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [])
