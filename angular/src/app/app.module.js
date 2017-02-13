@@ -15,6 +15,7 @@ var app_component_1 = require('./app.component');
 var member_detail_component_1 = require('./member-detail.component');
 var members_component_1 = require('./members.component');
 var dashboard_component_1 = require('./dashboard.component');
+var member_search_component_1 = require('./member-search.component');
 var member_service_1 = require('./member.service');
 var app_routing_module_1 = require('./app-routing.module');
 var AppModule = (function () {
@@ -31,7 +32,8 @@ var AppModule = (function () {
                 app_component_1.AppComponent,
                 member_detail_component_1.MemberDetailComponent,
                 members_component_1.MembersComponent,
-                dashboard_component_1.DashboardComponent
+                dashboard_component_1.DashboardComponent,
+                member_search_component_1.MemberSearchComponent
             ],
             providers: [
                 member_service_1.MemberService

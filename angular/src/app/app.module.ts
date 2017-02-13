@@ -7,6 +7,7 @@ import { AppComponent }  from './app.component';
 import { MemberDetailComponent } from './member-detail.component';
 import { MembersComponent } from './members.component';
 import { DashboardComponent } from './dashboard.component';
+import { MemberSearchComponent } from './member-search.component';
 import { MemberService } from './member.service';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,7 +22,8 @@ import { AppRoutingModule } from './app-routing.module';
 		AppComponent,
 		MemberDetailComponent,
 		MembersComponent,
-		DashboardComponent
+		DashboardComponent,
+		MemberSearchComponent
 	],
 	providers: [
 		MemberService
