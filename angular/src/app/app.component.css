@@ -8,17 +8,19 @@ h2 {
   margin-top: 0;
   padding-top: 0;
 }
+
+md-sidenav-container.navigation-container{
+  min-height: 100%;
+}
+
 nav a {
   padding: 5px 10px;
   text-decoration: none;
   margin-top: 10px;
-  width: 100px;
+  width: 150px;
   display: inline-block;
   background-color: #eee;
   border-radius: 4px;
-}
-nav a md-icon, span {
-  display: inline-block;
 }
 
 nav a:visited, a:link {
