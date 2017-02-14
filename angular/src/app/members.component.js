@@ -10,15 +10,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
-var member_service_1 = require('./member.service');
+var data_service_1 = require('./data.service');
 var MembersComponent = (function () {
-    function MembersComponent(memberService, router) {
-        this.memberService = memberService;
+    function MembersComponent(dataService, router) {
+        this.dataService = dataService;
         this.router = router;
     }
     MembersComponent.prototype.getMembers = function () {
         var _this = this;
-        this.memberService.getMembers().then(function (members) { return _this.members = members; });
+        this.dataService.getMembers().then(function (members) { return _this.members = members; });
     };
     MembersComponent.prototype.ngOnInit = function () {
         this.getMembers();
@@ -27,7 +27,7 @@ var MembersComponent = (function () {
         this.selectedMember = member;
     };
     MembersComponent.prototype.gotoDetail = function () {
-        this.router.navigate(['/detail', this.selectedMember.address]);
+        this.router.navigate(['/detail_member', this.selectedMember.address]);
     };
     MembersComponent = __decorate([
         core_1.Component({
@@ -36,7 +36,7 @@ var MembersComponent = (function () {
             templateUrl: './members.component.html',
             styleUrls: ['./members.component.css'],
         }), 
-        __metadata('design:paramtypes', [member_service_1.MemberService, router_1.Router])
+        __metadata('design:paramtypes', [data_service_1.DataService, router_1.Router])
     ], MembersComponent);
     return MembersComponent;
 }());

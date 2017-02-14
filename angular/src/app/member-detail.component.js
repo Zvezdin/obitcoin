@@ -12,23 +12,27 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var common_1 = require('@angular/common');
 require('rxjs/add/operator/switchMap');
-var member_service_1 = require('./member.service');
+var data_service_1 = require('./data.service');
 var MemberDetailComponent = (function () {
-    function MemberDetailComponent(memberService, route, location) {
-        this.memberService = memberService;
+    function MemberDetailComponent(dataService, route, location, router) {
+        this.dataService = dataService;
         this.route = route;
         this.location = location;
+        this.router = router;
     }
     MemberDetailComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.route.params
             .switchMap(function (params) {
-            return _this.memberService.getMember(params['address']);
+            return _this.dataService.getMember(params['address']);
         })
-            .subscribe(function (member) { return _this.member = member; });
+            .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member); });
     };
     MemberDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
+    };
+    MemberDetailComponent.prototype.edit = function () {
+        this.router.navigate(['/edit_member', this.member.address]);
     };
     MemberDetailComponent = __decorate([
         core_1.Component({
@@ -37,7 +41,7 @@ var MemberDetailComponent = (function () {
             templateUrl: './member-detail.component.html',
             styleUrls: ['./member-detail.component.css'],
         }), 
-        __metadata('design:paramtypes', [member_service_1.MemberService, router_1.ActivatedRoute, common_1.Location])
+        __metadata('design:paramtypes', [data_service_1.DataService, router_1.ActivatedRoute, common_1.Location, router_1.Router])
     ], MemberDetailComponent);
     return MemberDetailComponent;
 }());

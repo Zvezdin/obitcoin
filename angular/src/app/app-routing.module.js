@@ -10,9 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
+var member_edit_component_1 = require('./member-edit.component');
 var member_detail_component_1 = require('./member-detail.component');
 var members_component_1 = require('./members.component');
-var dashboard_component_1 = require('./dashboard.component');
 var routes = [
     {
         path: 'members',
@@ -20,7 +20,7 @@ var routes = [
     },
     {
         path: 'dashboard',
-        component: dashboard_component_1.DashboardComponent
+        component: member_detail_component_1.MemberDetailComponent
     },
     {
         path: '',
@@ -28,9 +28,13 @@ var routes = [
         pathMatch: 'full'
     },
     {
-        path: 'detail/:address',
+        path: 'edit_member/:address',
+        component: member_edit_component_1.MemberEditComponent
+    },
+    {
+        path: 'detail_member/:address',
         component: member_detail_component_1.MemberDetailComponent
-    }
+    },
 ];
 var AppRoutingModule = (function () {
     function AppRoutingModule() {

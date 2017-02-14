@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DataService } from './data.service';
 
 @Component({
 	moduleId: module.id,
@@ -11,7 +12,7 @@ import { Component } from '@angular/core';
 		<button md-button (click)="sidenav.open()">Menu</button>
 
 		<md-sidenav #sidenav class="navigation">
-			<nav>
+			<nav (click)="sidenav.close()">
 				<a routerLink="/dashboard" routerLinkActive="active">
 					<md-icon>account_balance_wallet</md-icon>
 					<span>Dashboard</span>
@@ -35,6 +36,14 @@ import { Component } from '@angular/core';
 	styleUrls: ['./app.component.css'],
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
 	title = "Obitcoin";
+
+	constructor(
+		private dataService: DataService,
+	) {}
+
+	ngOnInit(){
+		this.dataService.init();
+	}
 }

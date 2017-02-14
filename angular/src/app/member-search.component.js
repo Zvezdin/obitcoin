@@ -10,10 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
-var member_service_1 = require('./member.service');
+var data_service_1 = require('./data.service');
 var MemberSearchComponent = (function () {
-    function MemberSearchComponent(memberService, router) {
-        this.memberService = memberService;
+    function MemberSearchComponent(dataService, router) {
+        this.dataService = dataService;
         this.router = router;
     }
     MemberSearchComponent.prototype.search = function (term) {
@@ -21,7 +21,7 @@ var MemberSearchComponent = (function () {
         if (term.length == 0)
             this.members = null;
         else
-            this.memberService.search(term).then(function (members) { return _this.members = members; });
+            this.dataService.search(term).then(function (members) { return _this.members = members; });
     };
     MemberSearchComponent.prototype.ngOnInit = function () {
     };
@@ -36,7 +36,7 @@ var MemberSearchComponent = (function () {
             templateUrl: './member-search.component.html',
             styleUrls: ['./member-search.component.css'],
         }), 
-        __metadata('design:paramtypes', [member_service_1.MemberService, router_1.Router])
+        __metadata('design:paramtypes', [data_service_1.DataService, router_1.Router])
     ], MemberSearchComponent);
     return MemberSearchComponent;
 }());

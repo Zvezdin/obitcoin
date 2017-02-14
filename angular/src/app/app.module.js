@@ -12,11 +12,12 @@ var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
 var forms_1 = require('@angular/forms');
 var app_component_1 = require('./app.component');
+var member_edit_component_1 = require('./member-edit.component');
 var member_detail_component_1 = require('./member-detail.component');
 var members_component_1 = require('./members.component');
 var dashboard_component_1 = require('./dashboard.component');
 var member_search_component_1 = require('./member-search.component');
-var member_service_1 = require('./member.service');
+var data_service_1 = require('./data.service');
 var app_routing_module_1 = require('./app-routing.module');
 var material_1 = require('@angular/material');
 var AppModule = (function () {
@@ -32,13 +33,14 @@ var AppModule = (function () {
             ],
             declarations: [
                 app_component_1.AppComponent,
-                member_detail_component_1.MemberDetailComponent,
+                member_edit_component_1.MemberEditComponent,
                 members_component_1.MembersComponent,
                 dashboard_component_1.DashboardComponent,
-                member_search_component_1.MemberSearchComponent
+                member_search_component_1.MemberSearchComponent,
+                member_detail_component_1.MemberDetailComponent,
             ],
             providers: [
-                member_service_1.MemberService
+                data_service_1.DataService
             ],
             bootstrap: [app_component_1.AppComponent]
         }), 

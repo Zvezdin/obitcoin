@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Member } from './member';
-import { MemberService} from './member.service';
+import { DataService } from './data.service';
 
 @Component({
 	moduleId: module.id,
@@ -14,9 +14,9 @@ export class DashboardComponent implements OnInit {
 	
 	members: Member[] = [];
 	
-	constructor(private memberService: MemberService) {}
+	constructor(private dataService: DataService) {}
 	
 	ngOnInit(): void {
-		this.memberService.getMembers().then(members => this.members = members.slice(1,5));
+		this.dataService.getMembers().then(members => this.members = members.slice(1,5));
 	}
 }

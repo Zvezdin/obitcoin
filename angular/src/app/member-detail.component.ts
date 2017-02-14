@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import 'rxjs/add/operator/switchMap';
 
 import { Member } from './member';
-import { MemberService } from './member.service';
+import { DataService } from './data.service';
 
 @Component({
 	moduleId: module.id,
@@ -19,19 +19,24 @@ export class MemberDetailComponent implements OnInit {
 	member: Member;
 	
 	constructor(
-		private memberService: MemberService,
+		private dataService: DataService,
 		private route: ActivatedRoute,
-		private location: Location
+		private location: Location,
+        private router: Router,
 	) {}
 	
 	ngOnInit(): void {
 		this.route.params
 			.switchMap((params: Params) =>
-		this.memberService.getMember(params['address']))
-			.subscribe(member => this.member = member);
+		this.dataService.getMember(params['address']))
+			.subscribe(member => (member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member));
 	}
 	
 	goBack(): void {
 		this.location.back(); //problematic, guard against exiting the website
 	}
+
+    edit(): void {
+        this.router.navigate(['/edit_member', this.member.address]);
+    }
 }

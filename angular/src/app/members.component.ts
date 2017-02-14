@@ -3,7 +3,7 @@ import { Member } from './member';
 import { OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { MemberService } from './member.service';
+import { DataService } from './data.service';
 
 @Component({
 	moduleId: module.id,
@@ -19,12 +19,12 @@ export class MembersComponent implements OnInit {
 	selectedMember: Member;
 	
 	constructor(
-		private memberService: MemberService,
+		private dataService: DataService,
 		private router: Router,
 	) {}
 	
 	getMembers(): void {
-		this.memberService.getMembers().then(members => this.members = members);
+		this.dataService.getMembers().then(members => this.members = members);
 	}
 	
 	ngOnInit(): void {
@@ -36,6 +36,6 @@ export class MembersComponent implements OnInit {
 	}
 	
 	gotoDetail(): void {
-		this.router.navigate(['/detail', this.selectedMember.address]);
+		this.router.navigate(['/detail_member', this.selectedMember.address]);
 	}
 }

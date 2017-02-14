@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { MemberService } from './member.service';
+import { DataService } from './data.service';
 import { Member } from './member';
 
 @Component({
@@ -15,13 +15,13 @@ export class MemberSearchComponent implements OnInit {
     members: Member[];
 
     constructor(
-        private memberService : MemberService,
+        private dataService : DataService,
         private router: Router
     ) {}
 
     search(term: string): void {
         if(term.length==0) this.members=null;
-        else this.memberService.search(term).then(members => this.members=members);
+        else this.dataService.search(term).then(members => this.members=members);
     }
 
     ngOnInit(): void {

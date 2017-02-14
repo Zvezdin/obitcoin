@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent }  from './app.component';
+import { MemberEditComponent } from './member-edit.component';
 import { MemberDetailComponent } from './member-detail.component';
 import { MembersComponent } from './members.component';
 import { DashboardComponent } from './dashboard.component';
 import { MemberSearchComponent } from './member-search.component';
-import { MemberService } from './member.service';
+import { DataService } from './data.service';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -23,13 +24,14 @@ import { MaterialModule } from '@angular/material';
 	],
 	declarations: [ 
 		AppComponent,
-		MemberDetailComponent,
+		MemberEditComponent,
 		MembersComponent,
 		DashboardComponent,
-		MemberSearchComponent
+		MemberSearchComponent,
+		MemberDetailComponent,
 	],
 	providers: [
-		MemberService
+		DataService
 	],
 	
 	bootstrap: [ AppComponent ]
