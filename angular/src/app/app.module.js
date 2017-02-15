@@ -20,6 +20,7 @@ var member_search_component_1 = require('./member-search.component');
 var data_service_1 = require('./data.service');
 var app_routing_module_1 = require('./app-routing.module');
 var material_1 = require('@angular/material');
+var primeng_1 = require('primeng/primeng');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -30,6 +31,8 @@ var AppModule = (function () {
                 forms_1.FormsModule,
                 app_routing_module_1.AppRoutingModule,
                 material_1.MaterialModule.forRoot(),
+                primeng_1.DataTableModule,
+                primeng_1.SharedModule,
             ],
             declarations: [
                 app_component_1.AppComponent,

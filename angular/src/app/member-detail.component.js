@@ -26,7 +26,27 @@ var MemberDetailComponent = (function () {
             .switchMap(function (params) {
             return _this.dataService.getMember(params['address']);
         })
-            .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member); });
+            .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member,
+            _this.dataService.getPools().then(function (pools) {
+                _this.pools = pools.filter(function (pool) { return pool.members.find(function (member2) { return member2 == _this.member; }) != undefined; }),
+                    _this.initData();
+            })); });
+    };
+    MemberDetailComponent.prototype.initData = function () {
+        var _this = this;
+        this.pools.forEach(function (pool) {
+            _this.totalSlices = 0;
+            _this.totalTokens = 0;
+            pool.members.forEach(function (member) {
+                if (pool.slices[member.address] != undefined)
+                    _this.totalSlices += pool.slices[member.address];
+                if (pool.tokens[member.address] != undefined)
+                    _this.totalTokens += pool.tokens[member.address];
+            });
+            pool.totalSlices = _this.totalSlices;
+            pool.totalTokens = _this.totalTokens;
+            console.log("Total slices " + _this.totalSlices + " and " + _this.totalTokens);
+        });
     };
     MemberDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website

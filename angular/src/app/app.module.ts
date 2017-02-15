@@ -15,12 +15,16 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { MaterialModule } from '@angular/material';
 
+import { DataTableModule, SharedModule } from 'primeng/primeng';
+
 @NgModule({
 	imports: [ 
 		BrowserModule,
 		FormsModule,
 		AppRoutingModule,
 		MaterialModule.forRoot(),
+		DataTableModule,
+		SharedModule,
 	],
 	declarations: [ 
 		AppComponent,

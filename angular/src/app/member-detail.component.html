@@ -14,4 +14,11 @@
 	</md-list>
 	<button md-button (click)="goBack()">Back</button>
 	<button md-button (click)="edit()">Edit</button>
+
+	<p-dataTable [value]="pools">
+		<p-column field="name" header="Name"></p-column>
+		<p-column field="members.length" header="Member count"></p-column>
+		<p-column field="totalTokens" header="Token count"></p-column>
+		<p-column field="totalSlices" header="Slice count"></p-column>
+	</p-dataTable>
 </div>
