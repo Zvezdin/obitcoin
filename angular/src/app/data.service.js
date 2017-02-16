@@ -20,6 +20,10 @@ var DataService = (function () {
     DataService.prototype.getMembers = function () {
         return Promise.resolve(this.members);
     };
+    DataService.prototype.getPoolMembers = function (pool) {
+        return this.getMembers()
+            .then(function (members) { return members.filter(function (member) { return member.address === pool.members.find(function (member) { return member; }); }); });
+    };
     DataService.prototype.getMembersSlowly = function () {
         var _this = this;
         return new Promise(function (resolve) {

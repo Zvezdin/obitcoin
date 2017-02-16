@@ -26,10 +26,10 @@ var MockPools = (function () {
         this.pools[1].members = mock_members_1.MEMBERS.slice(2, 6);
         this.pools[1].tokens = new Map();
         this.pools[1].slices = new Map();
-        this.pools[1].tokens[this.pools[0].members[0].address] = 123;
-        this.pools[1].slices[this.pools[0].members[0].address] = 500;
-        this.pools[1].tokens[this.pools[0].members[1].address] = 32;
-        this.pools[1].slices[this.pools[0].members[1].address] = 3;
+        this.pools[1].tokens[this.pools[1].members[0].address] = 123;
+        this.pools[1].slices[this.pools[1].members[0].address] = 500;
+        this.pools[1].tokens[this.pools[1].members[1].address] = 32;
+        this.pools[1].slices[this.pools[1].members[1].address] = 3;
     };
     MockPools.prototype.getPools = function () {
         return this.pools;

@@ -3,7 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { MemberEditComponent } from './member-edit.component';
 import { MemberDetailComponent } from './member-detail.component';
+import { PoolDetailComponent } from './pool-detail.component';
 import { MembersComponent } from './members.component';
+import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
 
 const routes: Routes = [
@@ -31,6 +33,16 @@ const routes: Routes = [
 	{
 		path: 'detail_member/:address',
 		component: MemberDetailComponent
+	},
+
+	{
+		path: 'pools',
+		component: PoolsComponent
+	},
+
+	{
+		path: 'detail_pool/:id',
+		component: PoolDetailComponent;
 	},
 ];
 

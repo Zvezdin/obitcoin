@@ -14,7 +14,9 @@ var forms_1 = require('@angular/forms');
 var app_component_1 = require('./app.component');
 var member_edit_component_1 = require('./member-edit.component');
 var member_detail_component_1 = require('./member-detail.component');
+var pool_detail_component_1 = require('./pool-detail.component');
 var members_component_1 = require('./members.component');
+var pools_component_1 = require('./pools.component');
 var dashboard_component_1 = require('./dashboard.component');
 var member_search_component_1 = require('./member-search.component');
 var data_service_1 = require('./data.service');
@@ -41,6 +43,8 @@ var AppModule = (function () {
                 dashboard_component_1.DashboardComponent,
                 member_search_component_1.MemberSearchComponent,
                 member_detail_component_1.MemberDetailComponent,
+                pools_component_1.PoolsComponent,
+                pool_detail_component_1.PoolDetailComponent,
             ],
             providers: [
                 data_service_1.DataService

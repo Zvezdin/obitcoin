@@ -12,15 +12,15 @@ import { DataService } from './data.service';
 
 @Component({
 	moduleId: module.id,
-	selector: 'member-detail',
+	selector: 'pool-detail',
 	
-	templateUrl: './member-detail.component.html',
-	styleUrls: ['./member-detail.component.css'],
+	templateUrl: './pool-detail.component.html',
+	styleUrls: ['./pool-detail.component.css'],
 })
 
-export class MemberDetailComponent implements OnInit {
-	member: Member;
-	pools: Pool[];
+export class PoolDetailComponent implements OnInit {
+	members: Member[];
+	pool : Pool;
 
 	constructor(
 		private dataService: DataService,
@@ -32,10 +32,10 @@ export class MemberDetailComponent implements OnInit {
 	ngOnInit(): void {
 		this.route.params
 			.switchMap((params: Params) =>
-		this.dataService.getMember(params['address']))
-			.subscribe(member => ( member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member,
+		this.dataService.getPool(params['id']))
+			.subscribe(pool => ( this.pool=pool,
 
-			this.dataService.getPools().then(pools => {
+			this.dataService.getMembers().then(pools => {
 				this.pools = pools.filter( pool => pool.members.find(member2 => member2==this.member) != undefined ),
 				this.initData()
 			})

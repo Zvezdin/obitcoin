@@ -13,26 +13,26 @@ var router_1 = require('@angular/router');
 var common_1 = require('@angular/common');
 require('rxjs/add/operator/switchMap');
 var data_service_1 = require('./data.service');
-var MemberDetailComponent = (function () {
-    function MemberDetailComponent(dataService, route, location, router) {
+var PoolDetailComponent = (function () {
+    function PoolDetailComponent(dataService, route, location, router) {
         this.dataService = dataService;
         this.route = route;
         this.location = location;
         this.router = router;
     }
-    MemberDetailComponent.prototype.ngOnInit = function () {
+    PoolDetailComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.route.params
             .switchMap(function (params) {
-            return _this.dataService.getMember(params['address']);
+            return _this.dataService.getPool(params['id']);
         })
-            .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member,
-            _this.dataService.getPools().then(function (pools) {
+            .subscribe(function (pool) { return (_this.pool = pool,
+            _this.dataService.getMembers().then(function (pools) {
                 _this.pools = pools.filter(function (pool) { return pool.members.find(function (member2) { return member2 == _this.member; }) != undefined; }),
                     _this.initData();
             })); });
     };
-    MemberDetailComponent.prototype.initData = function () {
+    PoolDetailComponent.prototype.initData = function () {
         var _this = this;
         this.pools.forEach(function (pool) {
             pool.init();
@@ -41,22 +41,22 @@ var MemberDetailComponent = (function () {
             ;
         });
     };
-    MemberDetailComponent.prototype.goBack = function () {
+    PoolDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
     };
-    MemberDetailComponent.prototype.edit = function () {
+    PoolDetailComponent.prototype.edit = function () {
         this.router.navigate(['/edit_member', this.member.address]);
     };
-    MemberDetailComponent = __decorate([
+    PoolDetailComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
-            selector: 'member-detail',
-            templateUrl: './member-detail.component.html',
-            styleUrls: ['./member-detail.component.css'],
+            selector: 'pool-detail',
+            templateUrl: './pool-detail.component.html',
+            styleUrls: ['./pool-detail.component.css'],
         }), 
         __metadata('design:paramtypes', [data_service_1.DataService, router_1.ActivatedRoute, common_1.Location, router_1.Router])
-    ], MemberDetailComponent);
-    return MemberDetailComponent;
+    ], PoolDetailComponent);
+    return PoolDetailComponent;
 }());
-exports.MemberDetailComponent = MemberDetailComponent;
-//# sourceMappingURL=member-detail.component.js.map
+exports.PoolDetailComponent = PoolDetailComponent;
+//# sourceMappingURL=pool-detail.component.js.map

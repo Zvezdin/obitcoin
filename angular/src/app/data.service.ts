@@ -22,6 +22,11 @@ export class DataService {
 		return Promise.resolve(this.members);
 	}
 
+	getPoolMembers(pool : Pool): Promise<Member[]> {
+		return this.getMembers()
+			.then(members => members.filter(member => member.address === pool.members.find(member => member)));
+	}
+
 	getMembersSlowly(): Promise<Member[]> {
 		return new Promise(resolve => {
 			setTimeout(() => resolve(this.getMembers()), 2000);

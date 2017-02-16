@@ -20,7 +20,7 @@ import { DataService } from './data.service';
 				<a routerLink="/members" routerLinkActive="active">
 					<md-icon>people</md-icon>
 					<span>Members</span>
-				</a><br><a routerLink="/dashboard" routerLinkActive="active">
+				</a><br><a routerLink="/pools" routerLinkActive="active">
 					<md-icon>call_split</md-icon>
 					<span>Pools</span>
 				</a><br><a routerLink="/dashboard" routerLinkActive="active">

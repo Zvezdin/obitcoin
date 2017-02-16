@@ -6,7 +6,9 @@ import { RouterModule } from '@angular/router';
 import { AppComponent }  from './app.component';
 import { MemberEditComponent } from './member-edit.component';
 import { MemberDetailComponent } from './member-detail.component';
+import { PoolDetailComponent } from './pool-detail.component';
 import { MembersComponent } from './members.component';
+import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
 import { MemberSearchComponent } from './member-search.component';
 import { DataService } from './data.service';
@@ -33,6 +35,8 @@ import { DataTableModule, SharedModule } from 'primeng/primeng';
 		DashboardComponent,
 		MemberSearchComponent,
 		MemberDetailComponent,
+		PoolsComponent,
+		PoolDetailComponent,
 	],
 	providers: [
 		DataService

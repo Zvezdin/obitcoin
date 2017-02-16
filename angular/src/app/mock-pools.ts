@@ -29,10 +29,10 @@ export class MockPools{
         this.pools[1].members = MEMBERS.slice(2,6);
         this.pools[1].tokens = new Map<string, number>();
         this.pools[1].slices = new Map<string, number>();
-        this.pools[1].tokens[this.pools[0].members[0].address] = 123;
-        this.pools[1].slices[this.pools[0].members[0].address] = 500;
-        this.pools[1].tokens[this.pools[0].members[1].address] = 32;
-        this.pools[1].slices[this.pools[0].members[1].address] = 3;
+        this.pools[1].tokens[this.pools[1].members[0].address] = 123;
+        this.pools[1].slices[this.pools[1].members[0].address] = 500;
+        this.pools[1].tokens[this.pools[1].members[1].address] = 32;
+        this.pools[1].slices[this.pools[1].members[1].address] = 3;
     }
 
     getPools(): Pool[] {
