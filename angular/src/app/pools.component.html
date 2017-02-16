@@ -7,7 +7,7 @@
     <p-column field="totalSlices" [sortable]="true" header="Slice count"></p-column>
     <p-column>
         <template let-pool="rowData" pTemplate="body">
-            <button type="button" pButton (click)="onSelect(pool)" icon="fa-search"></button>
+            <button md-button (click) = onSelect(pool)>></button>
         </template>
     </p-column>
 </p-dataTable>

@@ -13,6 +13,7 @@ var router_1 = require('@angular/router');
 var member_edit_component_1 = require('./member-edit.component');
 var member_detail_component_1 = require('./member-detail.component');
 var pool_detail_component_1 = require('./pool-detail.component');
+var pool_edit_component_1 = require('./pool-edit.component');
 var members_component_1 = require('./members.component');
 var pools_component_1 = require('./pools.component');
 var routes = [
@@ -44,6 +45,10 @@ var routes = [
     {
         path: 'detail_pool/:id',
         component: pool_detail_component_1.PoolDetailComponent
+    },
+    {
+        path: 'edit_pool/:id',
+        component: pool_edit_component_1.PoolEditComponent
     },
 ];
 var AppRoutingModule = (function () {

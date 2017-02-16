@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MemberEditComponent } from './member-edit.component';
 import { MemberDetailComponent } from './member-detail.component';
 import { PoolDetailComponent } from './pool-detail.component';
+import { PoolEditComponent } from './pool-edit.component';
 import { MembersComponent } from './members.component';
 import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
@@ -42,7 +43,12 @@ const routes: Routes = [
 
 	{
 		path: 'detail_pool/:id',
-		component: PoolDetailComponent;
+		component: PoolDetailComponent
+	},
+
+	{
+		path: 'edit_pool/:id',
+		component: PoolEditComponent
 	},
 ];
 

@@ -15,6 +15,7 @@ var app_component_1 = require('./app.component');
 var member_edit_component_1 = require('./member-edit.component');
 var member_detail_component_1 = require('./member-detail.component');
 var pool_detail_component_1 = require('./pool-detail.component');
+var pool_edit_component_1 = require('./pool-edit.component');
 var members_component_1 = require('./members.component');
 var pools_component_1 = require('./pools.component');
 var dashboard_component_1 = require('./dashboard.component');
@@ -35,6 +36,7 @@ var AppModule = (function () {
                 material_1.MaterialModule.forRoot(),
                 primeng_1.DataTableModule,
                 primeng_1.SharedModule,
+                primeng_1.ButtonModule,
             ],
             declarations: [
                 app_component_1.AppComponent,
@@ -45,6 +47,7 @@ var AppModule = (function () {
                 member_detail_component_1.MemberDetailComponent,
                 pools_component_1.PoolsComponent,
                 pool_detail_component_1.PoolDetailComponent,
+                pool_edit_component_1.PoolEditComponent,
             ],
             providers: [
                 data_service_1.DataService

@@ -24,7 +24,7 @@ export class DataService {
 
 	getPoolMembers(pool : Pool): Promise<Member[]> {
 		return this.getMembers()
-			.then(members => members.filter(member => member.address === pool.members.find(member => member)));
+			.then(members => members.filter(member => pool.members.find(member2 => member2.address == member.address)));
 	}
 
 	getMembersSlowly(): Promise<Member[]> {
@@ -48,7 +48,19 @@ export class DataService {
 	}
 
 	getPool(id: number): Promise<Pool> {
-		return this.getPools().then(pools => pools.find(pool => pool.id === id));
+		return this.getPools().then(pools => pools.find(pool => pool.id == id));
+	}
+
+	updateMember(member: Member){ //testing method
+		var oldMember = this.members.find(member2 => member2.address==member.address);
+		oldMember.name = member.name;
+	}
+
+	updatePool(pool: Pool){
+		var oldPool = this.pools.find(pool2 => pool2.id == pool.id);
+		oldPool.name = pool.name;
+		oldPool.legalContract = pool.legalContract;
+		oldPool.financialReports = pool.financialReports;
 	}
 
 	init(){

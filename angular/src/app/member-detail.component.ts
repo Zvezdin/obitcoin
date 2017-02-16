@@ -50,7 +50,7 @@ export class MemberDetailComponent implements OnInit {
 		this.pools.forEach(pool => {
 			pool.init();
 			(pool as any).tokensShare = ((pool.tokens[this.member.address]/pool.totalTokens)* 100 ).toFixed(2) + "%";
-			(pool as any).slicesShare = ((pool.slices[this.member.address]/pool.totalSlices)* 100 ).toFixed(2) + "%";;
+			(pool as any).slicesShare = ((pool.slices[this.member.address]/pool.totalSlices)* 100 ).toFixed(2) + "%";
 		});
 	}
 

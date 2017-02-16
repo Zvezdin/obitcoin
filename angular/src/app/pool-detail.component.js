@@ -27,25 +27,24 @@ var PoolDetailComponent = (function () {
             return _this.dataService.getPool(params['id']);
         })
             .subscribe(function (pool) { return (_this.pool = pool,
-            _this.dataService.getMembers().then(function (pools) {
-                _this.pools = pools.filter(function (pool) { return pool.members.find(function (member2) { return member2 == _this.member; }) != undefined; }),
-                    _this.initData();
+            _this.dataService.getPoolMembers(pool).then(function (members) {
+                _this.members = members;
+                _this.initData();
             })); });
     };
     PoolDetailComponent.prototype.initData = function () {
         var _this = this;
-        this.pools.forEach(function (pool) {
-            pool.init();
-            pool.tokensShare = ((pool.tokens[_this.member.address] / pool.totalTokens) * 100).toFixed(2) + "%";
-            pool.slicesShare = ((pool.slices[_this.member.address] / pool.totalSlices) * 100).toFixed(2) + "%";
-            ;
+        this.pool.init();
+        this.members.forEach(function (member) {
+            member.tokens = _this.pool.tokens[member.address] == undefined ? 0 : _this.pool.tokens[member.address];
+            member.slices = _this.pool.slices[member.address] == undefined ? 0 : _this.pool.slices[member.address];
         });
     };
     PoolDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
     };
     PoolDetailComponent.prototype.edit = function () {
-        this.router.navigate(['/edit_member', this.member.address]);
+        this.router.navigate(['/edit_pool', this.pool.id]);
     };
     PoolDetailComponent = __decorate([
         core_1.Component({

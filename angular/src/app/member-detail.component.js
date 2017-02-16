@@ -38,7 +38,6 @@ var MemberDetailComponent = (function () {
             pool.init();
             pool.tokensShare = ((pool.tokens[_this.member.address] / pool.totalTokens) * 100).toFixed(2) + "%";
             pool.slicesShare = ((pool.slices[_this.member.address] / pool.totalSlices) * 100).toFixed(2) + "%";
-            ;
         });
     };
     MemberDetailComponent.prototype.goBack = function () {

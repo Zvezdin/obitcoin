@@ -7,6 +7,7 @@ import { AppComponent }  from './app.component';
 import { MemberEditComponent } from './member-edit.component';
 import { MemberDetailComponent } from './member-detail.component';
 import { PoolDetailComponent } from './pool-detail.component';
+import { PoolEditComponent } from './pool-edit.component';
 import { MembersComponent } from './members.component';
 import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
@@ -17,7 +18,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { MaterialModule } from '@angular/material';
 
-import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
 
 @NgModule({
 	imports: [ 
@@ -27,6 +28,7 @@ import { DataTableModule, SharedModule } from 'primeng/primeng';
 		MaterialModule.forRoot(),
 		DataTableModule,
 		SharedModule,
+		ButtonModule,
 	],
 	declarations: [ 
 		AppComponent,
@@ -37,6 +39,7 @@ import { DataTableModule, SharedModule } from 'primeng/primeng';
 		MemberDetailComponent,
 		PoolsComponent,
 		PoolDetailComponent,
+		PoolEditComponent,
 	],
 	providers: [
 		DataService

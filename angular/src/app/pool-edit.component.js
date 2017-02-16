@@ -12,51 +12,55 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var common_1 = require('@angular/common');
 require('rxjs/add/operator/switchMap');
-var member_1 = require('./member');
+var pool_1 = require('./pool');
 var data_service_1 = require('./data.service');
-var MemberEditComponent = (function () {
-    function MemberEditComponent(dataService, route, location) {
+var PoolEditComponent = (function () {
+    function PoolEditComponent(dataService, route, location) {
         this.dataService = dataService;
         this.route = route;
         this.location = location;
     }
-    MemberEditComponent.prototype.ngOnInit = function () {
+    PoolEditComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.member = new member_1.Member;
-        console.log(this.route);
+        this.pool = new pool_1.Pool();
         this.route.params
             .switchMap(function (params) {
-            return _this.dataService.getMember(params['address']);
+            return _this.dataService.getPool(params['id']);
         })
-            .subscribe(function (member) { return _this.setMember(member); });
+            .subscribe(function (pool) { return _this.setPool(pool); });
     };
-    MemberEditComponent.prototype.setMember = function (member) {
-        this.member.address = member.address;
-        this.member.name = member.name;
+    PoolEditComponent.prototype.setPool = function (pool) {
+        this.pool.id = pool.id;
+        this.pool.name = pool.name;
+        this.pool.legalContract = pool.legalContract;
+        this.pool.financialReports = pool.financialReports;
     };
-    MemberEditComponent.prototype.goBack = function () {
+    PoolEditComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
     };
-    MemberEditComponent.prototype.save = function () {
-        this.member.address = this.member.address.trim();
-        this.member.name = this.member.name.trim();
-        if (this.member.address.length <= 0)
+    PoolEditComponent.prototype.save = function () {
+        this.pool.name = this.pool.name.trim(); //error checking
+        this.pool.legalContract = this.pool.legalContract.trim();
+        this.pool.financialReports = this.pool.financialReports.trim();
+        if (this.pool.name.length <= 0)
             return;
-        if (this.member.name.length <= 0)
+        if (this.pool.legalContract.length <= 0)
             return;
-        this.dataService.updateMember(this.member);
+        if (this.pool.financialReports.length <= 0)
+            return;
+        this.dataService.updatePool(this.pool);
         this.goBack();
     };
-    MemberEditComponent = __decorate([
+    PoolEditComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
-            selector: 'member-edit',
-            templateUrl: './member-edit.component.html',
-            styleUrls: ['./member-edit.component.css'],
+            selector: 'pool-edit',
+            templateUrl: './pool-edit.component.html',
+            styleUrls: ['./pool-edit.component.css'],
         }), 
         __metadata('design:paramtypes', [data_service_1.DataService, router_1.ActivatedRoute, common_1.Location])
-    ], MemberEditComponent);
-    return MemberEditComponent;
+    ], PoolEditComponent);
+    return PoolEditComponent;
 }());
-exports.MemberEditComponent = MemberEditComponent;
-//# sourceMappingURL=member-edit.component.js.map
+exports.PoolEditComponent = PoolEditComponent;
+//# sourceMappingURL=pool-edit.component.js.map

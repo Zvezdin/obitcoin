@@ -26,7 +26,7 @@ var MemberSearchComponent = (function () {
     MemberSearchComponent.prototype.ngOnInit = function () {
     };
     MemberSearchComponent.prototype.gotoDetail = function (member) {
-        var link = ['/detail', member.address];
+        var link = ['/detail_member', member.address];
         this.router.navigate(link);
     };
     MemberSearchComponent = __decorate([

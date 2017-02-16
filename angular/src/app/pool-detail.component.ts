@@ -34,11 +34,11 @@ export class PoolDetailComponent implements OnInit {
 			.switchMap((params: Params) =>
 		this.dataService.getPool(params['id']))
 			.subscribe(pool => ( this.pool=pool,
-
-			this.dataService.getMembers().then(pools => {
-				this.pools = pools.filter( pool => pool.members.find(member2 => member2==this.member) != undefined ),
-				this.initData()
-			})
+			this.dataService.getPoolMembers(pool).then(members => {
+					this.members=members;
+					this.initData();
+				}
+			)
 
 		));
 	}
@@ -47,10 +47,10 @@ export class PoolDetailComponent implements OnInit {
 	totalTokens: number;
 
 	initData(){
-		this.pools.forEach(pool => {
-			pool.init();
-			(pool as any).tokensShare = ((pool.tokens[this.member.address]/pool.totalTokens)* 100 ).toFixed(2) + "%";
-			(pool as any).slicesShare = ((pool.slices[this.member.address]/pool.totalSlices)* 100 ).toFixed(2) + "%";;
+		this.pool.init();
+		this.members.forEach(member => {
+			(member as any).tokens = this.pool.tokens[member.address] == undefined ? 0 : this.pool.tokens[member.address];
+			(member as any).slices = this.pool.slices[member.address] == undefined ? 0 : this.pool.slices[member.address];
 		});
 	}
 
@@ -59,6 +59,6 @@ export class PoolDetailComponent implements OnInit {
 	}
 
     edit(): void {
-        this.router.navigate(['/edit_member', this.member.address]);
+        this.router.navigate(['/edit_pool', this.pool.id]);
     }
 }

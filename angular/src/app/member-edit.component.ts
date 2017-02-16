@@ -25,17 +25,29 @@ export class MemberEditComponent implements OnInit {
 	) {}
 	
 	ngOnInit(): void {
+		this.member = new Member;
+		console.log(this.route);
 		this.route.params
 			.switchMap((params: Params) =>
 		this.dataService.getMember(params['address']))
-			.subscribe(member => this.member = member);
+			.subscribe(member => this.setMember(member));
 	}
 	
+	setMember(member: Member): void {
+		this.member.address = member.address;
+		this.member.name = member.name;
+	}
+
 	goBack(): void {
 		this.location.back(); //problematic, guard against exiting the website
 	}
 
 	save(): void {
+		this.member.address = this.member.address.trim();
+		this.member.name = this.member.name.trim();
+		if(this.member.address.length<=0) return;
+		if(this.member.name.length<=0) return;
+		this.dataService.updateMember(this.member);
 		this.goBack();
 	}
 }

@@ -22,7 +22,7 @@ var DataService = (function () {
     };
     DataService.prototype.getPoolMembers = function (pool) {
         return this.getMembers()
-            .then(function (members) { return members.filter(function (member) { return member.address === pool.members.find(function (member) { return member; }); }); });
+            .then(function (members) { return members.filter(function (member) { return pool.members.find(function (member2) { return member2.address == member.address; }); }); });
     };
     DataService.prototype.getMembersSlowly = function () {
         var _this = this;
@@ -42,7 +42,17 @@ var DataService = (function () {
         return Promise.resolve(this.pools);
     };
     DataService.prototype.getPool = function (id) {
-        return this.getPools().then(function (pools) { return pools.find(function (pool) { return pool.id === id; }); });
+        return this.getPools().then(function (pools) { return pools.find(function (pool) { return pool.id == id; }); });
+    };
+    DataService.prototype.updateMember = function (member) {
+        var oldMember = this.members.find(function (member2) { return member2.address == member.address; });
+        oldMember.name = member.name;
+    };
+    DataService.prototype.updatePool = function (pool) {
+        var oldPool = this.pools.find(function (pool2) { return pool2.id == pool.id; });
+        oldPool.name = pool.name;
+        oldPool.legalContract = pool.legalContract;
+        oldPool.financialReports = pool.financialReports;
     };
     DataService.prototype.init = function () {
         this.members = mock_members_1.MEMBERS;

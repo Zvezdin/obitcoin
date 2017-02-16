@@ -27,7 +27,6 @@ var PoolsComponent = (function () {
         this.getPools();
     };
     PoolsComponent.prototype.onSelect = function (pool) {
-        console.log(pool);
         this.router.navigate(['/detail_pool', pool.id]);
     };
     PoolsComponent = __decorate([

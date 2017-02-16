@@ -34,7 +34,6 @@ export class PoolsComponent implements OnInit {
     }
 	
 	onSelect(pool: Pool): void {
-        console.log(pool);
 		this.router.navigate(['/detail_pool', pool.id]);
     }
 }
