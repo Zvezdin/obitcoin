@@ -8,6 +8,7 @@ import { PoolEditComponent } from './pool-edit.component';
 import { MembersComponent } from './members.component';
 import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
+import { TransactionsComponent } from './transactions.component';
 
 const routes: Routes = [
 	{
@@ -49,6 +50,11 @@ const routes: Routes = [
 	{
 		path: 'edit_pool/:id',
 		component: PoolEditComponent
+	},
+
+	{
+		path: 'transactions',
+		component: TransactionsComponent
 	},
 ];
 

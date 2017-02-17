@@ -1,7 +1,8 @@
 export class Transaction {
-    initiator: string;
     type: string;
     date: string;
+    from: string;
+    to: string;
     pool: number;
     data: string;
 }

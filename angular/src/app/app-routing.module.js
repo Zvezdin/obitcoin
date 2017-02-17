@@ -16,6 +16,7 @@ var pool_detail_component_1 = require('./pool-detail.component');
 var pool_edit_component_1 = require('./pool-edit.component');
 var members_component_1 = require('./members.component');
 var pools_component_1 = require('./pools.component');
+var transactions_component_1 = require('./transactions.component');
 var routes = [
     {
         path: 'members',
@@ -49,6 +50,10 @@ var routes = [
     {
         path: 'edit_pool/:id',
         component: pool_edit_component_1.PoolEditComponent
+    },
+    {
+        path: 'transactions',
+        component: transactions_component_1.TransactionsComponent
     },
 ];
 var AppRoutingModule = (function () {

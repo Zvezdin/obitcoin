@@ -12,13 +12,14 @@ import { MembersComponent } from './members.component';
 import { PoolsComponent } from './pools.component';
 import { DashboardComponent } from './dashboard.component';
 import { MemberSearchComponent } from './member-search.component';
+import { TransactionsComponent } from './transactions.component';
 import { DataService } from './data.service';
 
 import { AppRoutingModule } from './app-routing.module';
 
 import { MaterialModule } from '@angular/material';
 
-import { DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
+import { DropdownModule, DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
 
 @NgModule({
 	imports: [ 
@@ -29,6 +30,7 @@ import { DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
 		DataTableModule,
 		SharedModule,
 		ButtonModule,
+		DropdownModule,
 	],
 	declarations: [ 
 		AppComponent,
@@ -40,6 +42,7 @@ import { DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
 		PoolsComponent,
 		PoolDetailComponent,
 		PoolEditComponent,
+		TransactionsComponent,
 	],
 	providers: [
 		DataService

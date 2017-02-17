@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var mock_members_1 = require('./mock-members');
+var mock_transactions_1 = require('./mock-transactions');
 var mock_pools_1 = require('./mock-pools');
 var DataService = (function () {
     function DataService() {
@@ -44,6 +45,9 @@ var DataService = (function () {
     DataService.prototype.getPool = function (id) {
         return this.getPools().then(function (pools) { return pools.find(function (pool) { return pool.id == id; }); });
     };
+    DataService.prototype.getTransactions = function () {
+        return Promise.resolve(this.transactions);
+    };
     DataService.prototype.updateMember = function (member) {
         var oldMember = this.members.find(function (member2) { return member2.address == member.address; });
         oldMember.name = member.name;
@@ -57,6 +61,7 @@ var DataService = (function () {
     DataService.prototype.init = function () {
         this.members = mock_members_1.MEMBERS;
         this.mockPools = new mock_pools_1.MockPools();
+        this.transactions = mock_transactions_1.TRANSACTIONS;
         this.mockPools.init();
         this.pools = this.mockPools.getPools();
     };

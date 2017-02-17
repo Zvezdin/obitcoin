@@ -20,6 +20,7 @@ var members_component_1 = require('./members.component');
 var pools_component_1 = require('./pools.component');
 var dashboard_component_1 = require('./dashboard.component');
 var member_search_component_1 = require('./member-search.component');
+var transactions_component_1 = require('./transactions.component');
 var data_service_1 = require('./data.service');
 var app_routing_module_1 = require('./app-routing.module');
 var material_1 = require('@angular/material');
@@ -37,6 +38,7 @@ var AppModule = (function () {
                 primeng_1.DataTableModule,
                 primeng_1.SharedModule,
                 primeng_1.ButtonModule,
+                primeng_1.DropdownModule,
             ],
             declarations: [
                 app_component_1.AppComponent,
@@ -48,6 +50,7 @@ var AppModule = (function () {
                 pools_component_1.PoolsComponent,
                 pool_detail_component_1.PoolDetailComponent,
                 pool_edit_component_1.PoolEditComponent,
+                transactions_component_1.TransactionsComponent,
             ],
             providers: [
                 data_service_1.DataService

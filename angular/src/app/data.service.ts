@@ -4,6 +4,7 @@ import { Member } from './member';
 import { Pool } from './pool';
 import { Transaction } from './transaction';
 import { MEMBERS } from './mock-members';
+import { TRANSACTIONS } from './mock-transactions';
 import { MockPools } from './mock-pools';
 
 @Injectable()
@@ -11,7 +12,7 @@ import { MockPools } from './mock-pools';
 export class DataService {
 	members: Member[];
 	pools: Pool[];
-	transactions: Transaction;
+	transactions: Transaction[];
 	mockPools: MockPools;
 
 	getUser(): Promise<Member> {
@@ -51,6 +52,10 @@ export class DataService {
 		return this.getPools().then(pools => pools.find(pool => pool.id == id));
 	}
 
+	getTransactions(): Promise<Transaction[]> {
+		return Promise.resolve(this.transactions);
+	}
+
 	updateMember(member: Member){ //testing method
 		var oldMember = this.members.find(member2 => member2.address==member.address);
 		oldMember.name = member.name;
@@ -66,6 +71,7 @@ export class DataService {
 	init(){
 		this.members=MEMBERS;
 		this.mockPools = new MockPools();
+		this.transactions = TRANSACTIONS;
 		this.mockPools.init();
 		this.pools=this.mockPools.getPools();
 	}

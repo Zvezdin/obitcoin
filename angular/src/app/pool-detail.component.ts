@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { DataTableModule, SharedModule } from 'primeng/primeng';
-
 import 'rxjs/add/operator/switchMap';
 
 import { Member } from './member';
