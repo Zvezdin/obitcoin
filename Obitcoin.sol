@@ -15,22 +15,22 @@ contract Obitcoin{
     DebtPool[] private pools;
     
     //event for any coin transfers happening
-    event CoinsTransfer(address indexed from, address indexed to, uint8 poolIndex, int amount, uint time);
+    event CoinsTransfer(address indexed from, address indexed to, uint8 indexed pool, int amount, uint time);
     
-    event CoinsPurchase(address indexed from, uint8 indexed poolIndex, uint amount, uint time);
+    event CoinsPurchase(address indexed from, uint8 indexed pool, uint amount, uint time);
     
 	//event for the creaition of a pool, containing it's index for later access
-    event PoolCreated(uint8 index, address indexed by, uint time);
+    event PoolCreated(address indexed from, uint8 indexed pool, uint time);
 	
 	//event to notify that someone has tried to access a method that he shouldn't have
-	event UnauthorizedAccess(address from, uint time);
+	event UnauthorizedAccess(address indexed from, uint time);
 	
 	//event to notify the removal or addition of an admin
-	event AdminChanged(address person, bool added, uint time);
+	event AdminChanged(address indexed from, address indexed to, bool added, uint time);
 	
-	//event to notify the removal or addition of a person in a certain debt pool
+	//event to notify the removal or addition of a person
 	//unused as of now
-	event PersonChanged(address person, bool added, uint8 poolIndex, uint time);
+	event PersonChanged(address indexed from, address indexed to, bool added, uint time);
 	
     function Obitcoin(){ //constructor
         owner = msg.sender;
@@ -71,18 +71,18 @@ contract Obitcoin{
     }
     
     function addAdmin(address adminToAdd) public onlyOwner {
-        AdminChanged(adminToAdd, true, now);
+        AdminChanged(msg.sender, adminToAdd, true, now);
         admins[adminToAdd] = true;
     }
     
     function removeAdmin(address adminToRemove) public onlyOwner { //Problematic. Seems to be a bug in solidity (setting a bool to false). Don't use as of now.
-        AdminChanged(adminToRemove, false, now);
+        AdminChanged(msg.sender, adminToRemove, false, now);
         admins[adminToRemove] = false; //the problematic line
     }
     
     function createDebtPool(address[] people) public onlyAdmin {
         pools.push(DebtPool(people));
-		PoolCreated(uint8(pools.length-1), msg.sender, now);
+		PoolCreated(msg.sender, uint8(pools.length-1), now);
     }
     
 	//unable to make a good removal function, putting this on pause for now
@@ -90,6 +90,10 @@ contract Obitcoin{
 		pools[index].people.push(person);
 		pools[index].debt[person] = initialDebt;
 	}*/
+	
+	function getContractAddress() public constant returns (address){
+	    return this;
+	}
 	
 	function getPoolCount() public constant returns (uint){
 		return pools.length;

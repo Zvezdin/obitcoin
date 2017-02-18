@@ -9,11 +9,55 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var transaction_1 = require('./transaction');
 var mock_members_1 = require('./mock-members');
-var mock_transactions_1 = require('./mock-transactions');
 var mock_pools_1 = require('./mock-pools');
 var DataService = (function () {
     function DataService() {
+        var _this = this;
+        this.handleEvent = function (event) {
+            console.log(event.event);
+            var d = new Date(0);
+            d.setUTCSeconds(event.args.time);
+            var transaction = new transaction_1.Transaction();
+            transaction.type = event.event;
+            transaction.date = d.toLocaleString();
+            switch (event.event) {
+                case "PoolCreated":
+                    {
+                        transaction.from = event.args.by;
+                        transaction.pool = event.args.index.valueOf();
+                    }
+                    break;
+                case "CoinsTransfer":
+                    {
+                        transaction.from = event.args.from;
+                        transaction.to = event.args.to;
+                        transaction.pool = event.args.poolIndex;
+                        transaction.data = event.args.amount + " tokens";
+                    }
+                    break;
+                case "CoinsPurchase":
+                    {
+                        transaction.from = event.args.from;
+                        transaction.pool = event.args.poolIndex;
+                        transaction.data = event.args.amount + " tokens";
+                    }
+                    break;
+                case "UnauthorizedAccess":
+                    {
+                        transaction.from = event.args.from;
+                    }
+                    break;
+                case "AdminChanged":
+                    {
+                        transaction.to = event.args.person;
+                        transaction.data = event.args.added ? "Admin added" : "Admin removed";
+                    }
+                    break;
+            }
+            _this.transactions.push(transaction);
+        };
     }
     DataService.prototype.getUser = function () {
         return Promise.resolve(this.members[0]);
@@ -59,11 +103,16 @@ var DataService = (function () {
         oldPool.financialReports = pool.financialReports;
     };
     DataService.prototype.init = function () {
+        this.self = this;
         this.members = mock_members_1.MEMBERS;
         this.mockPools = new mock_pools_1.MockPools();
-        this.transactions = mock_transactions_1.TRANSACTIONS;
+        //this.transactions = TRANSACTIONS;
+        this.transactions = [];
         this.mockPools.init();
         this.pools = this.mockPools.getPools();
+        this.contract = new contract_integration();
+        this.contract.connectToContract("0xa2bfcdb45344c9544c97bfca947092d7e4676f94");
+        this.contract.startListeningForEvents(this.handleEvent);
     };
     DataService = __decorate([
         core_1.Injectable(), 
