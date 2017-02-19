@@ -7,10 +7,10 @@ var Pool = (function () {
         this.totalSlices = 0;
         this.totalTokens = 0;
         this.members.forEach(function (member) {
-            if (_this.slices[member.address] != undefined)
-                _this.totalSlices += _this.slices[member.address];
-            if (_this.tokens[member.address] != undefined)
-                _this.totalTokens += _this.tokens[member.address];
+            if (_this.slices[member.id] != undefined)
+                _this.totalSlices += _this.slices[member.id];
+            if (_this.tokens[member.id] != undefined)
+                _this.totalTokens += _this.tokens[member.id];
         });
         console.log("Total slices for pool " + this.name + " - " + this.totalSlices + " and tokens - " + this.totalTokens);
     };

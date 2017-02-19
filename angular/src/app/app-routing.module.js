@@ -32,11 +32,11 @@ var routes = [
         pathMatch: 'full'
     },
     {
-        path: 'edit_member/:address',
+        path: 'edit_member/:id',
         component: member_edit_component_1.MemberEditComponent
     },
     {
-        path: 'detail_member/:address',
+        path: 'detail_member/:id',
         component: member_detail_component_1.MemberDetailComponent
     },
     {

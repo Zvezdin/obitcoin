@@ -27,7 +27,7 @@ var MembersComponent = (function () {
         this.selectedMember = member;
     };
     MembersComponent.prototype.gotoDetail = function () {
-        this.router.navigate(['/detail_member', this.selectedMember.address]);
+        this.router.navigate(['/detail_member', this.selectedMember.id]);
     };
     MembersComponent = __decorate([
         core_1.Component({

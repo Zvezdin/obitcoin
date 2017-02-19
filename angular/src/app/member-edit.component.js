@@ -23,16 +23,17 @@ var MemberEditComponent = (function () {
     MemberEditComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.member = new member_1.Member;
-        console.log(this.route);
         this.route.params
             .switchMap(function (params) {
-            return _this.dataService.getMember(params['address']);
+            return _this.dataService.getMember(params['id']);
         })
             .subscribe(function (member) { return _this.setMember(member); });
     };
     MemberEditComponent.prototype.setMember = function (member) {
         this.member.address = member.address;
         this.member.name = member.name;
+        this.member.id = member.id;
+        this.member.permissionLevel = member.permissionLevel;
     };
     MemberEditComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website

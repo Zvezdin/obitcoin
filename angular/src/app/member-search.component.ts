@@ -29,7 +29,7 @@ export class MemberSearchComponent implements OnInit {
     }
 
     gotoDetail(member: Member): void {
-        let link = ['/detail_member', member.address];
+        let link = ['/detail_member', member.id];
         this.router.navigate(link);
     }
 }

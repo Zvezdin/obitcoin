@@ -36,6 +36,6 @@ export class MembersComponent implements OnInit {
 	}
 	
 	gotoDetail(): void {
-		this.router.navigate(['/detail_member', this.selectedMember.address]);
+		this.router.navigate(['/detail_member', this.selectedMember.id]);
 	}
 }

@@ -34,12 +34,20 @@ export class DataService {
 	}
 
 	getMembers(): Promise<Member[]> {
-		return Promise.resolve(this.members);
+		if(this.members!=undefined) return Promise.resolve(this.members); //return the cached version
+
+		return new Promise(resolve => { //get the data the slow way
+			var self = this;
+			this.contract.getWholeMembers(function(members: any[]){
+				self.members = members;
+				resolve(members);
+			});
+		});
 	}
 
 	getPoolMembers(pool : Pool): Promise<Member[]> {
 		return this.getMembers()
-			.then(members => members.filter(member => pool.members.find(member2 => member2.address == member.address)));
+			.then(members => members.filter(member => pool.members.find(member2 => member2.id == member.id)));
 	}
 
 	getMembersSlowly(): Promise<Member[]> {
@@ -48,9 +56,10 @@ export class DataService {
 		});
 	}
 	
-	getMember(address: string): Promise<Member> {
+	getMember(id: number): Promise<Member> {
+		console.log("Getting member with id "+id);
 		return this.getMembers()
-			.then(members => members.find(member => member.address === address));
+			.then(members => members.find(member => member.id == id));
 	}
 
 	search(term: string): Promise<Member[]> {
@@ -71,8 +80,9 @@ export class DataService {
 	}
 
 	updateMember(member: Member){ //testing method
-		var oldMember = this.members.find(member2 => member2.address==member.address);
+		var oldMember = this.members.find(member2 => member2.id==member.id);
 		oldMember.name = member.name;
+		oldMember.address = member.address;
 	}
 
 	updatePool(pool: Pool){
@@ -84,17 +94,56 @@ export class DataService {
 
 	init(){
 		this.self = this;
-		this.members=MEMBERS;
 		this.mockPools = new MockPools();
 		//this.transactions = TRANSACTIONS;
 		this.transactions = [];
 		this.mockPools.init();
-		this.pools=this.mockPools.getPools();
+		//this.pools=this.mockPools.getPools();
 
 		this.contract = new contract_integration();
 
-		this.contract.connectToContract("0xa2bfcdb45344c9544c97bfca947092d7e4676f94");
+		this.contract.connectToContract("0xad2b2b39f0e1048ebee657bba379011cbe5523f5");
 		this.contract.startListeningForEvents(this.handleEvent);
+
+		/*this.contract.getPools();
+		this.contract.getPoolData(1);
+		this.contract.getPoolParticipants(1);
+		this.contract.getMemberBalance(1,1);
+		this.contract.getWhileMembers();
+		this.contract.getMemberName(1);
+		this.contract.getMemberAddress(1);
+		this.contract.getMemberPermLevel(1);*/
+		
+		//this.contract.getWholeMembers(this.handleMembers);
+		this.contract.getWholePools(this.handlePools);
+	}
+
+	handlePools = (pools: any[]) => {
+		var self = this;
+		this.pools = [];
+		pools.forEach(pool => {
+			var newPool = new Pool();
+			newPool.id = pool.id;
+			newPool.financialReports = pool.financialReports;
+			newPool.legalContract = pool.legalContract;
+			newPool.name = pool.name;
+			newPool.slices = pool.slices;
+			newPool.tokens = pool.tokens;
+			newPool.members = [];
+
+			var members = pool.members;
+			members.forEach(function(id: number){
+				self.getMember(id).then(function(member: Member){
+					newPool.members.push(member);
+				});
+			});
+
+			self.pools.push(newPool);
+		});
+	}
+
+	handleMembers = (members: any[]) => {
+		this.members=members;
 	}
 
 	handleEvent = (event: any) => {
@@ -107,27 +156,26 @@ export class DataService {
 		transaction.type = event.event;
 		transaction.date = d.toLocaleString();
 
+		transaction.from = event.args.from;
+
 		switch(event.event){
 			case "PoolCreated": {
-				transaction.from = event.args.by;
-				transaction.pool = event.args.index.valueOf();
+				transaction.pool = event.args.pool;
 			} break;
 
 			case "CoinsTransfer": {
-				transaction.from = event.args.from;
 				transaction.to = event.args.to;
-				transaction.pool = event.args.poolIndex;
+				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 			} break;
 
 			case "CoinsPurchase": {
-				transaction.from = event.args.from;
-				transaction.pool = event.args.poolIndex;
+				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 			} break;
 
 			case "UnauthorizedAccess": {
-				transaction.from = event.args.from;
+				transaction.data = "from address: "+event.args.fromAddress;
 			} break;
 
 			case "AdminChanged": {

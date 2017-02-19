@@ -24,7 +24,7 @@ var MemberDetailComponent = (function () {
         var _this = this;
         this.route.params
             .switchMap(function (params) {
-            return _this.dataService.getMember(params['address']);
+            return _this.dataService.getMember(params['id']);
         })
             .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member,
             _this.dataService.getPools().then(function (pools) {
@@ -36,15 +36,15 @@ var MemberDetailComponent = (function () {
         var _this = this;
         this.pools.forEach(function (pool) {
             pool.init();
-            pool.tokensShare = ((pool.tokens[_this.member.address] / pool.totalTokens) * 100).toFixed(2) + "%";
-            pool.slicesShare = ((pool.slices[_this.member.address] / pool.totalSlices) * 100).toFixed(2) + "%";
+            pool.tokensShare = ((pool.tokens[_this.member.id] / pool.totalTokens) * 100).toFixed(2) + "%";
+            pool.slicesShare = ((pool.slices[_this.member.id] / pool.totalSlices) * 100).toFixed(2) + "%";
         });
     };
     MemberDetailComponent.prototype.goBack = function () {
         this.location.back(); //problematic, guard against exiting the website
     };
     MemberDetailComponent.prototype.edit = function () {
-        this.router.navigate(['/edit_member', this.member.address]);
+        this.router.navigate(['/edit_member', this.member.id]);
     };
     MemberDetailComponent = __decorate([
         core_1.Component({

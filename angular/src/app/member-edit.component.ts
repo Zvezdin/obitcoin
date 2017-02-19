@@ -26,16 +26,17 @@ export class MemberEditComponent implements OnInit {
 	
 	ngOnInit(): void {
 		this.member = new Member;
-		console.log(this.route);
 		this.route.params
 			.switchMap((params: Params) =>
-		this.dataService.getMember(params['address']))
+		this.dataService.getMember(params['id']))
 			.subscribe(member => this.setMember(member));
 	}
 	
 	setMember(member: Member): void {
 		this.member.address = member.address;
 		this.member.name = member.name;
+		this.member.id = member.id;
+		this.member.permissionLevel = member.permissionLevel;
 	}
 
 	goBack(): void {

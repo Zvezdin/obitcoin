@@ -28,12 +28,12 @@ const routes: Routes = [
 	},
 	
 	{
-		path: 'edit_member/:address',
+		path: 'edit_member/:id',
 		component: MemberEditComponent
 	},
 
 	{
-		path: 'detail_member/:address',
+		path: 'detail_member/:id',
 		component: MemberDetailComponent
 	},
 

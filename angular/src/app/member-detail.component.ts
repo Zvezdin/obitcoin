@@ -32,7 +32,7 @@ export class MemberDetailComponent implements OnInit {
 	ngOnInit(): void {
 		this.route.params
 			.switchMap((params: Params) =>
-		this.dataService.getMember(params['address']))
+		this.dataService.getMember(params['id']))
 			.subscribe(member => ( member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member,
 
 			this.dataService.getPools().then(pools => {
@@ -49,8 +49,8 @@ export class MemberDetailComponent implements OnInit {
 	initData(){
 		this.pools.forEach(pool => {
 			pool.init();
-			(pool as any).tokensShare = ((pool.tokens[this.member.address]/pool.totalTokens)* 100 ).toFixed(2) + "%";
-			(pool as any).slicesShare = ((pool.slices[this.member.address]/pool.totalSlices)* 100 ).toFixed(2) + "%";
+			(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";
+			(pool as any).slicesShare = ((pool.slices[this.member.id]/pool.totalSlices)* 100 ).toFixed(2) + "%";
 		});
 	}
 
@@ -59,6 +59,6 @@ export class MemberDetailComponent implements OnInit {
 	}
 
     edit(): void {
-        this.router.navigate(['/edit_member', this.member.address]);
+        this.router.navigate(['/edit_member', this.member.id]);
     }
 }
