@@ -36,7 +36,9 @@ export class MemberDetailComponent implements OnInit {
 			.subscribe(member => ( member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member,
 
 			this.dataService.getPools().then(pools => {
-				this.pools = pools.filter( pool => pool.members.find(member2 => member2==this.member) != undefined ),
+				console.log(pools[0].members[0]);
+				console.log(this.member);
+				this.pools = pools.filter( pool => pool.members.find(member2 => member2.id==this.member.id) != undefined ),
 				this.initData()
 			})
 
