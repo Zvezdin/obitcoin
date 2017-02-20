@@ -28,7 +28,9 @@ var MemberDetailComponent = (function () {
         })
             .subscribe(function (member) { return (member == undefined ? _this.dataService.getUser().then(function (member) { return _this.member = member; }) : _this.member = member,
             _this.dataService.getPools().then(function (pools) {
-                _this.pools = pools.filter(function (pool) { return pool.members.find(function (member2) { return member2 == _this.member; }) != undefined; }),
+                console.log(pools[0].members[0]);
+                console.log(_this.member);
+                _this.pools = pools.filter(function (pool) { return pool.members.find(function (member2) { return member2.id == _this.member.id; }) != undefined; }),
                     _this.initData();
             })); });
     };

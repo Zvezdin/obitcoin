@@ -67,8 +67,35 @@ export class DataService {
 			.then(members => members.filter(member => member.name.includes(term)));
 	}
 
-	getPools(): Promise<Pool[]> {
-		return Promise.resolve(this.pools);
+	getPools (): Promise<Pool[]> {
+		if(this.pools!=undefined) return Promise.resolve(this.pools);
+		var self = this;
+
+		return new Promise(resolve => {
+			this.contract.getWholePools(function(pools: any[]){
+				self.pools = [];
+				pools.forEach(pool => {
+					var newPool = new Pool();
+					newPool.id = pool.id;
+					newPool.financialReports = pool.financialReports;
+					newPool.legalContract = pool.legalContract;
+					newPool.name = pool.name;
+					newPool.slices = pool.slices;
+					newPool.tokens = pool.tokens;
+					newPool.members = [];
+
+					var members = pool.members;
+					members.forEach(function(id: number){
+						self.getMember(id).then(function(member: Member){
+							newPool.members.push(member);
+						});
+					});
+
+					self.pools.push(newPool);
+				});
+				resolve(self.pools);
+			});
+		});
 	}
 
 	getPool(id: number): Promise<Pool> {
@@ -115,10 +142,10 @@ export class DataService {
 		this.contract.getMemberPermLevel(1);*/
 		
 		//this.contract.getWholeMembers(this.handleMembers);
-		this.contract.getWholePools(this.handlePools);
+		//this.contract.getWholePools(this.handlePools);
 	}
 
-	handlePools = (pools: any[]) => {
+	handlePools = (pools: any[], callback: any) => {
 		var self = this;
 		this.pools = [];
 		pools.forEach(pool => {
@@ -140,6 +167,8 @@ export class DataService {
 
 			self.pools.push(newPool);
 		});
+
+		callback(this.pools);
 	}
 
 	handleMembers = (members: any[]) => {

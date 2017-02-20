@@ -15,7 +15,7 @@ var mock_pools_1 = require('./mock-pools');
 var DataService = (function () {
     function DataService() {
         var _this = this;
-        this.handlePools = function (pools) {
+        this.handlePools = function (pools, callback) {
             var self = _this;
             _this.pools = [];
             pools.forEach(function (pool) {
@@ -35,6 +35,7 @@ var DataService = (function () {
                 });
                 self.pools.push(newPool);
             });
+            callback(_this.pools);
         };
         this.handleMembers = function (members) {
             _this.members = members;
@@ -116,7 +117,33 @@ var DataService = (function () {
             .then(function (members) { return members.filter(function (member) { return member.name.includes(term); }); });
     };
     DataService.prototype.getPools = function () {
-        return Promise.resolve(this.pools);
+        var _this = this;
+        if (this.pools != undefined)
+            return Promise.resolve(this.pools);
+        var self = this;
+        return new Promise(function (resolve) {
+            _this.contract.getWholePools(function (pools) {
+                self.pools = [];
+                pools.forEach(function (pool) {
+                    var newPool = new pool_1.Pool();
+                    newPool.id = pool.id;
+                    newPool.financialReports = pool.financialReports;
+                    newPool.legalContract = pool.legalContract;
+                    newPool.name = pool.name;
+                    newPool.slices = pool.slices;
+                    newPool.tokens = pool.tokens;
+                    newPool.members = [];
+                    var members = pool.members;
+                    members.forEach(function (id) {
+                        self.getMember(id).then(function (member) {
+                            newPool.members.push(member);
+                        });
+                    });
+                    self.pools.push(newPool);
+                });
+                resolve(self.pools);
+            });
+        });
     };
     DataService.prototype.getPool = function (id) {
         return this.getPools().then(function (pools) { return pools.find(function (pool) { return pool.id == id; }); });
@@ -154,7 +181,7 @@ var DataService = (function () {
         this.contract.getMemberAddress(1);
         this.contract.getMemberPermLevel(1);*/
         //this.contract.getWholeMembers(this.handleMembers);
-        this.contract.getWholePools(this.handlePools);
+        //this.contract.getWholePools(this.handlePools);
     };
     DataService = __decorate([
         core_1.Injectable(), 
