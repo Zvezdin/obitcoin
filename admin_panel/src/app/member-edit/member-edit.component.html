@@ -1,0 +1,13 @@
+<div *ngIf="member">
+	<h2>Add/edit member</h2>
+	<div>
+		<label>Address: </label>
+		<input [(ngModel)]="member.address" placeholder="address">
+	</div>
+	<div>
+		<label>name: </label>
+		<input [(ngModel)]="member.name" placeholder="name">
+	</div>
+	<button (click)="goBack()">Back</button>
+	<button (click)="save()">Save</button>
+</div>

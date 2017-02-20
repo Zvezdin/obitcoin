@@ -1,0 +1,77 @@
+{
+  "project": {
+    "version": "2.1.0",
+    "name": "Fury"
+  },
+  "apps": [
+    {
+      "root": "src",
+      "outDir": "dist",
+      "assets": [
+        "assets",
+        "favicon.ico"
+      ],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.json",
+      "prefix": "ms",
+      "styles": [
+        "../node_modules/normalize.css/normalize.css",
+        "./app/core/highlightjs/github.css",
+        "../node_modules/nvd3/build/nv.d3.css",
+        "../node_modules/quill/dist/quill.snow.css",
+        "../node_modules/angular-calendar/dist/css/angular-calendar.css",
+        "styles.scss"
+      ],
+      "scripts": [
+        "../node_modules/hammerjs/hammer.js",
+        "../node_modules/sortablejs/Sortable.js",
+        "./app/core/highlightjs/highlight.pack.js",
+        "../node_modules/css-element-queries/src/ResizeSensor.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "files": "src/**/*.ts",
+      "project": "src/tsconfig.json"
+    },
+    {
+      "files": "e2e/**/*.ts",
+      "project": "e2e/tsconfig.json"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "scss",
+    "prefixInterfaces": false,
+    "inline": {
+      "style": false,
+      "template": false
+    },
+    "spec": {
+      "class": false,
+      "component": true,
+      "directive": true,
+      "module": false,
+      "pipe": true,
+      "service": true
+    }
+  }
+}

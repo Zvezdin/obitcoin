@@ -1,0 +1,66 @@
+<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+  <md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+    <md-card-title>Pesho Georgiev</md-card-title>
+    <md-card-content>
+      <p>
+        Contract owner
+      </p>
+    </md-card-content>
+  </md-card>
+
+  <md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+    <md-card-title>Identification</md-card-title>
+    <md-card-content>
+      <p>
+        Address: 0x872ac3b8b2BbA1cdD350Ad16cfF24576De0a6226
+      </p>
+      <p>
+        ID: 3
+      </p>
+    </md-card-content>
+  </md-card>
+
+  <md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+    <md-card-title>Experience</md-card-title>
+    <md-card-content>
+      <p>
+        Member since: 23.2.2017
+        </p>
+        <p>
+        Total tokens: 372
+        </p>
+        <p>
+        Total slices: 4486
+      </p>
+    </md-card-content>
+  </md-card>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutWrap="wrap">
+  <div fixFlex>
+
+<table fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="table" [class.table-hover]="true" [class.table-striped]="true" [class.table-condensed]="false" [class.table-bordered]="false">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Name</th>
+    <th>Company</th>
+    <th>E-Mail</th>
+    <th>Phone</th>
+    <th>Balance</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let row of rows">
+    <td class="avatar-cell"><img class="avatar" [src]="row.picture"></td>
+    <td>{{ row.name.first }} {{ row.name.last }}</td>
+    <td>{{ row.company }}</td>
+    <td>{{ row.email }}</td>
+    <td>{{ row.phone }}</td>
+    <td>{{ row.balance }}</td>
+  </tr>
+  </tbody>
+</table>
+
+</div>
+</div>

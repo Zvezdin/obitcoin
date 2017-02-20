@@ -1,0 +1,13 @@
+<h2>Pools</h2>
+
+<p-dataTable [value]="pools">
+    <p-column field="name" [sortable]="true" header="Name"></p-column>
+    <p-column field="members.length" [sortable]="true" header="Member count"></p-column>
+    <p-column field="totalTokens" [sortable]="true" header="Token count"></p-column>
+    <p-column field="totalSlices" [sortable]="true" header="Slice count"></p-column>
+    <p-column>
+        <template let-pool="rowData" pTemplate="body">
+            <button md-button (click) = onSelect(pool)>></button>
+        </template>
+    </p-column>
+</p-dataTable>
