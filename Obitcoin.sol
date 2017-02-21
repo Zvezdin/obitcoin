@@ -32,13 +32,17 @@ contract Obitcoin{
     uint16 memberCounter;
     uint16 poolCounter;
     
-    //event for any coin transfers happening
-    event CoinsTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time);
+    uint32 firstBlockNumber;
     
-    event CoinsPurchase(uint16 indexed from, uint16 indexed pool, uint128 amount, uint time);
+    //event for any coin transfers happening
+    event TokenTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time); //int256 because we can both remove and add tokens
+    
+    event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time); //int128 because we can only add slices
+    
+    event TokenPurchase(uint16 indexed from, uint16 indexed pool, uint128 amount, uint time);
     
 	//event for the creaition of a pool, containing it's index for later access
-    event PoolCreated(uint16 indexed from, uint16 indexed pool, uint time);
+    event PoolChanged(uint16 indexed from, uint16 indexed pool, bool added, uint time);
 	
 	//event to notify that someone has tried to access a method that he shouldn't have
 	event UnauthorizedAccess(uint16 indexed from, address indexed fromAddress, uint time);
@@ -53,6 +57,8 @@ contract Obitcoin{
     function Obitcoin(){ //constructor
         owner = msg.sender;
         
+        firstBlockNumber = uint32 (block.number);
+        
         memberCounter=1;
         poolCounter=1;
         
@@ -65,7 +71,7 @@ contract Obitcoin{
     
     
     modifier onlyOwner { //only the owner is allowed to call the function
-        if (msg.sender != owner){
+        if (members[memberAddresses[msg.sender]].permLevel != PermLevel.owner){
 			UnauthorizedAccess(memberAddresses[msg.sender], msg.sender, now);
             return;
 		}
@@ -103,11 +109,29 @@ contract Obitcoin{
         members[memberCounter] = Member(name, adr, isAdmin ? PermLevel.admin : PermLevel.member, true);
         memberAddresses[adr] = memberCounter;
         memberIds.push(memberCounter);
+        
+        PersonChanged(memberAddresses[msg.sender], memberCounter, true, now);
+        
         memberCounter++;
+    }
+    
+    function updateMember(uint16 member, bytes32 name, address adr, bool isAdmin) public onlyAdmin {
+        if(!members[member].exists) throw;
+        if(members[member].permLevel == PermLevel.owner) throw; //the owner should stay untouched
+        
+        memberAddresses[members[member].adr] = 0;
+        memberAddresses[adr] = member;
+        
+        members[member].name = name;
+        members[member].adr = adr;
+        members[member].permLevel = isAdmin ? PermLevel.admin : PermLevel.member;
+        
+        PersonChanged(memberAddresses[msg.sender], member, false, now);
     }
     
     function setAdmin(uint16 id, bool admin) public onlyOwner {
         if(!members[id].exists) throw;
+        if(members[id].permLevel == PermLevel.owner) throw; //shouldn't let the owner be changed
         
         members[id].permLevel = admin ? PermLevel.admin : PermLevel.member;
         
@@ -115,18 +139,27 @@ contract Obitcoin{
     }
     
     function createDebtPool(bytes16 name, bytes16 legalContract, bytes16 financialReports) public onlyAdmin {
-        Pool memory p; //do it the other way
+        Pool p = pools[poolCounter];
         p.name = name;
         p.legalContract = legalContract;
         p.financialReports = financialReports;
         p.exists = true;
-        pools[poolCounter] = p;
         poolIds.push(poolCounter);
         
         
-		PoolCreated(memberAddresses[msg.sender], poolCounter, now);
+		PoolChanged(memberAddresses[msg.sender], poolCounter, true, now);
 		
 		poolCounter++;
+    }
+    
+    function updateDebtPool(uint16 pool, bytes16 name, bytes16 legalContract, bytes16 financialReports) public onlyAdmin {
+        if(!pools[pool].exists) throw;
+        
+        pools[pool].name = name;
+        pools[pool].legalContract = legalContract;
+        pools[pool].financialReports = financialReports;
+        
+        PoolChanged(memberAddresses[msg.sender], pool, false, now);
     }
     
 	//unable to make a good removal function, putting this on pause for now
@@ -137,6 +170,10 @@ contract Obitcoin{
 	
 	function getContractAddress() public constant returns (address){
 	    return this;
+	}
+	
+	function getPublishingBlockNumber() public constant returns (uint32){
+	    return firstBlockNumber;
 	}
 	
 	function getPoolCount() public constant returns (uint){
@@ -158,16 +195,28 @@ contract Obitcoin{
         return pools[pool].members;
     }
     
-    function getPersonBalance(uint16 pool, uint16 member) public constant returns (uint128[2]) {
+    function getMemberBalance(uint16 pool, uint16 member) public constant returns (uint128[2]) {
         if(!pools[pool].exists || !members[member].exists) throw;
         return pools[pool].balance[member];
+    }
+    
+    function getMembersBalance(uint16 pool) public constant returns (uint128[2][], uint16[]) {
+        if(!pools[pool].exists) throw;
+        
+        uint128[2][] memory balances = new uint128[2][](pools[pool].members.length);
+        
+        for(uint16 i=0; i<pools[pool].members.length; i++){
+            balances[i] = pools[pool].balance[pools[pool].members[i]];
+        }
+        
+        return (balances, pools[pool].members);
     }
     
     function getMembers() public constant returns (uint16[]){
         return memberIds;
     }
     
-    function getMemberName(uint16 member) public constant returns (bytes32){
+    /*function getMemberName(uint16 member) public constant returns (bytes32){
         if(!members[member].exists) throw;
         
         return members[member].name;
@@ -184,6 +233,13 @@ contract Obitcoin{
         
         return members[member].permLevel;
     }
+    */
+    
+    function getMemberDetails(uint16 member) public constant returns (bytes32, address, PermLevel){
+        if(!members[member].exists) throw;
+        
+        return (members[member].name, members[member].adr, members[member].permLevel);
+    }
     
     function sendCoins(uint16 pool, uint16 member, uint128 amount) public onlyAdmin {
         if(amount == 0 || !pools[pool].exists || !members[member].exists) throw;
@@ -194,7 +250,7 @@ contract Obitcoin{
         
         pools[pool].balance[member][0] += amount;
         
-        CoinsTransfer(memberAddresses[msg.sender], member, pool, int256 (amount), now); //Log the transaction
+        TokenTransfer(memberAddresses[msg.sender], member, pool, int256 (amount), now); //Log the transaction
     }
     
 	//track earned points overtime, if exess coins transferred, split them based on the total points.
@@ -219,6 +275,9 @@ contract Obitcoin{
 		uint128 slices;
 		uint128 value;
 		
+	    uint128[] memory slicesToApply = new uint128[](pools[pool].members.length);
+		//int256[] memory tokensToApply = new int256[](pools[pool].members.length);
+		
 		if(tokenSum>0){
 			for(i=0; i<pools[pool].members.length; i++){
 			    member = pools[pool].members[i];
@@ -231,20 +290,20 @@ contract Obitcoin{
 				
 				
 				if(debt-value>debt){ //if we're sending more than the token count of the person
-					CoinsTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
+					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
 					totalSent+=debt;
 					slices +=debt;
-					debt = 0; //TODO do something with the extra value
+					debt = 0; //only clear the debt of the person, nothing else.
 				}
 				else{
-					CoinsTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
+					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
 					debt -= value;
 					slices += value;
 					totalSent+=value;
 				}
 				
 				pools[pool].balance[member][0] = debt;
-				pools[pool].balance[member][1] = slices;
+				slicesToApply[i] = slices;
 				sliceSum += slices;
 			}
 		}
@@ -259,10 +318,13 @@ contract Obitcoin{
     				
     				
     				slices+=value;
+    				
     				totalSent+=value;
     				
 
-    				pools[pool].balance[member][1] = slices;
+    				slicesToApply[i] = slices;
+    				
+    				//SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
     			}
     		}
     		else {
@@ -279,10 +341,16 @@ contract Obitcoin{
 		        pools[pool].balance[member][0]=0;
 		    }
 		    
-		    pools[pool].balance[member][1]+=(amount-totalSent);
+		    slicesToApply[pools[pool].members.length-1]+=(amount-totalSent);
+		}
+		
+		for(i=0; i<pools[pool].members.length; i++){
+		    SliceTransfer(memberAddresses[msg.sender], pools[pool].members[i], pool, slicesToApply[i]-pools[pool].balance[pools[pool].members[i]][1], now);
+		    
+		    pools[pool].balance[pools[pool].members[i]][1] = slicesToApply[i];
 		}
 		
 		if(totalSent>amount) throw; //theorertically impossible
-		CoinsPurchase(memberAddresses[msg.sender], pool, totalSent, now);
+		TokenPurchase(memberAddresses[msg.sender], pool, totalSent, now);
     }
 }
