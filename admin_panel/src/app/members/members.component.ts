@@ -11,12 +11,11 @@ import { DataService } from '../data.service';
 	selector: 'members',
 	templateUrl: './members.component.html',
 	
-	styleUrls: ['./members.component.css'],
+	styleUrls: ['./members.component.scss'],
 })
 
 export class MembersComponent implements OnInit {
 	members: Member[];
-	selectedMember: Member;
 	
 	constructor(
 		private dataService: DataService,
@@ -31,11 +30,7 @@ export class MembersComponent implements OnInit {
 		this.getMembers();
 	}
 	
-	onSelect(member: Member): void {
-		this.selectedMember = member;
-	}
-	
-	gotoDetail(): void {
-		this.router.navigate(['/detail_member', this.selectedMember.id]);
+	gotoDetail(member: Member): void {
+		this.router.navigate(['/detail_member', member.id]);
 	}
 }

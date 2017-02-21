@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
+import { fadeInAnimation } from '../route.animation';
 
 import 'rxjs/add/operator/switchMap';
 
@@ -12,12 +13,18 @@ import { DataService } from '../data.service';
 	selector: 'pool-edit',
 	
 	templateUrl: './pool-edit.component.html',
-	styleUrls: ['./pool-edit.component.css'],
+	styleUrls: ['./pool-edit.component.scss'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class PoolEditComponent implements OnInit {
 	pool: Pool;
-	
+	title: string;
+
 	constructor(
 		private dataService: DataService,
 		private route: ActivatedRoute,
@@ -38,6 +45,7 @@ export class PoolEditComponent implements OnInit {
         this.pool.name = pool.name;
         this.pool.legalContract = pool.legalContract;
         this.pool.financialReports = pool.financialReports;
+		this.title = pool.name;
     }
 
 	goBack(): void {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import {fadeInAnimation} from "../route.animation";
 
 import 'rxjs/add/operator/switchMap';
 
@@ -13,7 +14,12 @@ import { DataService } from '../data.service';
 	selector: 'pool-detail',
 	
 	templateUrl: './pool-detail.component.html',
-	styleUrls: ['./pool-detail.component.css'],
+	styleUrls: ['./pool-detail.component.scss'],
+
+	host: {
+		'[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class PoolDetailComponent implements OnInit {

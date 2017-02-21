@@ -37,7 +37,8 @@ class contract_integration{
 	}
 
 	deployNewContract() {
-		
+		while(!web3);
+
 		var obitcoinContract = web3.eth.contract(this.contractAbi);
 		this.Obitcoin = obitcoinContract.new(
 		{
@@ -55,7 +56,8 @@ class contract_integration{
 	}
 
 	connectToContract(address) {
-		
+		while(!web3);
+
 		var obitcoinContract = web3.eth.contract(this.contractAbi);
 		
 		this.Obitcoin = obitcoinContract.at(address);

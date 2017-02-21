@@ -1,17 +1,41 @@
-<div *ngIf="pool">
-	<h2>Edit {{pool.name}}</h2>
-	<div>
-		<label>Name: </label>
-		<input [(ngModel)]="pool.name" placeholder="name">
+<div class="pool-container" fxLayout="column" fxLayoutAlign="start stretch">
+	<div *ngIf="pool">
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<md-card>
+				<md-card-title>{{title}}</md-card-title>
+				<md-card-content>
+					<div fxLayout="column">
+						<md-input-container fxFlex>
+							<input md-input
+							placeholder="Name"
+							maxlength="16"
+							[(ngModel)]="pool.name">
+							<md-hint align="end">max 16 chars</md-hint>
+						</md-input-container>
+
+						<md-input-container fxFlex>
+							<input md-input
+							placeholder="Legal contract"
+							maxlength="16"
+							[(ngModel)]="pool.legalContract">
+							<md-hint align="end">max 16 chars</md-hint>
+						</md-input-container>
+
+						<md-input-container fxFlex>
+							<input md-input
+							placeholder="Financial reports"
+							maxlength="16"
+							[(ngModel)]="pool.financialReports">
+							<md-hint align="end">max 16 chars</md-hint>
+						</md-input-container>
+					</div>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<button md-raised-button (click)="goBack()">Back</button>
+			<button md-raised-button color="primary" (click)="save()">Save</button>
+		</div>
 	</div>
-	<div>
-		<label>Legal contract: </label>
-		<input [(ngModel)]="pool.legalContract" placeholder="URL">
-	</div>
-    <div>
-		<label>Financial reports: </label>
-		<input [(ngModel)]="pool.financialReports" placeholder="URL">
-	</div>
-	<button (click)="goBack()">Back</button>
-	<button (click)="save()">Save</button>
 </div>

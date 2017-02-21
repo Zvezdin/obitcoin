@@ -13,7 +13,7 @@ import { SelectItem} from 'primeng/primeng';
 	selector: 'transactions',
 	templateUrl: './transactions.component.html',
 	
-	styleUrls: ['./transactions.component.css'],
+	styleUrls: ['./transactions.component.scss'],
 })
 
 export class TransactionsComponent implements OnInit {

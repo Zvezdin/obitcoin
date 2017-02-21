@@ -1,14 +1,16 @@
-<h2>Transactions</h2>
+<div class="transactions-container" fxLayout="column" fxLayoutAlign="start stretch">
+    <h2>Transactions</h2>
 
-<p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [globalFilter]="gb" #dt>
-    <p-column field="type" [sortable]="true" header="Type"></p-column>
-    <p-column field="date" [sortable]="true" header="Date"></p-column>
-    <p-column field="from" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Initiator"></p-column>
-    <p-column field="to" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Receiver"></p-column>
-    <p-column field="poolName" [sortable]="false" [filter]="true" [style]="{'overflow':'visible'}" filterMatchMode="equals" header="Pool">
-        <template pTemplate="filter" let-col>
-            <p-dropdown [options]="pools" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value,col.field,col.filterMatchMode)" styleClass="ui-column-filter"></p-dropdown>
-        </template>
-    </p-column>
-    <p-column field="data" [sortable]="true" header="Data"></p-column>
-</p-dataTable>
+    <p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [globalFilter]="gb" #dt>
+        <p-column field="type" [sortable]="true" header="Type"></p-column>
+        <p-column field="date" [sortable]="true" header="Date"></p-column>
+        <p-column field="from" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Initiator"></p-column>
+        <p-column field="to" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Receiver"></p-column>
+        <p-column field="poolName" [sortable]="false" [filter]="true" [style]="{'overflow':'visible'}" filterMatchMode="equals" header="Pool">
+            <template pTemplate="filter" let-col>
+                <p-dropdown [options]="pools" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value,col.field,col.filterMatchMode)" styleClass="ui-column-filter"></p-dropdown>
+            </template>
+        </p-column>
+        <p-column field="data" [sortable]="true" header="Data"></p-column>
+    </p-dataTable>
+</div>

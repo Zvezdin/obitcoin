@@ -1,18 +1,17 @@
-<h2>Members</h2>
+<div class="member-container" fxLayout="column" fxLayoutAlign="start stretch">
 
-<member-search></member-search>
+	<h2>Members</h2>
 
-<ul class="members">
-	<li *ngFor="let member of members"
-		[class.selected]="member === selectedMember"
-		(click)="onSelect(member)">
-		<span class="memberName">{{member.name}}</span> {{member.memberSince}}
-	</li>
-</ul>
-
-<div *ngIf="selectedMember">
-	<h2>
-		Selected {{selectedMember.name | uppercase}}
-	</h2>
-	<button (click)="gotoDetail()">View Details</button>
+		<p-dataTable [value]="members">
+			<p-column field="name" [sortable]="true" header="Name"></p-column>
+			<p-column field="address" [sortable]="true" header="Address" [style]="{'width':'500px'}"></p-column>
+			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
+			<p-column field="tokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
+			<p-column field="slices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
+			<p-column>
+				<template let-member="rowData" pTemplate="body">
+					<button md-raised-button (click) = gotoDetail(member)>Details</button>
+				</template>
+        	</p-column>
+		</p-dataTable>
 </div>

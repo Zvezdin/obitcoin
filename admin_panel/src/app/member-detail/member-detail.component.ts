@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { fadeInAnimation } from '../route.animation';
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 
@@ -15,7 +16,12 @@ import { DataService } from '../data.service';
 	selector: 'member-detail',
 	
 	templateUrl: './member-detail.component.html',
-	styleUrls: ['./member-detail.component.css'],
+	styleUrls: ['./member-detail.component.scss'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class MemberDetailComponent implements OnInit {

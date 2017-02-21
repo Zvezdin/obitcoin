@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
+import { fadeInAnimation } from '../route.animation';
 
 import 'rxjs/add/operator/switchMap';
 
@@ -13,11 +14,18 @@ import { DataService } from '../data.service';
 	
 	templateUrl: './member-edit.component.html',
 	styleUrls: ['./member-edit.component.css'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class MemberEditComponent implements OnInit {
 	member: Member;
-	
+	memberAddress: string;
+	title: string;
+
 	constructor(
 		private dataService: DataService,
 		private route: ActivatedRoute,
@@ -33,13 +41,21 @@ export class MemberEditComponent implements OnInit {
 	}
 	
 	setMember(member: Member): void {
-		this.member.address = member.address;
-		this.member.name = member.name;
-		this.member.id = member.id;
-		this.member.permissionLevel = member.permissionLevel;
+		console.log(member.name.length);
+		if(member!=undefined){
+			this.member.address = member.address;
+			this.member.name = member.name;
+			this.member.id = member.id;
+			this.member.permissionLevel = member.permissionLevel;
+			this.title = member.name;
+		} else{
+			this.member.permissionLevel = 1;
+			this.title = "Add member";
+		}
 	}
 
 	goBack(): void {
+		console.log(this.memberAddress);
 		this.location.back(); //problematic, guard against exiting the website
 	}
 

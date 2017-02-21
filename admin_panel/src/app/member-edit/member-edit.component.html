@@ -1,13 +1,33 @@
-<div *ngIf="member">
-	<h2>Add/edit member</h2>
-	<div>
-		<label>Address: </label>
-		<input [(ngModel)]="member.address" placeholder="address">
+<div class="member-container" fxLayout="column" fxLayoutAlign="start stretch">
+	<div *ngIf="member">
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<md-card>
+				<md-card-title>{{title}}</md-card-title>
+				<md-card-content>
+					<div fxLayout="column">
+						<md-input-container fxFlex>
+							<input md-input
+							placeholder="Name"
+							maxlength="32"
+							[(ngModel)]="member.name">
+							<md-hint align="end">max 32 chars</md-hint>
+						</md-input-container>
+
+						<md-input-container fxFlex>
+							<input md-input
+							placeholder="Address"
+							maxlength="32"
+							[(ngModel)]="member.address">
+							<md-hint align="end">It is critical to input the correct address!</md-hint>
+						</md-input-container>
+					</div>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<button md-raised-button (click)="goBack()">Back</button>
+			<button md-raised-button color="primary" (click)="save()">Save</button>
+		</div>
 	</div>
-	<div>
-		<label>name: </label>
-		<input [(ngModel)]="member.name" placeholder="name">
-	</div>
-	<button (click)="goBack()">Back</button>
-	<button (click)="save()">Save</button>
 </div>

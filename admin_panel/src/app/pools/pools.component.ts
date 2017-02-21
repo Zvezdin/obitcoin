@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Pool } from '../pool';
 import { OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { fadeInAnimation } from '../route.animation';
 
 import { DataService } from '../data.service';
 
@@ -11,7 +12,12 @@ import { DataService } from '../data.service';
 	selector: 'pools',
 	templateUrl: './pools.component.html',
 	
-	styleUrls: ['./pools.component.css'],
+	styleUrls: ['./pools.component.scss'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class PoolsComponent implements OnInit {
