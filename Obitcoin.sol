@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.9;
 
 contract Obitcoin{
     address owner;
@@ -119,7 +119,7 @@ contract Obitcoin{
         if(!members[member].exists) throw;
         if(members[member].permLevel == PermLevel.owner) throw; //the owner should stay untouched
         
-        memberAddresses[members[member].adr] = 0;
+        memberAddresses[members[member].adr] = 65535;
         memberAddresses[adr] = member;
         
         members[member].name = name;
@@ -241,7 +241,16 @@ contract Obitcoin{
         return (members[member].name, members[member].adr, members[member].permLevel);
     }
     
-    function sendCoins(uint16 pool, uint16 member, uint128 amount) public onlyAdmin {
+    function sendTokensBulk(uint16[] pools, uint16[] members, uint128[] amount){
+        //check to see if the data is valid. The function sendTokens will further check if every pool and member exists.
+        if(members.length == 0 || amount.length == 0 || pools.length == 0 || amount.length != members.length || members.length!=pools.length) throw;
+        
+        for(uint16 i = 0; i<members.length && i<amount.length && i<pools.length; i++){
+            sendTokens(pools[i], members[i], amount[i]);
+        }
+    }
+    
+    function sendTokens(uint16 pool, uint16 member, uint128 amount) public onlyAdmin {
         if(amount == 0 || !pools[pool].exists || !members[member].exists) throw;
         
         if(pools[pool].balance[member][0] + amount < pools[pool].balance[member][0]) throw; //avoid the 16-byte INT overflow
@@ -255,7 +264,7 @@ contract Obitcoin{
     
 	//track earned points overtime, if exess coins transferred, split them based on the total points.
 	
-    function buyCoins(uint16 pool, uint128 amount) public onlyAdmin {
+    function buyTokens(uint16 pool, uint128 amount) public onlyAdmin {
         if(amount == 0 || !pools[pool].exists || pools[pool].members.length==0) throw;
         
         uint128 tokenSum = 0;
@@ -288,24 +297,25 @@ contract Obitcoin{
 				
 				value = (debt*amount)/tokenSum; //calculate what part of the coins to buy.
 				
-				
-				if(debt-value>debt){ //if we're sending more than the token count of the person
-					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
-					SliceTransfer(memberAddresses[msg.sender], member, pool, debt, now);
-					totalSent+=debt;
-					slices +=debt;
-					debt = 0; //only clear the debt of the person, nothing else.
+				if(value>0){
+    				if(debt-value>debt){ //if we're sending more than the token count of the person
+        				TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
+        				SliceTransfer(memberAddresses[msg.sender], member, pool, debt, now);
+        				totalSent+=debt;
+        				slices +=debt;
+        				debt = 0; //only clear the debt of the person, nothing else.
+    				}
+    				else {
+        				TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
+        				SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+    					debt -= value;
+    					slices += value;
+    					totalSent+=value;
+    				}
+    				
+    				pools[pool].balance[member][0] = debt;
+    				pools[pool].balance[member][1] = slices;
 				}
-				else{
-					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
-					SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
-					debt -= value;
-					slices += value;
-					totalSent+=value;
-				}
-				
-				pools[pool].balance[member][0] = debt;
-				pools[pool].balance[member][1] = slices;
 				sliceSum += slices;
 			}
 		}
@@ -318,15 +328,14 @@ contract Obitcoin{
     				
     				value = (slices*(amount-totalSent))/sliceSum; //calculate what part of the coins to buy.
     				
-    				
-    				slices+=value;
-    				
-    				totalSent+=value;
-    				
-
-    				pools[pool].balance[member][1] = slices;
-    				
-        			SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+    				if(value>0){
+        				slices+=value;
+        				totalSent+=value;
+        				
+        				pools[pool].balance[member][1] = slices;
+        				
+            			SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+    				}
     			}
     		}
     		else {
@@ -336,17 +345,21 @@ contract Obitcoin{
 		
 		if(totalSent<amount){ //if there are still leftover money, just give them to the newest member of the pool
 		    member = pools[pool].members[pools[pool].members.length-1];
+		    value = amount-totalSent;
+		    debt = pools[pool].balance[member][0];
 		    
-		    if(pools[pool].balance[member][0]>(amount-totalSent)){
-		        pools[pool].balance[member][0]-=(amount-totalSent);
-		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(amount-totalSent)), now);
+		    if(debt>value){
+		        debt-=value;
+		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
 		    } else {
-		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(pools[pool].balance[member][0])), now);
-		        pools[pool].balance[member][0]=0;
+		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
+		        debt=0;
 		    }
 		    
-		    pools[pool].balance[member][1]+=(amount-totalSent);
-		    SliceTransfer(memberAddresses[msg.sender], member, pool, (amount-totalSent), now);
+		    pools[pool].balance[member][1]+=value;
+		    pools[pool].balance[member][0]=debt;
+		    SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+		    totalSent = amount;
 		}
 		
 		/*for(i=0; i<pools[pool].members.length; i++){
