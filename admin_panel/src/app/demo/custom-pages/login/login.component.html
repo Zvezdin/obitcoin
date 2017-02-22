@@ -3,20 +3,13 @@
     <div class="login-header" fxLayout="column" fxLayoutAlign="center center">
       <img src="assets/img/icon.png">
     </div>
-    <form #form="ngForm" (ngSubmit)="login()">
+    <form #form="ngForm">
       <div class="login-content" fxLayout="column" fxLayoutAlign="start stretch">
           <md-input-container>
-            <input md-input placeholder="E-Mail" type="text" name="email" required [(ngModel)]="email">
+            <input md-input placeholder="Contract address" type="text" name="contract_address" required [(ngModel)]="address">
           </md-input-container>
-          <md-input-container>
-            <input md-input placeholder="Password" type="password" name="password" required [(ngModel)]="password">
-          </md-input-container>
-          <div class="extra-options" fxLayout="row" fxLayoutAlign="space-between center">
-            <md-checkbox class="remember-me">Remember Me</md-checkbox>
-            <a class="forgot-password" [routerLink]="['/forgot-password']">Forgot Password?</a>
-          </div>
-          <button color="primary" md-raised-button [disabled]="!form.valid">SIGN IN</button>
-        <p class="note">Don't have an account?<br/> <a [routerLink]="['/register']">Click here to create one</a></p>
+          <button color="primary" md-raised-button [disabled]="!form.valid" (click) = "login()">SIGN IN</button>
+        <p class="note">Don't have a contract?<br/> <a [routerLink]="['/register']">Click here to create one</a></p>
       </div>
     </form>
   </div>

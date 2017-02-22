@@ -1,0 +1,39 @@
+<div class="issue-tokens-container" fxLayout="column" fxLayoutAlign="start stretch">
+	<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+		<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+			<md-card-title>Issue tokens</md-card-title>
+			<md-card-content>
+				<div fxLayout="column">
+					<div>Please select the pool, member and input the amount for each transaction</div>
+					<div *ngFor="let input of inputs">
+						<md-select placeholder="Select pool" [(ngModel)]="input.pool" name="pool">
+							<md-option *ngFor="let pool of pools" [value]="pool.id">
+								{{pool.name}}
+							</md-option>
+						</md-select>
+
+						<md-select placeholder="Select member" [(ngModel)]="input.member" name="member">
+							<md-option *ngFor="let member of members" [value]="member.id">
+								{{member.name}}
+							</md-option>
+						</md-select>
+
+						<md-input-container>
+							<input md-input type="number" placeholder="Amount" [(ngModel)]="input.amount">
+						</md-input-container>
+					</div>
+
+					<div fxFlexAlign = "start">
+						<button md-button (click)="newInput()">New line</button>
+					</div>
+
+					<md-divider></md-divider>
+
+					<div fxFlexAlign = "end">
+						<button md-raised-button color="primary" (click)="issueTokens()">Apply all changes</button>
+					</div>
+				</div>
+			</md-card-content>
+		</md-card>
+	</div>
+</div>

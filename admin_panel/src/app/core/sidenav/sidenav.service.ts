@@ -19,19 +19,11 @@ export class SidenavService {
   constructor() {
     let menu = this;
 
-    let dashboard = menu.addItem('Dashboard', 'dashboard', '/', 1);
+    let dashboard = menu.addItem('Dashboard', 'dashboard', '/dashboard', 1);
 
-    menu.addItem('Member details', 'person', '/details', 1);
     menu.addItem('Members', 'people', '/members', 1);
     menu.addItem('Pools', 'message', '/pools', 1);
     menu.addItem('Transactions', 'link', '/transactions', 1);
-    
-    
-
-
-    menu.addItem('Inbox', 'mail', '/apps/inbox', 1, '22', '#7986CC');
-    menu.addItem('Chat', 'chat', '/apps/chat', 2, '14', '#E15C74');
-    menu.addItem('Calendar', 'date_range', '/apps/calendar', 3);
 
     let components =  menu.addItem('Components', 'layers', null, 3);
     menu.addSubItem(components, 'Buttons', '/components/buttons', 1);
@@ -52,9 +44,6 @@ export class SidenavService {
     menu.addSubItem(tables, 'Simple Table', '/tables/simple-table', 1);
     menu.addSubItem(tables, 'Fixed Header Table', '/tables/fixed-header-table', 2);
 
-    let maps =  menu.addItem('Maps', 'map', null, 6, '3', '#4CAF50');
-    menu.addSubItem(maps, 'Google Maps', '/maps/google-maps', 1);
-
     let icons = menu.addItem('Material Icons', 'grade', '/icons', 7);
 
     let customPages = menu.addItem('Custom Pages', 'web', null, 8);
@@ -62,19 +51,6 @@ export class SidenavService {
     menu.addSubItem(customPages, 'Register Page', '/register', 2);
     menu.addSubItem(customPages, 'Forgot Password', '/forgot-password', 3);
     menu.addSubItem(customPages, 'Dashboard v1', '/dashboard-v1', 4);
-
-    let dragAndDrop = menu.addItem('Drag & Drop', 'mouse', '/drag-and-drop', 9);
-
-    let editor = menu.addItem('WYSIWYG Editor', 'format_shapes', '/editor', 10, 'NEW', '#3F51B5');
-
-    let dynamicMenu = menu.addItem('Dynamic Menu', 'extension', '/dynamic-menu', 11);
-
-    let multiLevel = menu.addItem('Multi-Level Menu', 'menu', null, 12);
-    let level1 = menu.addSubItem(multiLevel, 'Level 1', '/level1', 1);
-    let level2 = menu.addSubItem(level1, 'Level 2', '/level1/level2', 2);
-    let level3 = menu.addSubItem(level2, 'Level 3', '/level1/level2/level3', 3);
-    let level4 = menu.addSubItem(level3, 'Level 4', '/level1/level2/level3/level4', 4);
-    let level5 = menu.addSubItem(level4, 'Level 5', '/level1/level2/level3/level4/level5', 5);
   }
 
   addItem(name: string, icon: string, route: string, position: number, badge?: string, badgeColor?: string) {

@@ -26,6 +26,7 @@ import { DataService } from '../data.service';
 
 export class MemberDetailComponent implements OnInit {
 	member: Member;
+	memberPermLevel: string;
 	pools: Pool[];
 
 	constructor(
@@ -42,8 +43,6 @@ export class MemberDetailComponent implements OnInit {
 			.subscribe(member => ( member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member,
 
 			this.dataService.getPools().then(pools => {
-				console.log(pools[0].members[0]);
-				console.log(this.member);
 				this.pools = pools.filter( pool => pool.members.find(member2 => member2==this.member.id) != undefined ),
 				this.initData()
 			})
@@ -60,6 +59,16 @@ export class MemberDetailComponent implements OnInit {
 			(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";
 			(pool as any).slicesShare = ((pool.slices[this.member.id]/pool.totalSlices)* 100 ).toFixed(2) + "%";
 		});
+
+		console.log(this.member.permissionLevel);
+		console.log(this.member);
+		switch(this.member.permissionLevel){
+			case 0: {this.memberPermLevel="No permissions"; break;}
+			case 1: {this.memberPermLevel="Contract member"; break;}
+			case 2: {this.memberPermLevel="Contract admin"; break;}
+			case 3: {this.memberPermLevel="Contract owner"; break;}
+			default: {this.memberPermLevel="Contract member"; break;}
+		}
 	}
 
 	goBack(): void {

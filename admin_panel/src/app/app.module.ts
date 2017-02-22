@@ -82,6 +82,8 @@ import { PoolsComponent } from './pools/pools.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 
 import { DropdownModule, DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
+import { IssueTokensComponent } from './issue-tokens/issue-tokens.component';
+import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
 
 const perfectScrollbarConfig: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -152,6 +154,8 @@ const sortablejsConfig: SortablejsOptions = {
     PoolEditComponent,
     PoolsComponent,
     TransactionsComponent,
+    IssueTokensComponent,
+    BuyTokensComponent,
   ],
   entryComponents: [
     DemoDialog,

@@ -119,11 +119,15 @@ export class DataService {
 		return Promise.resolve(this.transactions);
 	}
 
-	updateMember(member: Member, callback: Function){ //testing method
+	isConnected(): boolean {
+		return this.contract.isConnected();
+	}
+
+	updateMember(member: Member, callback: Function){
 		var oldMember = this.members.find(member2 => member2.id==member.id);
 
 		this.contract.updateMember(member.id, member.name, member.address, member.permissionLevel == 2 ? true : false, function(result){
-			console.log(result);
+			console.log("Transaction hash:"+result);
 			oldMember.name = member.name;
 			oldMember.address = member.address;
 
@@ -135,7 +139,7 @@ export class DataService {
 		var oldPool = this.pools.find(pool2 => pool2.id == pool.id);
 
 		this.contract.updatePool(pool.id, pool.name, pool.financialReports, pool.legalContract, function(result){
-			console.log(result);
+			console.log("Transaction hash:"+result);
 
 			oldPool.name = pool.name;
 			oldPool.legalContract = pool.legalContract;
@@ -147,7 +151,7 @@ export class DataService {
 
 	addMember(name: string, address: string, isAdmin: boolean, callback: Function){
 		this.contract.addMember(name, address, isAdmin, function(result){
-			console.log(result);
+			console.log("Transaction hash:"+result);
 
 			callback(result);
 		});
@@ -155,13 +159,31 @@ export class DataService {
 
 	addPool(name: string, legalContract: string, financialReports: string, callback: Function){
 		this.contract.createDebtPool(name, legalContract, financialReports, function(result){
-			console.log(result);
+			console.log("Transaction hash:"+result);
 
 			callback(result);
 		});
 	}
 
+	sendTokens(pools: number[], members: number[], amount: number[], callback){
+		this.contract.sendTokensBulk(pools, members, amount, function(result){
+			console.log("Transaction hash:"+result);
+			callback(result);
+		});
+	}
+
+	buyTokens(pool: number, amount: number, callback){
+		this.contract.buyTokens(pool, amount, function(result){
+			console.log("Transaction hash:"+result);
+			callback(result);
+		});
+	}
+
 	init(){
+		this.contract = new contract_integration();
+	}
+
+	connectToContract(contractAddress: string, callback){
 		var self = this;
 		this.self = this;
 		this.mockPools = new MockPools();
@@ -170,12 +192,17 @@ export class DataService {
 		this.mockPools.init();
 		//this.pools=this.mockPools.getPools();
 
-		this.contract = new contract_integration();
-
-		this.contract.connectToContract("0xf854ef8f0604d25b99c1655900a29cd662282aea", function(){
+		this.contract.connectToContract(contractAddress, function(error: string){
+			if(error!=undefined){
+				callback(error);
+				return;
+			} else {
 			self.getMembers().then(members => 
-				self.getPools().then(pools => 
-					self.contract.startListeningForEvents(self.handleEvent)));
+				self.getPools().then(pools => {
+					self.contract.startListeningForEvents(self.handleEvent);
+					callback();
+				}));
+			}
 		});
 
 		//this.getMembers().then(members => this.contract.startListeningForEvents(this.handleEvent));

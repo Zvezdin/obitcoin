@@ -4,6 +4,8 @@ import {MediaChange, ObservableMedia} from "@angular/flex-layout";
 import {Router, NavigationEnd} from "@angular/router";
 import * as screenfull from 'screenfull';
 
+import { DataService } from '../../data.service';
+
 @Component({
   selector: 'ms-admin',
   templateUrl: './admin.component.html',
@@ -29,9 +31,12 @@ export class AdminComponent implements OnInit {
   constructor(
     private media: ObservableMedia,
     private router: Router,
+    private dataService: DataService,
   ) { }
 
   ngOnInit() {
+    if(!this.dataService.isConnected()) this.router.navigate(['/login']);
+
     this._mediaSubscription = this.media.asObservable().subscribe((change: MediaChange) => {
       let isMobile = (change.mqAlias == 'xs') || (change.mqAlias == 'sm');
 

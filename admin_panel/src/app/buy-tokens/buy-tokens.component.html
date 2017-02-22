@@ -1,0 +1,27 @@
+<div class="buy-tokens-container" fxLayout="column" fxLayoutAlign="start stretch">
+	<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+		<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+			<md-card-title>Buy tokens</md-card-title>
+			<md-card-content>
+				<div fxLayout="column">
+					<div>Please select the pool and input the amount for each transaction</div>
+					<md-select placeholder="Select pool" [(ngModel)]="selectedPool" name="pool">
+						<md-option *ngFor="let pool of pools" [value]="pool.id">
+							{{pool.name}}
+						</md-option>
+					</md-select>
+
+					<md-input-container>
+						<input md-input type="number" placeholder="Amount" [(ngModel)]="amount">
+					</md-input-container>
+
+					<md-divider></md-divider>
+
+					<div fxFlexAlign = "end">
+						<button md-raised-button color="primary" (click)="buyTokens()">Apply all changes</button>
+					</div>
+				</div>
+			</md-card-content>
+		</md-card>
+	</div>
+</div>

@@ -51,10 +51,10 @@ export class TransactionsComponent implements OnInit {
     }
 
 	sendTokens(): void {
-		
+		this.router.navigate(['/issue_tokens']);
 	}
 
 	buyTokens(): void {
-
+		this.router.navigate(['/buy_tokens']);
 	}
 }

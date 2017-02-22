@@ -39,8 +39,15 @@ import { PoolDetailComponent } from './pool-detail/pool-detail.component';
 import { PoolEditComponent } from './pool-edit/pool-edit.component';
 import { PoolsComponent } from './pools/pools.component';
 import { TransactionsComponent } from './transactions/transactions.component';
+import { IssueTokensComponent } from './issue-tokens/issue-tokens.component';
+import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
 
 const routes: Routes = [
+  {
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full'
+  },
   {
     path: 'login',
     component: LoginComponent
@@ -67,13 +74,6 @@ const routes: Routes = [
         path: 'dashboard',
         component: MemberDetailComponent
       },
-      
-      /*{
-        path: '',
-        redirectTo: '/dashboard',
-        pathMatch: 'full'
-      },*/
-      
       {
         path: 'edit_member/:id',
         component: MemberEditComponent
@@ -111,10 +111,13 @@ const routes: Routes = [
         path: 'transactions',
         component: TransactionsComponent
       },
-
       {
-        path: '',
-        component: DashboardComponent,
+        path: 'buy_tokens',
+        component: BuyTokensComponent,
+      },
+      {
+        path: 'issue_tokens',
+        component: IssueTokensComponent,
       },
       {
         path: 'details',
