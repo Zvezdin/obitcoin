@@ -49,4 +49,12 @@ export class TransactionsComponent implements OnInit {
 		this.pools.push({label: "All pools", value: null});
 		this.dataService.getPools().then(pools => pools.forEach(pool => this.pools.push({label: pool.name, value: pool.name})));
     }
+
+	sendTokens(): void {
+		
+	}
+
+	buyTokens(): void {
+
+	}
 }

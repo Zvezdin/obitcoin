@@ -80,6 +80,11 @@ const routes: Routes = [
       },
 
       {
+        path: 'add_member',
+        component: MemberEditComponent
+      },
+
+      {
         path: 'detail_member/:id',
         component: MemberDetailComponent
       },
@@ -98,7 +103,10 @@ const routes: Routes = [
         path: 'edit_pool/:id',
         component: PoolEditComponent
       },
-
+      {
+        path: 'add_pool',
+        component: PoolEditComponent
+      },
       {
         path: 'transactions',
         component: TransactionsComponent

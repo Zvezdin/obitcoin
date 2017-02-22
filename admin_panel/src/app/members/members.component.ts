@@ -33,4 +33,8 @@ export class MembersComponent implements OnInit {
 	gotoDetail(member: Member): void {
 		this.router.navigate(['/detail_member', member.id]);
 	}
+
+	addMember(): void {
+		this.router.navigate(['/add_member']);
+	}
 }

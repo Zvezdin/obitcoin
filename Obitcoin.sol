@@ -275,7 +275,7 @@ contract Obitcoin{
 		uint128 slices;
 		uint128 value;
 		
-	    uint128[] memory slicesToApply = new uint128[](pools[pool].members.length);
+	    //uint128[] memory slicesToApply = new uint128[](pools[pool].members.length);
 		//int256[] memory tokensToApply = new int256[](pools[pool].members.length);
 		
 		if(tokenSum>0){
@@ -291,19 +291,21 @@ contract Obitcoin{
 				
 				if(debt-value>debt){ //if we're sending more than the token count of the person
 					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
+					SliceTransfer(memberAddresses[msg.sender], member, pool, debt, now);
 					totalSent+=debt;
 					slices +=debt;
 					debt = 0; //only clear the debt of the person, nothing else.
 				}
 				else{
 					TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
+					SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
 					debt -= value;
 					slices += value;
 					totalSent+=value;
 				}
 				
 				pools[pool].balance[member][0] = debt;
-				slicesToApply[i] = slices;
+				pools[pool].balance[member][1] = slices;
 				sliceSum += slices;
 			}
 		}
@@ -322,9 +324,9 @@ contract Obitcoin{
     				totalSent+=value;
     				
 
-    				slicesToApply[i] = slices;
+    				pools[pool].balance[member][1] = slices;
     				
-    				//SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+        			SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
     			}
     		}
     		else {
@@ -337,18 +339,21 @@ contract Obitcoin{
 		    
 		    if(pools[pool].balance[member][0]>(amount-totalSent)){
 		        pools[pool].balance[member][0]-=(amount-totalSent);
+		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(amount-totalSent)), now);
 		    } else {
+		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(pools[pool].balance[member][0])), now);
 		        pools[pool].balance[member][0]=0;
 		    }
 		    
-		    slicesToApply[pools[pool].members.length-1]+=(amount-totalSent);
+		    pools[pool].balance[member][1]+=(amount-totalSent);
+		    SliceTransfer(memberAddresses[msg.sender], member, pool, (amount-totalSent), now);
 		}
 		
-		for(i=0; i<pools[pool].members.length; i++){
-		    SliceTransfer(memberAddresses[msg.sender], pools[pool].members[i], pool, slicesToApply[i]-pools[pool].balance[pools[pool].members[i]][1], now);
+		/*for(i=0; i<pools[pool].members.length; i++){
+		    //SliceTransfer(memberAddresses[msg.sender], pools[pool].members[i], pool, slicesToApply[i]-pools[pool].balance[pools[pool].members[i]][1], now);
 		    
 		    pools[pool].balance[pools[pool].members[i]][1] = slicesToApply[i];
-		}
+		}*/
 		
 		if(totalSent>amount) throw; //theorertically impossible
 		TokenPurchase(memberAddresses[msg.sender], pool, totalSent, now);

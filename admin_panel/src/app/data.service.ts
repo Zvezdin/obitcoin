@@ -40,7 +40,20 @@ export class DataService {
 			var self = this;
 			this.contract.getWholeMembers(function(members: any[]){
 				self.members = members;
-				resolve(members);
+
+				self.getPools().then(pools => {
+					members.forEach(member => {
+						member.totalTokens = 0;
+						member.totalSlices = 0;
+
+						pools.forEach(pool =>{
+							if(pool.tokens[member.id]!=undefined) member.totalTokens += pool.tokens[member.id];
+							if(pool.slices[member.id]!=undefined) member.totalSlices += pool.slices[member.id];
+						});
+
+						resolve(members);
+					});
+				});
 			});
 		});
 	}
@@ -106,20 +119,50 @@ export class DataService {
 		return Promise.resolve(this.transactions);
 	}
 
-	updateMember(member: Member){ //testing method
+	updateMember(member: Member, callback: Function){ //testing method
 		var oldMember = this.members.find(member2 => member2.id==member.id);
-		oldMember.name = member.name;
-		oldMember.address = member.address;
+
+		this.contract.updateMember(member.id, member.name, member.address, member.permissionLevel == 2 ? true : false, function(result){
+			console.log(result);
+			oldMember.name = member.name;
+			oldMember.address = member.address;
+
+			callback(result);
+		});
 	}
 
-	updatePool(pool: Pool){
+	updatePool(pool: Pool, callback: Function){
 		var oldPool = this.pools.find(pool2 => pool2.id == pool.id);
-		oldPool.name = pool.name;
-		oldPool.legalContract = pool.legalContract;
-		oldPool.financialReports = pool.financialReports;
+
+		this.contract.updatePool(pool.id, pool.name, pool.financialReports, pool.legalContract, function(result){
+			console.log(result);
+
+			oldPool.name = pool.name;
+			oldPool.legalContract = pool.legalContract;
+			oldPool.financialReports = pool.financialReports;
+
+			callback(result);
+		});
+	}
+
+	addMember(name: string, address: string, isAdmin: boolean, callback: Function){
+		this.contract.addMember(name, address, isAdmin, function(result){
+			console.log(result);
+
+			callback(result);
+		});
+	}
+
+	addPool(name: string, legalContract: string, financialReports: string, callback: Function){
+		this.contract.createDebtPool(name, legalContract, financialReports, function(result){
+			console.log(result);
+
+			callback(result);
+		});
 	}
 
 	init(){
+		var self = this;
 		this.self = this;
 		this.mockPools = new MockPools();
 		//this.transactions = TRANSACTIONS;
@@ -129,8 +172,13 @@ export class DataService {
 
 		this.contract = new contract_integration();
 
-		this.contract.connectToContract("0xad2b2b39f0e1048ebee657bba379011cbe5523f5");
-		this.contract.startListeningForEvents(this.handleEvent);
+		this.contract.connectToContract("0xf854ef8f0604d25b99c1655900a29cd662282aea", function(){
+			self.getMembers().then(members => 
+				self.getPools().then(pools => 
+					self.contract.startListeningForEvents(self.handleEvent)));
+		});
+
+		//this.getMembers().then(members => this.contract.startListeningForEvents(this.handleEvent));
 
 		/*this.contract.getPools();
 		this.contract.getPoolData(1);
@@ -188,29 +236,62 @@ export class DataService {
 		transaction.from = event.args.from;
 
 		switch(event.event){
-			case "PoolCreated": {
+			case "PoolChanged": {
 				transaction.pool = event.args.pool;
+				transaction.data = event.args.added ? "Pool created" : "Pool modified";
 			} break;
 
-			case "CoinsTransfer": {
+			case "PersonChanged": {
+				transaction.to = event.args.to;
+				transaction.data = event.args.added ? "Added member" : "Member modified";
+
+				if(event.args.added){
+					this.getMember(event.args.to.valueOf()).then(member =>{
+						if(member!=undefined){
+							var date = new Date(0);
+							date.setUTCSeconds(event.args.time);
+							member.memberSince = date.toLocaleString();
+						}
+					});
+				}
+			} break;
+			
+
+			case "TokenTransfer": {
 				transaction.to = event.args.to;
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 			} break;
 
-			case "CoinsPurchase": {
+			case "SliceTransfer": {
+				transaction.to = event.args.to;
+				transaction.pool = event.args.pool;
+				transaction.data = event.args.amount+" tokens";
+			} break;
+
+			case "TokenPurchase": {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 			} break;
 
 			case "UnauthorizedAccess": {
-				transaction.data = "from address: "+event.args.fromAddress;
+				transaction.data = "From address: "+event.args.fromAddress;
 			} break;
 
 			case "AdminChanged": {
 				transaction.to = event.args.person;
 				transaction.data = event.args.added ? "Admin added" : "Admin removed";
 			} break;
+		}
+
+		this.getMember(Number(transaction.from)).then(member => {
+			if(member!=undefined) transaction.fromName = member.name
+		});
+
+		if(transaction.to!=undefined){
+			this.getMember(Number(transaction.to)).then(member => {
+				if(member!=undefined) transaction.toName = member.name
+			});
 		}
 
 		this.transactions.push(transaction);

@@ -1,6 +1,9 @@
 <div class="pool-container" fxLayout="column" fxLayoutAlign="start stretch">
 
-    <h2>Pools</h2>
+    <div fxLayout="row" fxLayoutAlign="space-between">
+	<h2>Debt pools</h2>
+	<button fxFlexAlign="end" md-raised-button color="primary" (click) = addPool()>Add pool</button>
+	</div>
 
     <p-dataTable [value]="pools">
         <p-column field="name" [sortable]="true" header="Name"></p-column>

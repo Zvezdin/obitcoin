@@ -1,13 +1,16 @@
 <div class="member-container" fxLayout="column" fxLayoutAlign="start stretch">
 
+	<div fxLayout="row" fxLayoutAlign="space-between">
 	<h2>Members</h2>
+	<button fxFlexAlign="end" md-raised-button color="primary" (click) = addMember()>Add member</button>
+	</div>
 
 		<p-dataTable [value]="members">
 			<p-column field="name" [sortable]="true" header="Name"></p-column>
 			<p-column field="address" [sortable]="true" header="Address" [style]="{'width':'500px'}"></p-column>
 			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
-			<p-column field="tokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
-			<p-column field="slices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
+			<p-column field="totalTokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
+			<p-column field="totalSlices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
 			<p-column>
 				<template let-member="rowData" pTemplate="body">
 					<button md-raised-button (click) = gotoDetail(member)>Details</button>

@@ -42,4 +42,8 @@ export class PoolsComponent implements OnInit {
 	onSelect(pool: Pool): void {
 		this.router.navigate(['/detail_pool', pool.id]);
     }
+
+	addPool(): void {
+		this.router.navigate(['/add_pool']);
+	}
 }
