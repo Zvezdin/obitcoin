@@ -11,6 +11,8 @@ import { Member } from '../member';
 import { Pool } from '../pool';
 import { DataService } from '../data.service';
 
+import { Transaction } from '../transaction';
+
 @Component({
 	moduleId: module.id,
 	selector: 'member-detail',
@@ -28,6 +30,7 @@ export class MemberDetailComponent implements OnInit {
 	member: Member;
 	memberPermLevel: string;
 	pools: Pool[];
+	transactions: Transaction[];
 
 	constructor(
 		private dataService: DataService,
@@ -37,14 +40,18 @@ export class MemberDetailComponent implements OnInit {
 	) {}
 	
 	ngOnInit(): void {
+		var self = this;
 		this.route.params
 			.switchMap((params: Params) =>
 		this.dataService.getMember(params['id']))
-			.subscribe(member => ( member==undefined ? this.dataService.getUser().then(member => this.member = member) : this.member=member,
+			.subscribe(member => ( member==undefined ? self.dataService.getUser().then(member => self.member = member) : self.member=member,
 
-			this.dataService.getPools().then(pools => {
-				this.pools = pools.filter( pool => pool.members.find(member2 => member2==this.member.id) != undefined ),
-				this.initData()
+			self.dataService.getPools().then(pools => {
+				self.pools = pools.filter( pool => pool.members.find(member2 => member2==self.member.id) != undefined ),
+				self.dataService.getTransactionsForMember(self.member.id).then(transactions => {
+					self.transactions = transactions;
+					self.initData();
+				});
 			})
 
 		));

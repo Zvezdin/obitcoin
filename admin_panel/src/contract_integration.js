@@ -37,7 +37,7 @@ class contract_integration{
 		}
 	}
 
-	deployNewContract() {
+	deployNewContract(callback) {
 		var self = this;
 
 		var obitcoinContract = web3.eth.contract(this.contractAbi);
@@ -50,9 +50,11 @@ class contract_integration{
 			console.log(e, contract);
 			if (typeof contract.address !== 'undefined') {
 				console.log('Contract mined! address: ' + contract.address + ' transactionHash: ' + contract.transactionHash);
-				
+
 				self.connected = true;
 			}
+
+			callback(e, contract.address);
 		})
 	}
 

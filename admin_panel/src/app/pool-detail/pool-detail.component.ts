@@ -8,6 +8,7 @@ import 'rxjs/add/operator/switchMap';
 import { Member } from '../member';
 import { Pool } from '../pool';
 import { DataService } from '../data.service';
+import { Transaction } from '../transaction';
 
 @Component({
 	moduleId: module.id,
@@ -25,7 +26,7 @@ import { DataService } from '../data.service';
 export class PoolDetailComponent implements OnInit {
 	members: Member[];
 	pool : Pool;
-
+	transactions: Transaction[];
 	constructor(
 		private dataService: DataService,
 		private route: ActivatedRoute,
@@ -34,13 +35,18 @@ export class PoolDetailComponent implements OnInit {
 	) {}
 	
 	ngOnInit(): void {
+		var self = this;
+
 		this.route.params
 			.switchMap((params: Params) =>
 		this.dataService.getPool(params['id']))
-			.subscribe(pool => ( this.pool=pool,
-			this.dataService.getPoolMembers(pool).then(members => {
-					this.members=members;
-					this.initData();
+			.subscribe(pool => ( self.pool=pool,
+			self.dataService.getPoolMembers(pool).then(members => {
+					self.members=members;
+					self.dataService.getTransactionsForPool(pool.id).then(transactions => {
+						self.transactions = transactions;
+						self.initData();
+					});
 				}
 			)
 

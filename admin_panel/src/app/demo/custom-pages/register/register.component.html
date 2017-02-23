@@ -3,26 +3,20 @@
     <div class="register-header" fxLayout="column" fxLayoutAlign="center center">
       <img src="assets/img/icon.png">
     </div>
-    <form #form="ngForm" (ngSubmit)="register()">
       <div class="register-content" fxLayout="column" fxLayoutAlign="start stretch">
-        <md-input-container>
-          <input md-input placeholder="Name" type="text" name="name" required [(ngModel)]="name">
-        </md-input-container>
-        <md-input-container>
-          <input md-input placeholder="E-Mail" type="text" name="email" required [(ngModel)]="email">
-        </md-input-container>
-        <md-input-container>
-          <input md-input placeholder="Password" type="password" name="password" required [(ngModel)]="password">
-        </md-input-container>
-        <md-input-container>
-          <input md-input placeholder="Password (Confirm)" type="password" name="password-confirm" required [(ngModel)]="passwordConfirm">
-        </md-input-container>
-        <div class="extra-options" fxLayout="row" fxLayoutAlign="center center">
-          <md-checkbox class="remember-me">I accept the <a href="#">terms and conditions.</a></md-checkbox>
+        <button color="primary" md-raised-button (click)="register()">CREATE CONTRACT</button>
+
+        <div *ngIf="contractAddress" fxLayout="column" fxLayoutAlign="center center">
+			<p class="info">Contract published! Address:</p>
+			<p class="address"><b>{{contractAddress}}</b></p>
+			<p class="warning">You must remmeber the contract address. Without it, you cannot access your contract!</p>
+
+			<a [routerLink]="['/dashboard']">Login to contract</a>
         </div>
-        <button color="primary" md-raised-button [disabled]="!form.valid">CREATE ACCOUNT</button>
-        <p class="note">Already have an account?<br/> <a [routerLink]="['/login']">Sign in here</a></p>
+
+		<div *ngIf="!contractAddress">
+        	<p class="note">Already have a contract?<br/> <a [routerLink]="['/login']">Sign in here</a></p>
+		</div>
       </div>
-    </form>
-  </div>
+    </div>
 </div>

@@ -119,6 +119,14 @@ export class DataService {
 		return Promise.resolve(this.transactions);
 	}
 
+	getTransactionsForPool(pool: number): Promise<Transaction[]>{
+		return this.getTransactions().then(transactions => transactions.filter(transaction => transaction.pool == pool));
+	}
+
+	getTransactionsForMember(member: number): Promise<Transaction[]>{
+		return this.getTransactions().then(transactions => transactions.filter(transaction => Number(transaction.from) == member || Number(transaction.to) == member));
+	}
+
 	isConnected(): boolean {
 		return this.contract.isConnected();
 	}
@@ -181,6 +189,10 @@ export class DataService {
 
 	init(){
 		this.contract = new contract_integration();
+	}
+
+	createContract(callback: Function){
+		this.contract.deployNewContract(callback);
 	}
 
 	connectToContract(contractAddress: string, callback){
