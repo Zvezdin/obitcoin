@@ -2,7 +2,7 @@
 
 	<div fxLayout="row" fxLayoutAlign="space-between">
 	<h2>Members</h2>
-	<button fxFlexAlign="end" md-raised-button color="primary" (click) = addMember()>Add member</button>
+	<button fxFlexAlign="end" md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click) = addMember()>Add member</button>
 	</div>
 
 		<p-dataTable [value]="members">

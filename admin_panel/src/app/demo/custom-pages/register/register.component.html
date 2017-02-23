@@ -7,11 +7,12 @@
         <button color="primary" md-raised-button (click)="register()">CREATE CONTRACT</button>
 
         <div *ngIf="contractAddress" fxLayout="column" fxLayoutAlign="center center">
-			<p class="info">Contract published! Address:</p>
-			<p class="address"><b>{{contractAddress}}</b></p>
-			<p class="warning">You must remmeber the contract address. Without it, you cannot access your contract!</p>
+          <p class="info">Contract published! Address:</p>
+          <p class="address"><b>{{contractAddress}}</b></p>
+          <p class="warning">You must remmeber the contract address. Without it, you cannot access your contract!</p>
 
-			<a [routerLink]="['/dashboard']">Login to contract</a>
+
+          <button md-raised-button (click)="connectToContract()">Login to contract</button>
         </div>
 
 		<div *ngIf="!contractAddress">

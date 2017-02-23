@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Transaction } from '../transaction';
 import { OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { fadeInAnimation } from '../route.animation';
 
 import { DataService } from '../data.service';
 
@@ -14,11 +15,17 @@ import { SelectItem} from 'primeng/primeng';
 	templateUrl: './transactions.component.html',
 	
 	styleUrls: ['./transactions.component.scss'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 
 export class TransactionsComponent implements OnInit {
     transactions: Transaction[];
 	pools: SelectItem[];
+	userPermissionLevel: number;
 
 	constructor(
 		private dataService: DataService,
@@ -48,6 +55,7 @@ export class TransactionsComponent implements OnInit {
 		this.getTransactions();
 		this.pools.push({label: "All pools", value: null});
 		this.dataService.getPools().then(pools => pools.forEach(pool => this.pools.push({label: pool.name, value: pool.name})));
+		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
     }
 
 	sendTokens(): void {

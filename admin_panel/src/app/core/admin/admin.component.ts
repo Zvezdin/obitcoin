@@ -35,8 +35,6 @@ export class AdminComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    if(!this.dataService.isConnected()) this.router.navigate(['/login']);
-
     this._mediaSubscription = this.media.asObservable().subscribe((change: MediaChange) => {
       let isMobile = (change.mqAlias == 'xs') || (change.mqAlias == 'sm');
 
@@ -50,6 +48,9 @@ export class AdminComponent implements OnInit {
         this.sidenav.close();
       }
     });
+
+    if(!this.dataService.isWeb3Available()) this.router.navigate(['/getMetamask']);
+    else if(!this.dataService.isConnected()) this.router.navigate(['/login']);
   }
 
   toggleFullscreen() {

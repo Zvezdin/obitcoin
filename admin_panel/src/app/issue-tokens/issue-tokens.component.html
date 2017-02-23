@@ -21,6 +21,8 @@
 						<md-input-container>
 							<input md-input type="number" placeholder="Amount" [(ngModel)]="input.amount">
 						</md-input-container>
+
+						<button md-button (click)="remove(input)">X</button>
 					</div>
 
 					<div fxFlexAlign = "start">
@@ -29,8 +31,14 @@
 
 					<md-divider></md-divider>
 
-					<div fxFlexAlign = "end">
-						<button md-raised-button color="primary" (click)="issueTokens()">Apply all changes</button>
+					<div fxLayout="row" fxLayoutAlign="space-between">
+						<div fxFlexAlign = "syart">
+							<button md-raised-button (click)="back()">Back</button>
+						</div>
+
+						<div fxFlexAlign = "end">
+							<button md-raised-button color="primary" (click)="issueTokens()">Issue transactions</button>
+						</div>
 					</div>
 				</div>
 			</md-card-content>

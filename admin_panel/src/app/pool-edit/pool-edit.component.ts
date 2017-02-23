@@ -74,7 +74,9 @@ export class PoolEditComponent implements OnInit {
 		this.applyChanges(function(result){
 			if(result!=undefined){
 				console.log("showing notification");
-				self.snackBar.open("Submitted changes. May take up to a minute to apply. Transaction hash: "+result, "Close", {});
+				self.snackBar.open("Submitted changes. May take up to a minute to apply.", "Close", {
+					duration: 5000
+				});
 			}
 		});
 	}

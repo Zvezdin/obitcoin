@@ -18,6 +18,7 @@ declare var contract_integration: any;
 export class DataService {
 	contract: any;
 
+	membersSince: Map<number, string>
 	members: Member[];
 	pools: Pool[];
 	transactions: Transaction[];
@@ -28,20 +29,26 @@ export class DataService {
 
 	self: any;
 
+
+
 	getUser(): Promise<Member> {
 
-		return Promise.resolve(this.members[0]);
+		return this.getMembers().then(members => members.find(member => member.address == this.contract.getAccount()));
 	}
 
-	getMembers(): Promise<Member[]> {
-		if(this.members!=undefined) return Promise.resolve(this.members); //return the cached version
+	getMembers(forceReload: boolean = false): Promise<Member[]> {
+		if(this.members!=undefined && !forceReload) return Promise.resolve(this.members); //return the cached version
 
 		return new Promise(resolve => { //get the data the slow way
 			var self = this;
 			this.contract.getWholeMembers(function(members: any[]){
 				self.members = members;
 
-				self.getPools().then(pools => {
+				self.members.forEach(member => {
+					member.memberSince = self.membersSince[member.id];
+				});
+
+				self.getPools(forceReload).then(pools => {
 					members.forEach(member => {
 						member.totalTokens = 0;
 						member.totalSlices = 0;
@@ -80,8 +87,8 @@ export class DataService {
 			.then(members => members.filter(member => member.name.includes(term)));
 	}
 
-	getPools (): Promise<Pool[]> {
-		if(this.pools!=undefined) return Promise.resolve(this.pools);
+	getPools (forceReload: boolean = false): Promise<Pool[]> {
+		if(this.pools!=undefined && !forceReload) return Promise.resolve(this.pools);
 		var self = this;
 
 		return new Promise(resolve => {
@@ -96,13 +103,6 @@ export class DataService {
 					newPool.slices = pool.slices;
 					newPool.tokens = pool.tokens;
 					newPool.members = pool.members;
-
-					/*var members = pool.members;
-					members.forEach(function(id: number){
-						self.getMember(id).then(function(member: Member){
-							newPool.members.push(member);
-						});
-					});*/
 
 					self.pools.push(newPool);
 				});
@@ -131,27 +131,21 @@ export class DataService {
 		return this.contract.isConnected();
 	}
 
-	updateMember(member: Member, callback: Function){
-		var oldMember = this.members.find(member2 => member2.id==member.id);
+	isWeb3Available(): boolean {
+		return this.contract.isWeb3Available();
+	}
 
+	updateMember(member: Member, callback: Function){
 		this.contract.updateMember(member.id, member.name, member.address, member.permissionLevel == 2 ? true : false, function(result){
 			console.log("Transaction hash:"+result);
-			oldMember.name = member.name;
-			oldMember.address = member.address;
 
 			callback(result);
 		});
 	}
 
 	updatePool(pool: Pool, callback: Function){
-		var oldPool = this.pools.find(pool2 => pool2.id == pool.id);
-
 		this.contract.updatePool(pool.id, pool.name, pool.financialReports, pool.legalContract, function(result){
 			console.log("Transaction hash:"+result);
-
-			oldPool.name = pool.name;
-			oldPool.legalContract = pool.legalContract;
-			oldPool.financialReports = pool.financialReports;
 
 			callback(result);
 		});
@@ -189,32 +183,63 @@ export class DataService {
 
 	init(){
 		this.contract = new contract_integration();
+		this.transactions = [];
+		this.membersSince = new Map<number, string>();
 	}
 
-	createContract(callback: Function){
-		this.contract.deployNewContract(callback);
+	initData(callback){
+		var self = this;
+		self.getMembers().then(members => 
+			self.getPools().then(pools => {
+				self.contract.startListeningForEvents(self.handleEvent);
+				callback();
+		}));
+	}
+
+	deployNewContract(callback){
+		var self = this;
+		//this.transactions = TRANSACTIONS;
+		//this.pools=this.mockPools.getPools();
+
+		var func = function(error: string, address: string){
+			if(error!=undefined){
+				callback(error, address);
+				return;
+			}
+
+			callback(error, address);
+		};
+
+		this.contract.init(function(error: string){
+			if(error==undefined){
+				self.contract.deployNewContract(func);
+			} else callback(error, undefined);
+		})
+
 	}
 
 	connectToContract(contractAddress: string, callback){
 		var self = this;
-		this.self = this;
-		this.mockPools = new MockPools();
 		//this.transactions = TRANSACTIONS;
-		this.transactions = [];
-		this.mockPools.init();
 		//this.pools=this.mockPools.getPools();
 
-		this.contract.connectToContract(contractAddress, function(error: string){
+		var func = function(error: string, address: string){
 			if(error!=undefined){
-				callback(error);
+				callback(error, address);
 				return;
 			} else {
-			self.getMembers().then(members => 
-				self.getPools().then(pools => {
-					self.contract.startListeningForEvents(self.handleEvent);
-					callback();
+				self.getMembers().then(members => 
+					self.getPools().then(pools => {
+						self.contract.startListeningForEvents(self.handleEvent);
+						callback(error, address);
 				}));
 			}
+		};
+
+		this.contract.init(function(error: string){
+			if(error==undefined){
+				self.contract.connectToContract(contractAddress, func);
+			} else callback(error, undefined);
 		});
 
 		//this.getMembers().then(members => this.contract.startListeningForEvents(this.handleEvent));
@@ -264,6 +289,9 @@ export class DataService {
 
 	handleEvent = (event: any) => {
 		console.log(event.event);
+		console.log(event);
+
+		var self = this;
 
 		var d = new Date(0);
 		d.setUTCSeconds(event.args.time);
@@ -274,25 +302,31 @@ export class DataService {
 
 		transaction.from = event.args.from;
 
+		var isNew = this.contract.getLastBlockNumber() < event.blockNumber;
+
+		console.log(isNew, this.contract.getLastBlockNumber(), event.blockNumber);
+
 		switch(event.event){
 			case "PoolChanged": {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.added ? "Pool created" : "Pool modified";
+
+				if(isNew) this.getPools(true);
 			} break;
 
 			case "PersonChanged": {
 				transaction.to = event.args.to;
 				transaction.data = event.args.added ? "Added member" : "Member modified";
+				
+					if(event.args.added){
+						var date = new Date(0);
+						date.setUTCSeconds(event.args.time);
+						self.membersSince[Number(event.args.to)] = date.toLocaleString();
 
-				if(event.args.added){
-					this.getMember(event.args.to.valueOf()).then(member =>{
-						if(member!=undefined){
-							var date = new Date(0);
-							date.setUTCSeconds(event.args.time);
-							member.memberSince = date.toLocaleString();
-						}
-					});
-				}
+						if(isNew) self.getMembers(true);
+						else self.getMember(Number(event.args.to)).then(member => member.memberSince = date.toLocaleString());
+					}
+
 			} break;
 			
 
@@ -300,17 +334,23 @@ export class DataService {
 				transaction.to = event.args.to;
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
+
+				if(isNew) this.getMembers(true);
 			} break;
 
 			case "SliceTransfer": {
 				transaction.to = event.args.to;
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
+
+				if(isNew) this.getMembers(true);
 			} break;
 
 			case "TokenPurchase": {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
+
+				if(isNew) this.getMembers(true);
 			} break;
 
 			case "UnauthorizedAccess": {

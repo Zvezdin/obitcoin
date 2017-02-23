@@ -8,16 +8,16 @@
   width: 100%;
 }
 
-.forgot {
+.getMetamask {
   background: white;
   width: 380px;
 
-  .forgot-header {
+  .header {
     background: $background-color__sidenav-list;
     padding: 24px;
   }
 
-  .forgot-content {
+  .content {
     padding: 24px 42px 42px;
 
     md-input-container {
@@ -38,6 +38,20 @@
       color: #777;
       margin: 24px 0 0;
       text-align: center;
+    }
+
+    .message {
+      color: #934;
+      margin: 24px 0 0;
+      text-align: center;
+      font-size: 1.5em;
+    }
+
+    .link {
+      color: #119;
+      margin: 24px 0 0;
+      text-align: center;
+      font-size: 2em;
     }
   }
 }

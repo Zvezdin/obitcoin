@@ -38,7 +38,7 @@
 
 		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
 			<button md-raised-button (click)="goBack()">Back</button>
-			<button md-raised-button color="primary" (click)="edit()">Edit</button>
+			<button md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click)="edit()">Edit</button>
 		</div>
 
 		<md-divider></md-divider>

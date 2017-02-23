@@ -27,6 +27,8 @@ export class PoolDetailComponent implements OnInit {
 	members: Member[];
 	pool : Pool;
 	transactions: Transaction[];
+	userPermissionLevel: number;
+
 	constructor(
 		private dataService: DataService,
 		private route: ActivatedRoute,
@@ -62,6 +64,8 @@ export class PoolDetailComponent implements OnInit {
 			(member as any).tokens = this.pool.tokens[member.id] == undefined ? 0 : this.pool.tokens[member.id];
 			(member as any).slices = this.pool.slices[member.id] == undefined ? 0 : this.pool.slices[member.id];
 		});
+
+		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
 	}
 
 	goBack(): void {

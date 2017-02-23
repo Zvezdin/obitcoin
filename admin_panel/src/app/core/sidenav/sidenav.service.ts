@@ -19,13 +19,13 @@ export class SidenavService {
   constructor() {
     let menu = this;
 
-    let dashboard = menu.addItem('Dashboard', 'dashboard', '/dashboard', 1);
+    let dashboard = menu.addItem('My balance', 'dashboard', '/dashboard', 1);
 
     menu.addItem('Members', 'people', '/members', 1);
     menu.addItem('Pools', 'message', '/pools', 1);
     menu.addItem('Transactions', 'link', '/transactions', 1);
 
-    let components =  menu.addItem('Components', 'layers', null, 3);
+   /*let components =  menu.addItem('Components', 'layers', null, 3);
     menu.addSubItem(components, 'Buttons', '/components/buttons', 1);
     menu.addSubItem(components, 'Cards', '/components/cards', 2);
     menu.addSubItem(components, 'Dialogs', '/components/dialogs', 3);
@@ -50,7 +50,7 @@ export class SidenavService {
     menu.addSubItem(customPages, 'Login Page', '/login', 1);
     menu.addSubItem(customPages, 'Register Page', '/register', 2);
     menu.addSubItem(customPages, 'Forgot Password', '/forgot-password', 3);
-    menu.addSubItem(customPages, 'Dashboard v1', '/dashboard-v1', 4);
+    menu.addSubItem(customPages, 'Dashboard v1', '/dashboard-v1', 4);*/
   }
 
   addItem(name: string, icon: string, route: string, position: number, badge?: string, badgeColor?: string) {

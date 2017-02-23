@@ -2,8 +2,8 @@
     <div fxLayout="row" fxLayoutAlign="space-between">
         <h2>Transactions</h2>
         <div fxLayout="row" fxFlexAlign="end" fxLayoutAlign="center">
-            <button fxFlex md-raised-button color="primary" (click) = "sendTokens()">Issue tokens</button>
-            <button fxFlex md-raised-button color="primary" (click) = "buyTokens()">Buy tokens</button>
+            <button fxFlex md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click) = "sendTokens()">Issue tokens</button>
+            <button fxFlex md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click) = "buyTokens()">Buy tokens</button>
         </div>
 	</div>
 

@@ -45,7 +45,7 @@ import {DynamicMenuService} from "./demo/dynamic-menu/dynamic-menu.service";
 import { AdminComponent } from './core/admin/admin.component';
 import { LoginComponent } from './demo/custom-pages/login/login.component';
 import { RegisterComponent } from './demo/custom-pages/register/register.component';
-import { ForgotPasswordComponent } from './demo/custom-pages/forgot-password/forgot-password.component';
+import { GetMetamaskComponent } from './demo/custom-pages/get-metamask/get-metamask.component';
 import { QuillModule } from 'ngx-quill';
 import { EditorComponent } from './demo/editor/editor.component';
 import { QuickpanelComponent } from './core/quickpanel/quickpanel.component';
@@ -127,7 +127,7 @@ const sortablejsConfig: SortablejsOptions = {
     AdminComponent,
     LoginComponent,
     RegisterComponent,
-    ForgotPasswordComponent,
+    GetMetamaskComponent,
     EditorComponent,
     QuickpanelComponent,
     DashboardComponent,

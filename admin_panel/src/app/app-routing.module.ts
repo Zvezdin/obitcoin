@@ -21,7 +21,7 @@ import {SimpleTableComponent} from "./demo/tables/simple-table/simple-table.comp
 import {FixedHeaderTableComponent} from "./demo/tables/fixed-header-table/fixed-header-table.component";
 import {LoginComponent} from "./demo/custom-pages/login/login.component";
 import {RegisterComponent} from "./demo/custom-pages/register/register.component";
-import {ForgotPasswordComponent} from "./demo/custom-pages/forgot-password/forgot-password.component";
+import {GetMetamaskComponent} from "./demo/custom-pages/get-metamask/get-metamask.component";
 import {EditorComponent} from "./demo/editor/editor.component";
 import {DashboardComponent} from "./demo/dashboard/dashboard.component";
 import {DragAndDropComponent} from "./demo/drag-and-drop/drag-and-drop.component";
@@ -57,8 +57,8 @@ const routes: Routes = [
     component: RegisterComponent
   },
   {
-    path: 'forgot-password',
-    component: ForgotPasswordComponent
+    path: 'getMetamask',
+    component: GetMetamaskComponent
   },
   {
     path: '',
@@ -118,10 +118,6 @@ const routes: Routes = [
       {
         path: 'issue_tokens',
         component: IssueTokensComponent,
-      },
-      {
-        path: 'details',
-        component: MemberDetailsComponent,
       },
       {
         path: 'apps/inbox',

@@ -28,9 +28,10 @@ import { Transaction } from '../transaction';
 
 export class MemberDetailComponent implements OnInit {
 	member: Member;
-	memberPermLevel: string;
 	pools: Pool[];
 	transactions: Transaction[];
+
+	userPermissionLevel: number;
 
 	constructor(
 		private dataService: DataService,
@@ -40,11 +41,16 @@ export class MemberDetailComponent implements OnInit {
 	) {}
 	
 	ngOnInit(): void {
+		console.log(this.route.params);
 		var self = this;
+
+		this.dataService.getUser().then(user => self.userPermissionLevel = user.permissionLevel);
+
 		this.route.params
 			.switchMap((params: Params) =>
-		this.dataService.getMember(params['id']))
-			.subscribe(member => ( member==undefined ? self.dataService.getUser().then(member => self.member = member) : self.member=member,
+			params['id'] != undefined ? this.dataService.getMember(params['id']) : this.dataService.getUser()
+		)
+			.subscribe(member => (	self.member=member,
 
 			self.dataService.getPools().then(pools => {
 				self.pools = pools.filter( pool => pool.members.find(member2 => member2==self.member.id) != undefined ),
@@ -63,19 +69,11 @@ export class MemberDetailComponent implements OnInit {
 	initData(){
 		this.pools.forEach(pool => {
 			pool.init();
-			(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";
-			(pool as any).slicesShare = ((pool.slices[this.member.id]/pool.totalSlices)* 100 ).toFixed(2) + "%";
+			if(pool.totalTokens>0)
+				(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";
+			if(pool.totalSlices>0)
+				(pool as any).slicesShare = ((pool.slices[this.member.id]/pool.totalSlices)* 100 ).toFixed(2) + "%";
 		});
-
-		console.log(this.member.permissionLevel);
-		console.log(this.member);
-		switch(this.member.permissionLevel){
-			case 0: {this.memberPermLevel="No permissions"; break;}
-			case 1: {this.memberPermLevel="Contract member"; break;}
-			case 2: {this.memberPermLevel="Contract admin"; break;}
-			case 3: {this.memberPermLevel="Contract owner"; break;}
-			default: {this.memberPermLevel="Contract member"; break;}
-		}
 	}
 
 	goBack(): void {

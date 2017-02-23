@@ -24,6 +24,10 @@ export class LoginComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
+		var self = this;
+		window.setTimeout(function(){
+			if(!self.dataService.isWeb3Available()) self.router.navigate(['/getMetamask']);
+		}, 1000);
 	}
 
 	login() {

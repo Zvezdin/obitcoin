@@ -22,6 +22,7 @@ import { DataService } from '../data.service';
 
 export class PoolsComponent implements OnInit {
 	pools: Pool[];
+	userPermissionLevel: number;
 	
 	constructor(
 		private dataService: DataService,
@@ -37,6 +38,7 @@ export class PoolsComponent implements OnInit {
 	
 	ngOnInit(): void {
 		this.getPools();
+		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
     }
 	
 	onSelect(pool: Pool): void {

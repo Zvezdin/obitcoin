@@ -2,7 +2,7 @@
 
     <div fxLayout="row" fxLayoutAlign="space-between">
 	<h2>Debt pools</h2>
-	<button fxFlexAlign="end" md-raised-button color="primary" (click) = addPool()>Add pool</button>
+	<button fxFlexAlign="end" md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click) = addPool()>Add pool</button>
 	</div>
 
     <p-dataTable [value]="pools">

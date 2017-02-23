@@ -43,7 +43,21 @@ export class SidenavComponent implements OnInit, OnDestroy {
     });
 
 
-    this.breadcrumbService.addFriendlyNameForRoute('/', "Derp board");
+    this.breadcrumbService.addFriendlyNameForRoute('/dashboard', "Profile page");
+    this.breadcrumbService.addFriendlyNameForRoute('/members', "Member list");
+    this.breadcrumbService.addFriendlyNameForRoute('/edit_member', "Edit member");
+    this.breadcrumbService.addFriendlyNameForRoute('/add_member', "Add member");
+    this.breadcrumbService.addFriendlyNameForRoute('/detail_member', "Member details");
+    this.breadcrumbService.addFriendlyNameForRoute('/pools', "Debt pools list");
+    this.breadcrumbService.addFriendlyNameForRoute('/detail_pool', "Debt pool details");
+    this.breadcrumbService.addFriendlyNameForRoute('/edit_pool', "Edit debt pool");
+    this.breadcrumbService.addFriendlyNameForRoute('/add_pool', "Add debt pool");
+    this.breadcrumbService.addFriendlyNameForRoute('/transactions', "Global transaction list");
+    this.breadcrumbService.addFriendlyNameForRoute('/buy_tokens', "Buy tokens");
+    this.breadcrumbService.addFriendlyNameForRoute('/issue_tokens', "Issue tokens");
+
+
+
     this.breadcrumbService.addFriendlyNameForRoute('/details', "Member details");
     this.breadcrumbService.addFriendlyNameForRoute('/apps', "Apps");
     this.breadcrumbService.addFriendlyNameForRoute('/apps/inbox', "Inbox");
@@ -88,11 +102,11 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
     this.sidenavService.isIconSidenav = !this.sidenavService.isIconSidenav;
 
-    if (this.sidenavService.isIconSidenav) {
+    /*if (this.sidenavService.isIconSidenav) {
       this.snackBar.open('You activated Icon-Sidenav, move your mouse to the content and see what happens!', '', {
         duration: 10000
       });
-    }
+    }*/
   }
 
   isIconSidenav(): boolean {

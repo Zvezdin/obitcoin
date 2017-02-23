@@ -14,7 +14,7 @@ import { DataService } from '../data.service';
 	selector: 'member-edit',
 	
 	templateUrl: './member-edit.component.html',
-	styleUrls: ['./member-edit.component.css'],
+	styleUrls: ['./member-edit.component.scss'],
 
 	host: {
     '[@fadeInAnimation]': 'true'
@@ -72,7 +72,9 @@ export class MemberEditComponent implements OnInit {
 
 		this.applyChanges(function(result){
 			if(result!=undefined){
-				self.snackBar.open("Submitted changes. May take up to a minute to apply. Transaction hash: "+result, "Close", {});
+				self.snackBar.open("Submitted changes. May take up to a minute to apply.", "Close", {
+					duration: 5000
+				});
 			}
 		});
 	}

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
 import { MdSnackBar } from "@angular/material";
+import { Location } from '@angular/common';
+import { fadeInAnimation } from '../route.animation';
 
 import { Pool } from '../pool';
 import { Member } from '../member';
@@ -8,14 +10,19 @@ import { Member } from '../member';
 @Component({
 	selector: 'ms-issue-tokens',
 	templateUrl: './issue-tokens.component.html',
-	styleUrls: ['./issue-tokens.component.scss']
+	styleUrls: ['./issue-tokens.component.scss'],
+
+	host: {
+    '[@fadeInAnimation]': 'true'
+	},
+	animations: [ fadeInAnimation ]
 })
 export class IssueTokensComponent implements OnInit {
 	pools: Pool[];
 	members: Member[];
 	inputs: Input[];
 
-	constructor(private dataService: DataService, private snackBar: MdSnackBar) { }
+	constructor(private dataService: DataService, private snackBar: MdSnackBar, private location: Location) { }
 
 	ngOnInit() {
 		var self = this;
@@ -35,6 +42,12 @@ export class IssueTokensComponent implements OnInit {
 
 	newInput(): void {
 		this.inputs.push(new Input());
+	}
+
+	remove(input: Input){
+		var index = this.inputs.indexOf(input);
+		if(index>=0)
+			this.inputs.splice(index, 1);
 	}
 
 	issueTokens(): void {
@@ -73,7 +86,9 @@ export class IssueTokensComponent implements OnInit {
 		this.dataService.sendTokens(pools, members, amount, function(result){
 			if(result!=undefined){
 				console.log("showing notification");
-				self.snackBar.open("Submitted changes. May take up to a minute to apply. Transaction hash: "+result, "Close", {});
+				self.snackBar.open("Sent transaction. May take up to a minute to apply.", "Close", {
+					duration: 5000
+				});
 			}
 		});
 	}
@@ -84,6 +99,10 @@ export class IssueTokensComponent implements OnInit {
 
 	isMember(id: Number): boolean{
 		return this.members.find(member => member.id == id) != undefined;
+	}
+
+	back(): void {
+		this.location.back();
 	}
 
 }

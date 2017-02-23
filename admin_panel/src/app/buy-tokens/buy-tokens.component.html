@@ -17,8 +17,14 @@
 
 					<md-divider></md-divider>
 
-					<div fxFlexAlign = "end">
-						<button md-raised-button color="primary" (click)="buyTokens()">Apply all changes</button>
+					<div fxLayout="row" fxLayoutAlign="space-between">
+						<div fxFlexAlign = "syart">
+							<button md-raised-button (click)="back()">Back</button>
+						</div>
+
+						<div fxFlexAlign = "end">
+							<button md-raised-button color="primary" (click)="buyTokens()">Issue transaction</button>
+						</div>
 					</div>
 				</div>
 			</md-card-content>
