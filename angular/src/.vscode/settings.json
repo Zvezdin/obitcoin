@@ -1,7 +1,0 @@
-// Platzieren Sie Ihre Einstellungen in dieser Datei, um die Standardeinstellungen zu überschreiben.
-{
-    "files.exclude": {
-        "**/*.js": {"when": "$(basename).ts"},
-        "**/*.js.map": true
-    }
-}

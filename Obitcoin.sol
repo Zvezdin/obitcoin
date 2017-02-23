@@ -275,6 +275,7 @@ contract Obitcoin{
 		
 		for(i=0; i<pools[pool].members.length; i++){
 		    tokenSum+=pools[pool].balance[pools[pool].members[i]][0]; //get the sum of the tokens in the pool.
+		    sliceSum+=pools[pool].balance[pools[pool].members[i]][1];
 		}
 		
 		i=0;
@@ -297,12 +298,13 @@ contract Obitcoin{
 				
 				value = (debt*amount)/tokenSum; //calculate what part of the coins to buy.
 				
-				if(value>0){
+				if(value>0 && debt>0){
     				if(debt-value>debt){ //if we're sending more than the token count of the person
         				TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
         				SliceTransfer(memberAddresses[msg.sender], member, pool, debt, now);
         				totalSent+=debt;
         				slices +=debt;
+        				sliceSum += debt;
         				debt = 0; //only clear the debt of the person, nothing else.
     				}
     				else {
@@ -310,13 +312,13 @@ contract Obitcoin{
         				SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
     					debt -= value;
     					slices += value;
+    					sliceSum += value;
     					totalSent+=value;
     				}
     				
     				pools[pool].balance[member][0] = debt;
     				pools[pool].balance[member][1] = slices;
 				}
-				sliceSum += slices;
 			}
 		}
 		if(totalSent<amount){ //if there are leftover money, split them based on slice ratio
@@ -351,7 +353,7 @@ contract Obitcoin{
 		    if(debt>value){
 		        debt-=value;
 		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
-		    } else {
+		    } else if(debt>0) {
 		        TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
 		        debt=0;
 		    }
