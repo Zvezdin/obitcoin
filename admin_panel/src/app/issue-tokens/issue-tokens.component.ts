@@ -87,7 +87,6 @@ export class IssueTokensComponent implements OnInit {
 			if(result!=undefined){
 				console.log("showing notification");
 				self.snackBar.open("Sent transaction. May take up to a minute to apply.", "Close", {
-					duration: 5000
 				});
 			}
 		});

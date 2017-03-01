@@ -7,11 +7,13 @@ import { MEMBERS } from './mock-members';
 import { TRANSACTIONS } from './mock-transactions';
 import { MockPools } from './mock-pools';
 
+//import * as contract_integration from './contractintegration';
 //import 'app/contract_integration.js';
 
-//declare var contract_integration: any;
-
 declare var contract_integration: any;
+declare var web3: any;
+
+//declare var contract_integration: any;
 
 @Injectable()
 
@@ -26,6 +28,8 @@ export class DataService {
 
 	accounts: string[];
 	account: string;
+
+	notificationCallback: Function;
 
 	self: any;
 
@@ -57,6 +61,8 @@ export class DataService {
 							if(pool.tokens[member.id]!=undefined) member.totalTokens += pool.tokens[member.id];
 							if(pool.slices[member.id]!=undefined) member.totalSlices += pool.slices[member.id];
 						});
+						
+						console.log("Loaded member: ", member);
 
 						resolve(members);
 					});
@@ -105,6 +111,7 @@ export class DataService {
 					newPool.members = pool.members;
 
 					self.pools.push(newPool);
+					console.log("Loading pool: ", newPool);
 				});
 				resolve(self.pools);
 			});
@@ -182,6 +189,7 @@ export class DataService {
 	}
 
 	init(){
+		console.log(typeof contract_integration);
 		this.contract = new contract_integration();
 		this.transactions = [];
 		this.membersSince = new Map<number, string>();
@@ -189,11 +197,10 @@ export class DataService {
 
 	initData(callback){
 		var self = this;
-		self.getMembers().then(members => 
-			self.getPools().then(pools => {
-				self.contract.startListeningForEvents(self.handleEvent);
-				callback();
-		}));
+		self.getMembers(true).then(members => {
+			self.contract.startListeningForEvents(self.handleEvent);
+			callback();
+		});
 	}
 
 	deployNewContract(callback){
@@ -228,11 +235,10 @@ export class DataService {
 				callback(error, address);
 				return;
 			} else {
-				self.getMembers().then(members => 
-					self.getPools().then(pools => {
-						self.contract.startListeningForEvents(self.handleEvent);
-						callback(error, address);
-				}));
+				self.getMembers(true).then(members => {
+					self.contract.startListeningForEvents(self.handleEvent);
+					callback(error, address);
+				});
 			}
 		};
 
@@ -255,6 +261,10 @@ export class DataService {
 		
 		//this.contract.getWholeMembers(this.handleMembers);
 		//this.contract.getWholePools(this.handlePools);
+	}
+
+	setNotificationCallback(callback){
+		this.notificationCallback = callback;
 	}
 
 	handlePools = (pools: Pool[], callback: any) => {
@@ -305,6 +315,10 @@ export class DataService {
 		var isNew = this.contract.getLastBlockNumber() < event.blockNumber;
 
 		console.log(isNew, this.contract.getLastBlockNumber(), event.blockNumber);
+
+		if(isNew){
+			if(this.notificationCallback!=undefined) this.notificationCallback("New event: "+event.event);
+		}
 
 		switch(event.event){
 			case "PoolChanged": {

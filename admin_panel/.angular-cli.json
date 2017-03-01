@@ -32,7 +32,7 @@
         "../node_modules/sortablejs/Sortable.js",
         "./app/core/highlightjs/highlight.pack.js",
         "../node_modules/css-element-queries/src/ResizeSensor.js",
-	"./app/contractintegration.js"
+		"./app/contractintegration.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

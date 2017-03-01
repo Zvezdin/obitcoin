@@ -73,7 +73,6 @@ export class MemberEditComponent implements OnInit {
 		this.applyChanges(function(result){
 			if(result!=undefined){
 				self.snackBar.open("Submitted changes. May take up to a minute to apply.", "Close", {
-					duration: 5000
 				});
 			}
 		});
