@@ -104,7 +104,7 @@ contract Obitcoin{
     }*/
     
     function addMember(bytes32 name, address adr, bool isAdmin) public onlyAdmin {
-        if(adr == 0) throw;
+        if(adr == 0) throw; //don't want to add a null address
         
         members[memberCounter] = Member(name, adr, isAdmin ? PermLevel.admin : PermLevel.member, true);
         memberAddresses[adr] = memberCounter;
@@ -200,16 +200,20 @@ contract Obitcoin{
         return pools[pool].balance[member];
     }
     
-    function getMembersBalance(uint16 pool) public constant returns (uint128[2][], uint16[]) {
+    function getMembersBalance(uint16 pool) public constant returns (uint128[], uint128[], uint16[]) {
         if(!pools[pool].exists) throw;
         
-        uint128[2][] memory balances = new uint128[2][](pools[pool].members.length);
+        uint128[] memory bal1 = new uint128[](pools[pool].members.length);
+        uint128[] memory bal2 = new uint128[](pools[pool].members.length);
+        uint16 member;
         
         for(uint16 i=0; i<pools[pool].members.length; i++){
-            balances[i] = pools[pool].balance[pools[pool].members[i]];
+            member = pools[pool].members[i];
+            bal1[i] = pools[pool].balance[member][0];
+            bal2[i] = pools[pool].balance[member][1];
         }
         
-        return (balances, pools[pool].members);
+        return (bal1, bal2, pools[pool].members);
     }
     
     function getMembers() public constant returns (uint16[]){
