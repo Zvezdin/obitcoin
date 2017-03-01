@@ -7,11 +7,11 @@ import { MEMBERS } from './mock-members';
 import { TRANSACTIONS } from './mock-transactions';
 import { MockPools } from './mock-pools';
 
+import { contractintegration } from './contractintegration';
 //import * as contract_integration from './contractintegration';
 //import 'app/contract_integration.js';
 
-declare var contract_integration: any;
-declare var web3: any;
+//declare var contract_integration: any;
 
 //declare var contract_integration: any;
 
@@ -189,8 +189,8 @@ export class DataService {
 	}
 
 	init(){
-		console.log(typeof contract_integration);
-		this.contract = new contract_integration();
+		console.log(typeof contractintegration);
+		this.contract = new contractintegration();
 		this.transactions = [];
 		this.membersSince = new Map<number, string>();
 	}

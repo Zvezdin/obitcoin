@@ -1,4 +1,20 @@
-class contractintegration{
+import { Member } from './member';
+import { Pool } from './pool';
+
+declare var web3: any;
+
+export class contractintegration{
+	accounts: any[];
+	account: any;
+	contractAbi: any;
+	contractCompiled: any;
+	contractGas: any;
+	connected: any;
+	initialized: any;
+	lastBlockNumber: any;
+	self: any;
+
+	Obitcoin: any;
 
 	constructor(){
 		this.accounts = [];
@@ -198,7 +214,7 @@ class contractintegration{
 
 		this.Obitcoin.getMemberDetails.call(member, {from: this.account}, function(error, result){
 			if(!error){
-				var data = [3];
+				var data = new Array(3);
 				data[0] = self.hex2a(result[0]);
 				data[1] = result[1];
 				data[2] = result[2].valueOf();
@@ -229,7 +245,7 @@ class contractintegration{
 	}
 
 	getWholeMember(id, callback){
-		var member = {};
+		var member = new Member();
 		member.id = Number(id);
 
 		this.getMemberDetails(id, function(result){
@@ -279,12 +295,12 @@ class contractintegration{
 	getWholePool(id, callback){
 		var self = this;
 
-		var pool = {};
+		var pool = new Pool();
 		pool.id = Number(id);
 		var stage1=false, stage2=false;
 
-		pool.tokens = new Map();
-		pool.slices = new Map();
+		pool.tokens = new Map<number, number>();
+		pool.slices = new Map<number, number>();
 
 		this.getPoolData(id, function(result){
 			console.log(result);

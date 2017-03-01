@@ -31,8 +31,7 @@
         "../node_modules/hammerjs/hammer.js",
         "../node_modules/sortablejs/Sortable.js",
         "./app/core/highlightjs/highlight.pack.js",
-        "../node_modules/css-element-queries/src/ResizeSensor.js",
-		"./app/contractintegration.js"
+        "../node_modules/css-element-queries/src/ResizeSensor.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
