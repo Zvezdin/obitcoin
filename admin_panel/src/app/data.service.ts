@@ -45,7 +45,7 @@ export class DataService {
 
 		return new Promise(resolve => { //get the data the slow way
 			var self = this;
-			this.contract.getWholeMembers(function(members: any[]){
+			this.contract.getWholeMembers(function(members: Member[]){
 				self.members = members;
 
 				self.members.forEach(member => {
@@ -99,8 +99,8 @@ export class DataService {
 
 		return new Promise(resolve => {
 			this.contract.getWholePools(function(pools: Pool[]){
-				self.pools = [];
-				pools.forEach(pool => {
+				self.pools = pools;
+				/*pools.forEach(pool => {
 					var newPool = new Pool();
 					newPool.id = pool.id;
 					newPool.financialReports = pool.financialReports;
@@ -112,7 +112,8 @@ export class DataService {
 
 					self.pools.push(newPool);
 					console.log("Loading pool: ", newPool);
-				});
+				});*/
+				console.log("Loaded pools: ", pools);
 				resolve(self.pools);
 			});
 		});
