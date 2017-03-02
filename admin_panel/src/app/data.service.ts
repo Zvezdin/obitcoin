@@ -61,8 +61,6 @@ export class DataService {
 							if(pool.tokens[member.id]!=undefined) member.totalTokens += pool.tokens[member.id];
 							if(pool.slices[member.id]!=undefined) member.totalSlices += pool.slices[member.id];
 						});
-						
-						console.log("Loaded member: ", member);
 
 						resolve(members);
 					});
@@ -82,9 +80,9 @@ export class DataService {
 		});
 	}
 	
-	getMember(id: number): Promise<Member> {
-		console.log("Getting member with id "+id);
-		return this.getMembers()
+	getMember(id: number, forceReload: boolean = false): Promise<Member> {
+		//console.log("Getting member with id "+id);
+		return this.getMembers(forceReload)
 			.then(members => members.find(member => member.id == id));
 	}
 
@@ -100,20 +98,6 @@ export class DataService {
 		return new Promise(resolve => {
 			this.contract.getWholePools(function(pools: Pool[]){
 				self.pools = pools;
-				/*pools.forEach(pool => {
-					var newPool = new Pool();
-					newPool.id = pool.id;
-					newPool.financialReports = pool.financialReports;
-					newPool.legalContract = pool.legalContract;
-					newPool.name = pool.name;
-					newPool.slices = pool.slices;
-					newPool.tokens = pool.tokens;
-					newPool.members = pool.members;
-
-					self.pools.push(newPool);
-					console.log("Loading pool: ", newPool);
-				});*/
-				console.log("Loaded pools: ", pools);
 				resolve(self.pools);
 			});
 		});
@@ -268,39 +252,7 @@ export class DataService {
 		this.notificationCallback = callback;
 	}
 
-	handlePools = (pools: Pool[], callback: any) => {
-		var self = this;
-		this.pools = [];
-		pools.forEach(pool => {
-			var newPool = new Pool();
-			newPool.id = pool.id;
-			newPool.financialReports = pool.financialReports;
-			newPool.legalContract = pool.legalContract;
-			newPool.name = pool.name;
-			newPool.slices = pool.slices;
-			newPool.tokens = pool.tokens;
-			newPool.members = pool.members;
-
-			/*var members = pool.members;
-			members.forEach(function(id: number){
-				self.getMember(id).then(function(member: Member){
-					newPool.members.push(member);
-				});
-			});*/
-
-			self.pools.push(newPool);
-		});
-
-		callback(this.pools);
-	}
-
-	handleMembers = (members: any[]) => {
-		this.members=members;
-	}
-
 	handleEvent = (event: any) => {
-		console.log(event.event);
-		console.log(event);
 
 		var self = this;
 
@@ -315,11 +267,9 @@ export class DataService {
 
 		var isNew = this.contract.getLastBlockNumber() < event.blockNumber;
 
-		console.log(isNew, this.contract.getLastBlockNumber(), event.blockNumber);
+		if(isNew) console.log(event);
 
-		if(isNew){
-			if(this.notificationCallback!=undefined) this.notificationCallback("New event: "+event.event);
-		}
+		let message : string;
 
 		switch(event.event){
 			case "PoolChanged": {
@@ -350,7 +300,18 @@ export class DataService {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 
-				if(isNew) this.getMembers(true);
+				if(isNew){
+					message = "";
+					this.getMember(Number(transaction.to), true).then(member => {
+						if(member != undefined){
+							if(event.args.amount.valueOf() > 0) message +="+";
+							message+=event.args.amount+" tokens to ";
+							message += member.name;
+							if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
+						}
+						
+					});
+				}
 			} break;
 
 			case "SliceTransfer": {
@@ -358,14 +319,28 @@ export class DataService {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 
-				if(isNew) this.getMembers(true);
+				if(isNew){
+					message = "";
+					this.getMember(Number(transaction.to), true).then(member => {
+						if(member != undefined){
+							if(event.args.amount.valueOf() > 0) message +="+";
+							message+=event.args.amount+" slices to ";
+							message += member.name;
+							if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
+						}
+						
+					});
+				}
 			} break;
 
 			case "TokenPurchase": {
 				transaction.pool = event.args.pool;
 				transaction.data = event.args.amount+" tokens";
 
-				if(isNew) this.getMembers(true);
+				if(isNew){
+					message = "Split "+event.args.amount+" total tokens";
+					if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
+				}
 			} break;
 
 			case "UnauthorizedAccess": {

@@ -20,6 +20,6 @@ export class Pool{
 			if(this.tokens[member]!=undefined)
 				this.totalTokens+=this.tokens[member]
 		});
-		console.log("Total slices for pool "+this.name+" - "+this.totalSlices+" and tokens - "+this.totalTokens);
+		//console.log("Total slices for pool "+this.name+" - "+this.totalSlices+" and tokens - "+this.totalTokens);
     }
 }

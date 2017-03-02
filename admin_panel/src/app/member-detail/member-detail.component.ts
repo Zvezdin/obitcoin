@@ -41,7 +41,6 @@ export class MemberDetailComponent implements OnInit {
 	) {}
 	
 	ngOnInit(): void {
-		console.log(this.route.params);
 		var self = this;
 
 		this.dataService.getUser().then(user => self.userPermissionLevel = user.permissionLevel);

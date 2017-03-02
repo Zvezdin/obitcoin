@@ -1,1 +1,1 @@
-testrpc -m "illegal goat income maid bargain junk bargain child story alone want dismiss"
+testrpc -m "illegal goat income maid bargain junk bargain child story alone want dismiss" -d 5

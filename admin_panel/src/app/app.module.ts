@@ -31,6 +31,7 @@ import {CommonModule} from "@angular/common";
 import { MemberDetailsComponent } from './member-details/member-details.component';
 
 import { DataService } from './data.service';
+import { DialogService } from './dialog.service';
 
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { MemberEditComponent } from './member-edit/member-edit.component';
@@ -41,9 +42,10 @@ import { PoolEditComponent } from './pool-edit/pool-edit.component';
 import { PoolsComponent } from './pools/pools.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 
-import { DropdownModule, DataTableModule, SharedModule, ButtonModule } from 'primeng/primeng';
+import { DropdownModule, DataTableModule, SharedModule, ButtonModule, DialogModule } from 'primeng/primeng';
 import { IssueTokensComponent } from './issue-tokens/issue-tokens.component';
 import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
+import { DialogComponent } from './dialog/dialog.component';
 
 const perfectScrollbarConfig: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -78,11 +80,10 @@ const sortablejsConfig: SortablejsOptions = {
     TransactionsComponent,
     IssueTokensComponent,
     BuyTokensComponent,
+    DialogComponent,
   ],
   entryComponents: [
-    /*DemoDialog,
-    InboxComposeComponent,
-    CalendarEditComponent*/
+    DialogComponent
   ],
   imports: [
     CommonModule,
@@ -104,13 +105,18 @@ const sortablejsConfig: SortablejsOptions = {
 		SharedModule,
 		ButtonModule,
 		DropdownModule,
+    DialogModule,
   ],
   providers: [
     SidenavService,
     MdIconRegistry,
     BreadcrumbService,
     DataService,
+    DialogService,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports : [
+    DialogModule
+  ]
 })
 export class AppModule { }
