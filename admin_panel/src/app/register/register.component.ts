@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {fadeInAnimation} from "../route.animation";
 import {Router} from "@angular/router";
 import { MdSnackBar } from "@angular/material";
-import { ApplicationRef } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 
 import { DataService } from '../data.service';
 
@@ -23,7 +23,7 @@ export class RegisterComponent implements OnInit {
 	private router: Router,
 	private dataService: DataService,
 	private snackBar: MdSnackBar,
-	private appRef: ApplicationRef,
+	private cdRef: ChangeDetectorRef,
 	) { }
 	
 	ngOnInit() {
@@ -31,16 +31,17 @@ export class RegisterComponent implements OnInit {
 	
 	register() {
 		var self = this;
-		this.dataService.deployNewContract(function(error: string, address: string){
+		this.dataService.deployNewContract(function(error, address: string){
 			console.log("Got contract");
 			if(error!=undefined){
-				self.snackBar.open(error, "Close", {});
+				console.log("Error with contract creation:",error);
+				self.snackBar.open("There was an error", "Close", {});
 			}
 			else {
 				self.snackBar.open("Contract created! Address: "+address, "Close");
 				self.contractAddress = address;
-				self.appRef.tick();
 			}
+			self.cdRef.detectChanges();
 		});
 	}
 

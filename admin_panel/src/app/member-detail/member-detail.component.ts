@@ -62,6 +62,12 @@ export class MemberDetailComponent implements OnInit {
 		));
 	}
 	
+	ngAfterViewInit() {
+		setTimeout(() => {
+			window.dispatchEvent(new Event('resize'));
+		}, 1000);
+	}
+
 	totalSlices : number;
 	totalTokens: number;
 

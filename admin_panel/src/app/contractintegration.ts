@@ -1,7 +1,11 @@
+import { Injectable } from '@angular/core';
+
 import { Member } from './member';
 import { Pool } from './pool';
 
 declare var web3: any;
+
+@Injectable()
 
 export class contractintegration{
 	accounts: any[];
@@ -71,7 +75,8 @@ export class contractintegration{
 			data: this.contractCompiled, 
 			gas: this.contractGas
 		}, function (e, contract){
-			if (typeof contract.address !== 'undefined') {
+			if(e) callback(e, undefined);
+			else if (typeof contract.address !== 'undefined') {
 				console.log('Contract mined! address: ' + contract.address + ' transactionHash: ' + contract.transactionHash);
 				console.log(contract);
 
@@ -79,7 +84,6 @@ export class contractintegration{
 
 				callback(e, contract.address);
 			}
-			if(e) callback(e, contract.address);
 		});
 	}
 
@@ -394,13 +398,12 @@ export class contractintegration{
 
 			self.Obitcoin.getPublishingBlockNumber.call({from: self.account}, function(error, result){
 
-				var events = self.Obitcoin.allEvents({fromBlock: result.valueOf(), toBlock: 'latest'});
+				var events = self.Obitcoin.allEvents({fromBlock: result.valueOf()});
 				events.watch(function(err, event) {
 					if (err) {
 						console.log(err)
 						return;
 					}
-
 					callback(event);
 				});
 

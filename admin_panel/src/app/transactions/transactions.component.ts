@@ -36,17 +36,7 @@ export class TransactionsComponent implements OnInit {
 		this.dataService.getTransactions().then(transactions =>
 		{
             this.transactions = transactions;
-			this.prepareData();
 		});
-	}
-	
-	prepareData(){
-		this.transactions.forEach(transaction => this.dataService.getPool(transaction.pool)
-		.then(pool => 
-		{
-			if(pool!=undefined) (transaction as any).poolName = pool.name
-		}
-		));
 	}
 
 	ngOnInit(): void {

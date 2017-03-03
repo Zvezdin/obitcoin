@@ -18,8 +18,6 @@ import { contractintegration } from './contractintegration';
 @Injectable()
 
 export class DataService {
-	contract: any;
-
 	membersSince: Map<number, string>
 	members: Member[];
 	pools: Pool[];
@@ -33,7 +31,12 @@ export class DataService {
 
 	self: any;
 
+	lastTransactionHash: string = "";
 
+	constructor(private contract : contractintegration) {
+		this.transactions = [];
+		this.membersSince = new Map<number, string>();
+	}
 
 	getUser(): Promise<Member> {
 
@@ -173,13 +176,6 @@ export class DataService {
 		});
 	}
 
-	init(){
-		console.log(typeof contractintegration);
-		this.contract = new contractintegration();
-		this.transactions = [];
-		this.membersSince = new Map<number, string>();
-	}
-
 	initData(callback){
 		var self = this;
 		self.getMembers(true).then(members => {
@@ -193,7 +189,7 @@ export class DataService {
 		//this.transactions = TRANSACTIONS;
 		//this.pools=this.mockPools.getPools();
 
-		var func = function(error: string, address: string){
+		var func = function(error, address: string){
 			if(error!=undefined){
 				callback(error, address);
 				return;
@@ -232,20 +228,6 @@ export class DataService {
 				self.contract.connectToContract(contractAddress, func);
 			} else callback(error, undefined);
 		});
-
-		//this.getMembers().then(members => this.contract.startListeningForEvents(this.handleEvent));
-
-		/*this.contract.getPools();
-		this.contract.getPoolData(1);
-		this.contract.getPoolParticipants(1);
-		this.contract.getMemberBalance(1,1);
-		this.contract.getWhileMembers();
-		this.contract.getMemberName(1);
-		this.contract.getMemberAddress(1);
-		this.contract.getMemberPermLevel(1);*/
-		
-		//this.contract.getWholeMembers(this.handleMembers);
-		//this.contract.getWholePools(this.handlePools);
 	}
 
 	setNotificationCallback(callback){
@@ -253,7 +235,6 @@ export class DataService {
 	}
 
 	handleEvent = (event: any) => {
-
 		var self = this;
 
 		var d = new Date(0);
@@ -264,6 +245,8 @@ export class DataService {
 		transaction.date = d.toLocaleString();
 
 		transaction.from = event.args.from;
+		if(typeof event.args.to != "undefined") transaction.to = event.args.to;
+		if(typeof event.args.pool != "undefined") transaction.pool = event.args.pool;
 
 		var isNew = this.contract.getLastBlockNumber() < event.blockNumber;
 
@@ -271,98 +254,112 @@ export class DataService {
 
 		let message : string;
 
-		switch(event.event){
-			case "PoolChanged": {
-				transaction.pool = event.args.pool;
-				transaction.data = event.args.added ? "Pool created" : "Pool modified";
+		let eventDataExtraction : Function = function(){
+			self.getMembers().then(members => {
+				members.forEach(member => {
+					if(member == undefined) return;
+					if(member.id == Number(transaction.from)) transaction.fromName = member.name;
+					if(member.id == Number(transaction.to)) transaction.toName = member.name;
+				});
 
-				if(isNew) this.getPools(true);
-			} break;
+				self.getPools().then(pools => {
+					pools.forEach(pool => {if(pool.id == transaction.pool) transaction.poolName = pool.name});
 
-			case "PersonChanged": {
-				transaction.to = event.args.to;
-				transaction.data = event.args.added ? "Added member" : "Member modified";
-				
-					if(event.args.added){
-						var date = new Date(0);
-						date.setUTCSeconds(event.args.time);
-						self.membersSince[Number(event.args.to)] = date.toLocaleString();
+					console.log("Extracting "+event.event);
 
-						if(isNew) self.getMembers(true);
-						else self.getMember(Number(event.args.to)).then(member => member.memberSince = date.toLocaleString());
+					switch(event.event){
+						case "PoolChanged": {
+							transaction.data = event.args.added ? "Pool created" : "Pool modified";
+							if(isNew) message = (event.args.added ? "Created pool " : "Modified pool ") + transaction.poolName;
+						} break;
+
+						case "PersonChanged": {
+							transaction.data = event.args.added ? "Added member" : "Member modified";
+							if(isNew) message = (event.args.added ? "Added " : "Modified ") + transaction.toName;
+
+							if(event.args.added){
+								var date = new Date(0);
+								date.setUTCSeconds(event.args.time);
+								self.membersSince[Number(event.args.to)] = date.toLocaleString();
+								members.forEach(member => member.id == Number(event.args.to) ? member.memberSince = date.toLocaleString() : false);
+							}
+						} break;
+						
+
+						case "TokenTransfer": {
+							transaction.data = event.args.amount+" tokens";
+
+							if(isNew){
+								message = "";
+								if(event.args.amount.valueOf() > 0) message +="+";
+								message+=event.args.amount+" tokens to ";
+								message += transaction.toName;
+								message += " in pool "+transaction.poolName;
+							}
+						} break;
+
+						case "SliceTransfer": {
+							transaction.data = event.args.amount+" tokens";
+
+							if(isNew){
+								message = "";
+								if(event.args.amount.valueOf() > 0) message +="+";
+								message+=event.args.amount+" slices to ";
+								message += transaction.toName;
+								message += " in pool "+transaction.poolName;
+							}
+						} break;
+
+						case "TokenPurchase": {
+							transaction.data = event.args.amount+" tokens";
+
+							if(isNew) message = "Split "+event.args.amount+" total tokens in pool "+transaction.poolName;
+						} break;
+
+						case "UnauthorizedAccess": {
+							transaction.data = "From address: "+event.args.fromAddress;
+							if(isNew) message = "Unauthorized access from address "+event.args.fromAddress;
+						} break;
+
+						case "AdminChanged": {
+							transaction.data = event.args.added ? "Admin added" : "Admin removed";
+
+							if(isNew) message = transaction.toName + (event.args.added ? " became an admin" : " is no longer admin");
+						} break;
 					}
 
-			} break;
-			
-
-			case "TokenTransfer": {
-				transaction.to = event.args.to;
-				transaction.pool = event.args.pool;
-				transaction.data = event.args.amount+" tokens";
-
-				if(isNew){
-					message = "";
-					this.getMember(Number(transaction.to), true).then(member => {
-						if(member != undefined){
-							if(event.args.amount.valueOf() > 0) message +="+";
-							message+=event.args.amount+" tokens to ";
-							message += member.name;
-							if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
-						}
-						
-					});
-				}
-			} break;
-
-			case "SliceTransfer": {
-				transaction.to = event.args.to;
-				transaction.pool = event.args.pool;
-				transaction.data = event.args.amount+" tokens";
-
-				if(isNew){
-					message = "";
-					this.getMember(Number(transaction.to), true).then(member => {
-						if(member != undefined){
-							if(event.args.amount.valueOf() > 0) message +="+";
-							message+=event.args.amount+" slices to ";
-							message += member.name;
-							if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
-						}
-						
-					});
-				}
-			} break;
-
-			case "TokenPurchase": {
-				transaction.pool = event.args.pool;
-				transaction.data = event.args.amount+" tokens";
-
-				if(isNew){
-					message = "Split "+event.args.amount+" total tokens";
-					if(this.notificationCallback!=undefined && message != undefined) this.notificationCallback(message);
-				}
-			} break;
-
-			case "UnauthorizedAccess": {
-				transaction.data = "From address: "+event.args.fromAddress;
-			} break;
-
-			case "AdminChanged": {
-				transaction.to = event.args.person;
-				transaction.data = event.args.added ? "Admin added" : "Admin removed";
-			} break;
-		}
-
-		this.getMember(Number(transaction.from)).then(member => {
-			if(member!=undefined) transaction.fromName = member.name
-		});
-
-		if(transaction.to!=undefined){
-			this.getMember(Number(transaction.to)).then(member => {
-				if(member!=undefined) transaction.toName = member.name
+					if(message != undefined && self.notificationCallback != undefined) self.notificationCallback(message);
+				});
 			});
+
 		}
 
-		this.transactions.push(transaction);
+		switch(event.event){
+			case "TokenTransfer":
+			case "SliceTransfer":
+			case "TokenPurchase":
+			case "PoolChanged":
+			case "AdminChanged":
+			case "PersonChanged": { //if there are any changes to the contract's state, reload everything and parse the event
+				if(self.lastTransactionHash == event.transactionHash){
+					console.log("Skipping data extraction due to same transaction");
+					eventDataExtraction(); //problematic when a newer event comes from the same transaction and the data loading is not completed
+				} else {
+					self.lastTransactionHash = event.transactionHash;
+					self.getMembers(isNew).then(members => {
+						eventDataExtraction();
+					});
+				}
+			} break;
+			default: { //if no changes are commited, then just parse the event
+				eventDataExtraction();
+			} break;
+		}
+
+		self.transactions.push(transaction);
+	}
+
+	handleTestEvent = (event: any) => {
+		console.log(event);
 	}
 }

@@ -1,15 +1,19 @@
+<p md-dialog-title>{{title}}</p>
+
 <md-dialog-content>
-
-  <md-divider></md-divider>
-  <p>{{title}}</p>
   <md-divider></md-divider>
 
-  <div *ngFor="let line of lines">
-  <p>{{line}}</p>
+  <!--  <md-input-container>
+    <textarea md-input placeholder="Transaction result">
+    </textarea>
+  </md-input-container>-->
+  <div contenteditable="true">
+    <div *ngFor="let line of lines">
+      {{line}}
+    </div>
   </div>
-
-  <md-dialog-actions>
-    <button md-button md-dialog-close>Close</button>
-  </md-dialog-actions>
-
+  <md-divider></md-divider>
 </md-dialog-content>
+
+
+<button md-button md-dialog-close>Close</button>

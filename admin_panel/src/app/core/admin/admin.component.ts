@@ -5,7 +5,7 @@ import {Router, NavigationEnd} from "@angular/router";
 import * as screenfull from 'screenfull';
 import { MdSnackBar } from "@angular/material";
 import { MdDialog } from '@angular/material';
-import { ApplicationRef } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 
 import { DataService } from '../../data.service';
 import { DialogService } from '../../dialog.service'
@@ -37,7 +37,6 @@ export class AdminComponent implements OnInit {
 	private router: Router,
 	private dataService: DataService,
 	private snackBar: MdSnackBar,
-	private appRef: ApplicationRef,
 	private viewContainerRef: ViewContainerRef,
 	private dialogService : DialogService,
 	) { }
@@ -81,6 +80,5 @@ export class AdminComponent implements OnInit {
 	onEvent = (message: string) => {
 		this.snackBar.open(message, "Close", {});
 		this.dialogService.appendMessage("Transaction complete", message, this.viewContainerRef);
-		this.appRef.tick();
 	}
 }

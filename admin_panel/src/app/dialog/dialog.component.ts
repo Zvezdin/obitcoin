@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MdDialogRef } from '@angular/material';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
 	selector: 'ms-dialog',
@@ -11,13 +12,14 @@ export class DialogComponent {
 	private title: string;
 	private lines: string[];
 	
-	constructor(public dialogRef: MdDialogRef<DialogComponent>) { }
+	constructor(public dialogRef: MdDialogRef<DialogComponent>, private cdRef: ChangeDetectorRef) {
+		this.lines = [];
+	}
 
 	public appendMessage(message: string){
-		if(this.lines == undefined) this.lines = [message];
-		else {
-			this.lines.push(message);
-		}
+		console.log("Appending ", message);
+		this.lines.push(message);
+		this.cdRef.detectChanges();
 	}
 
 	public setTitle(title: string){

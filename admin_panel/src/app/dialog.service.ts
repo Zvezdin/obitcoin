@@ -10,7 +10,7 @@ export class DialogService {
 	dialogRef : MdDialogRef<DialogComponent>;
     config : MdDialogConfig;
 
-	isOpen: boolean;
+	isOpen: boolean = false;
 
 	public notify(title: string, message: string, viewContainerRef : ViewContainerRef): void {
 		var self = this;

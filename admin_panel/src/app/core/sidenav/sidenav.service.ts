@@ -19,38 +19,10 @@ export class SidenavService {
   constructor() {
     let menu = this;
 
-    let dashboard = menu.addItem('My balance', 'dashboard', '/dashboard', 1);
-
+    menu.addItem('My balance', 'dashboard', '/dashboard', 1);
     menu.addItem('Members', 'people', '/members', 1);
     menu.addItem('Pools', 'message', '/pools', 1);
     menu.addItem('Transactions', 'link', '/transactions', 1);
-
-   /*let components =  menu.addItem('Components', 'layers', null, 3);
-    menu.addSubItem(components, 'Buttons', '/components/buttons', 1);
-    menu.addSubItem(components, 'Cards', '/components/cards', 2);
-    menu.addSubItem(components, 'Dialogs', '/components/dialogs', 3);
-    menu.addSubItem(components, 'Grid List', '/components/grid-list', 4);
-    menu.addSubItem(components, 'Lists', '/components/lists', 5);
-    menu.addSubItem(components, 'Menu', '/components/menu', 6);
-    menu.addSubItem(components, 'Slider', '/components/slider', 7);
-    menu.addSubItem(components, 'Snack-Bar', '/components/snack-bar', 8);
-    menu.addSubItem(components, 'Tooltips', '/components/tooltips', 8);
-
-    let forms = menu.addItem('Forms', 'insert_comment', null, 4);
-    menu.addSubItem(forms, 'Form Elements', '/forms/form-elements', 1);
-    menu.addSubItem(forms, 'Form Wizard', '/forms/form-wizard', 1);
-
-    let tables =  menu.addItem('Tables', 'format_line_spacing', null, 5);
-    menu.addSubItem(tables, 'Simple Table', '/tables/simple-table', 1);
-    menu.addSubItem(tables, 'Fixed Header Table', '/tables/fixed-header-table', 2);
-
-    let icons = menu.addItem('Material Icons', 'grade', '/icons', 7);
-
-    let customPages = menu.addItem('Custom Pages', 'web', null, 8);
-    menu.addSubItem(customPages, 'Login Page', '/login', 1);
-    menu.addSubItem(customPages, 'Register Page', '/register', 2);
-    menu.addSubItem(customPages, 'Forgot Password', '/forgot-password', 3);
-    menu.addSubItem(customPages, 'Dashboard v1', '/dashboard-v1', 4);*/
   }
 
   addItem(name: string, icon: string, route: string, position: number, badge?: string, badgeColor?: string) {

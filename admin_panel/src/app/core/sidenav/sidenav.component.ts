@@ -102,11 +102,11 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
     this.sidenavService.isIconSidenav = !this.sidenavService.isIconSidenav;
 
-    /*if (this.sidenavService.isIconSidenav) {
+    if (this.sidenavService.isIconSidenav) {
       this.snackBar.open('You activated Icon-Sidenav, move your mouse to the content and see what happens!', '', {
         duration: 10000
       });
-    }*/
+    }
   }
 
   isIconSidenav(): boolean {

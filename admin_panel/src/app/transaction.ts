@@ -6,5 +6,6 @@ export class Transaction {
     to: string;
     toName: string;
     pool: number;
+    poolName: string;
     data: string;
 }

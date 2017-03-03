@@ -47,6 +47,8 @@ import { IssueTokensComponent } from './issue-tokens/issue-tokens.component';
 import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
 import { DialogComponent } from './dialog/dialog.component';
 
+import { contractintegration } from './contractintegration';
+
 const perfectScrollbarConfig: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
 };
@@ -113,6 +115,7 @@ const sortablejsConfig: SortablejsOptions = {
     BreadcrumbService,
     DataService,
     DialogService,
+    contractintegration,
   ],
   bootstrap: [AppComponent],
   exports : [
