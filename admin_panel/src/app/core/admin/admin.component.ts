@@ -59,7 +59,6 @@ export class AdminComponent implements OnInit {
 		});
 		
 		if(!this.dataService.isConnected()) this.router.navigate(['/login']);
-		else this.router.navigate(['/dashboard']);
 	}
 	
 	toggleFullscreen() {

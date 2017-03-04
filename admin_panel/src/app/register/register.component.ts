@@ -27,6 +27,10 @@ export class RegisterComponent implements OnInit {
 	) { }
 	
 	ngOnInit() {
+		var self = this;
+		window.addEventListener('load', function() {
+			if(!self.dataService.isWeb3Available()) self.router.navigate(['/getMetamask']);
+		});
 	}
 	
 	register() {
