@@ -45,7 +45,7 @@ export class TransactionsComponent implements OnInit {
 		this.getTransactions();
 		this.pools.push({label: "All pools", value: null});
 		this.dataService.getPools().then(pools => pools.forEach(pool => this.pools.push({label: pool.name, value: pool.name})));
-		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);
     }
 
 	sendTokens(): void {

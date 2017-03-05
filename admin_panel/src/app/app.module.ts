@@ -28,7 +28,6 @@ import { LoadingOverlayComponent } from './core/loading-overlay/loading-overlay.
 import {SortablejsModule, SortablejsOptions} from "angular-sortablejs";
 import {CalendarModule} from "angular-calendar";
 import {CommonModule} from "@angular/common";
-import { MemberDetailsComponent } from './member-details/member-details.component';
 
 import { DataService } from './data.service';
 import { DialogService } from './dialog.service';
@@ -71,7 +70,6 @@ const sortablejsConfig: SortablejsOptions = {
     GetMetamaskComponent,
     QuickpanelComponent,
     LoadingOverlayComponent,
-    MemberDetailsComponent,
     MemberDetailComponent,
     MemberEditComponent,
     MembersComponent,
@@ -113,9 +111,9 @@ const sortablejsConfig: SortablejsOptions = {
     SidenavService,
     MdIconRegistry,
     BreadcrumbService,
+    contractintegration,
     DataService,
     DialogService,
-    contractintegration,
   ],
   bootstrap: [AppComponent],
   exports : [

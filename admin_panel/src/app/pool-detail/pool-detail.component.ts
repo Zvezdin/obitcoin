@@ -65,7 +65,7 @@ export class PoolDetailComponent implements OnInit {
 			(member as any).slices = this.pool.slices[member.id] == undefined ? 0 : this.pool.slices[member.id];
 		});
 
-		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);
 	}
 
 	goBack(): void {

@@ -35,7 +35,7 @@ export class MembersComponent implements OnInit {
 	
 	ngOnInit(): void {
 		this.getMembers();
-		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);
 	}
 	
 	gotoDetail(member: Member): void {

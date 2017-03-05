@@ -23,6 +23,7 @@ export class SidenavService {
     menu.addItem('Members', 'people', '/members', 1);
     menu.addItem('Pools', 'message', '/pools', 1);
     menu.addItem('Transactions', 'link', '/transactions', 1);
+    menu.addItem('Logout', 'exit_to_app', '/login', 1);
   }
 
   addItem(name: string, icon: string, route: string, position: number, badge?: string, badgeColor?: string) {

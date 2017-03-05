@@ -230,6 +230,10 @@ export class DataService {
 		});
 	}
 
+	disconnect(){
+		this.contract.disconnect();
+	}
+
 	setNotificationCallback(callback){
 		this.notificationCallback = callback;
 	}

@@ -116,6 +116,11 @@ export class contractintegration{
 		}
 	}
 
+	disconnect(){
+		this.Obitcoin = undefined;
+		this.connected = false;
+	}
+
 	isConnected(){
 		return this.connected;
 	}
@@ -125,6 +130,8 @@ export class contractintegration{
 	}
 
 	getPools(callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.getPools.call({from: this.account}, function(error, result){
 			if(!error){
 				var data = [];
@@ -137,6 +144,8 @@ export class contractintegration{
 	}
 
 	getPoolData(pool, callback){
+		if(!this.isConnected()) return;
+
 		var self = this;
 		this.Obitcoin.getPoolData.call(pool, {from: this.account}, function(error, result){
 			if(!error){
@@ -150,6 +159,8 @@ export class contractintegration{
 	}
 
 	getPoolParticipants(pool, callback) {
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.getPoolParticipants.call(pool, {from: this.account}, function(error, result){
 			if(!error){
 				var data = [];
@@ -162,6 +173,8 @@ export class contractintegration{
 	}
 
 	getMembers(callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.getMembers.call({from: this.account}, function(error, result){
 			if(!error){
 				var data = [];
@@ -174,6 +187,8 @@ export class contractintegration{
 	}
 
 	getMemberBalance(pool, member, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.getMemberBalance.call(pool, member, {from: this.account}, function(error, result){
 			if(!error){
 				var data = [];
@@ -186,6 +201,8 @@ export class contractintegration{
 	}
 
 	getMembersBalance(pool: Number, callback: Function){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.getMembersBalance.call(pool, {from: this.account}, function(error, result){
 			if(!error){
 				var members = [];
@@ -205,6 +222,8 @@ export class contractintegration{
 	}
 
 	getMemberDetails(member: Number, callback: Function){
+		if(!this.isConnected()) return;
+
 		var self = this;
 
 		this.Obitcoin.getMemberDetails.call(member, {from: this.account}, function(error, result){
@@ -308,6 +327,8 @@ export class contractintegration{
 	}
 
 	addMember(name, address, isAdmin, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.addMember(name, address, isAdmin, {from: this.account}, function(error, result){
 			if(!error){
 				callback(result);
@@ -318,6 +339,8 @@ export class contractintegration{
 	}
 
 	setAdmin(member, admin) {
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.setAdmin(member, admin, {from: this.account}, function(error, result){
 			if(!error)
 				console.log(result);
@@ -327,6 +350,8 @@ export class contractintegration{
 	}
 
 	createDebtPool(name, legalContract, financialReports, callback) {
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.createDebtPool(name, legalContract, financialReports, {from: this.account}, function(error, result){
 			if(!error)
 				callback(result);
@@ -336,6 +361,7 @@ export class contractintegration{
 	}
 
 	updateMember(member, name, address, isAdmin, callback){
+		if(!this.isConnected()) return;
 
 		this.Obitcoin.updateMember(member, name, address, isAdmin, {from: this.account}, function(error, result){
 			if(!error){
@@ -348,6 +374,8 @@ export class contractintegration{
 	}
 
 	updatePool(pool, name, legalContract, financialReports, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.updateDebtPool(pool, name, legalContract, financialReports, {from: this.account}, function(error, result){
 			if(!error){
 				console.log(result);
@@ -359,6 +387,8 @@ export class contractintegration{
 	}
 
 	sendTokens(pools, member, amount, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.sendTokens(pools, member, amount, {from: this.account}, function(error, result){
 			if(!error)
 				callback(result)
@@ -368,6 +398,8 @@ export class contractintegration{
 	}
 
 	sendTokensBulk(pool, members, amount, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.sendTokensBulk(pool, members, amount, {from: this.account}, function(error, result){
 			if(!error)
 				callback(result)
@@ -377,6 +409,8 @@ export class contractintegration{
 	}
 
 	buyTokens(pool, amount, callback){
+		if(!this.isConnected()) return;
+
 		this.Obitcoin.buyTokens(pool, amount, {from: this.account}, function(error, result){
 			if(!error)
 				callback(result)
@@ -390,6 +424,8 @@ export class contractintegration{
 	}
 
 	startListeningForEvents(callback){
+		if(!this.isConnected()) return;
+		
 		var self = this;
 
 		this.lastBlockNumber = web3.eth.getBlockNumber(function(err, result){

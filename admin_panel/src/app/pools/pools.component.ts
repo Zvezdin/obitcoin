@@ -38,7 +38,7 @@ export class PoolsComponent implements OnInit {
 	
 	ngOnInit(): void {
 		this.getPools();
-		this.dataService.getUser().then(user => this.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);
     }
 	
 	onSelect(pool: Pool): void {

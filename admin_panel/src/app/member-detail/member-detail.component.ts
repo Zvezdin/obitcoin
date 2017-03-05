@@ -43,23 +43,23 @@ export class MemberDetailComponent implements OnInit {
 	ngOnInit(): void {
 		var self = this;
 
-		this.dataService.getUser().then(user => self.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => user == undefined ? self.userPermissionLevel = 0 : self.userPermissionLevel = user.permissionLevel);
 
 		this.route.params
 			.switchMap((params: Params) =>
 			params['id'] != undefined ? this.dataService.getMember(params['id']) : this.dataService.getUser()
 		)
-			.subscribe(member => (	self.member=member,
-
+			.subscribe(member => {	self.member=member;
+			if(member==undefined) return;
 			self.dataService.getPools().then(pools => {
-				self.pools = pools.filter( pool => pool.members.find(member2 => member2==self.member.id) != undefined ),
+				self.pools = pools.filter( pool => pool.members.find(member2 => member2==self.member.id) != undefined );
 				self.dataService.getTransactionsForMember(self.member.id).then(transactions => {
 					self.transactions = transactions;
 					self.initData();
 				});
 			})
 
-		));
+		});
 	}
 	
 	ngAfterViewInit() {

@@ -27,6 +27,7 @@ export class MemberEditComponent implements OnInit {
 	memberAddress: string;
 	title: string;
 	creatingMember: boolean;
+	isAdmin: boolean = false;
 	constructor(
 		private dataService: DataService,
 		private route: ActivatedRoute,
@@ -49,6 +50,7 @@ export class MemberEditComponent implements OnInit {
 			this.member.name = member.name;
 			this.member.id = member.id;
 			this.member.permissionLevel = member.permissionLevel;
+			this.isAdmin = member.permissionLevel>=2;
 			this.title = member.name;
 			this.creatingMember = false;
 		} else{
@@ -79,6 +81,8 @@ export class MemberEditComponent implements OnInit {
 	}
 
 	applyChanges(callback): void {
+		this.member.permissionLevel = this.isAdmin ? 2 : 1;
+
 		if(this.creatingMember){
 			this.dataService.addMember(this.member.name, this.member.address, this.member.permissionLevel == 2, callback);
 		} else this.dataService.updateMember(this.member, callback);

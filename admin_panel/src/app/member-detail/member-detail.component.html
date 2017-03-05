@@ -68,4 +68,10 @@
 		</p-dataTable>
 	</div>
 
+	<div *ngIf="!member">
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<h2>You're not a member of this contract!</h2>
+		</div>
+	</div>
+
 </div>
