@@ -57,16 +57,9 @@ export class DataService {
 
 				self.getPools(forceReload).then(pools => {
 					members.forEach(member => {
-						member.totalTokens = 0;
-						member.totalSlices = 0;
-
-						pools.forEach(pool =>{
-							if(pool.tokens[member.id]!=undefined) member.totalTokens += pool.tokens[member.id];
-							if(pool.slices[member.id]!=undefined) member.totalSlices += pool.slices[member.id];
-						});
-
-						resolve(members);
+						member.init(pools);
 					});
+					resolve(members);
 				});
 			});
 		});
@@ -290,25 +283,22 @@ export class DataService {
 						} break;
 						
 
-						case "TokenTransfer": {
-							transaction.data = event.args.amount+" tokens";
-
-							if(isNew){
-								message = "";
-								if(event.args.amount.valueOf() > 0) message +="+";
-								message+=event.args.amount+" tokens to ";
-								message += transaction.toName;
-								message += " in pool "+transaction.poolName;
+						case "TokenTransfer":
+						case "SliceTransfer":
+						case "MoneyTransfer": {
+							var units = "";
+							switch(event.event){
+								case "TokenTransfer": units = "tokens"; break;
+								case "SliceTransfer": units = "slices"; break;
+								case "MoneyTransfer": units = "money units"; break;
 							}
-						} break;
 
-						case "SliceTransfer": {
-							transaction.data = event.args.amount+" tokens";
+							transaction.data = event.args.amount+" "+units;
 
 							if(isNew){
 								message = "";
 								if(event.args.amount.valueOf() > 0) message +="+";
-								message+=event.args.amount+" slices to ";
+								message += event.args.amount+" "+units+" to ";
 								message += transaction.toName;
 								message += " in pool "+transaction.poolName;
 							}
@@ -341,18 +331,17 @@ export class DataService {
 		switch(event.event){
 			case "TokenTransfer":
 			case "SliceTransfer":
+			case "MoneyTransfer":
 			case "TokenPurchase":
 			case "PoolChanged":
 			case "AdminChanged":
 			case "PersonChanged": { //if there are any changes to the contract's state, reload everything and parse the event
 				if(self.lastTransactionHash == event.transactionHash){
 					console.log("Skipping data extraction due to same transaction");
-					eventDataExtraction(); //problematic when a newer event comes from the same transaction and the data loading is not completed
+					self.getMembers(isNew).then(members => eventDataExtraction()); //problematic when a newer event comes from the same transaction and the data loading is not completed
 				} else {
 					self.lastTransactionHash = event.transactionHash;
-					self.getMembers(isNew).then(members => {
-						eventDataExtraction();
-					});
+					self.getMembers(isNew).then(members => eventDataExtraction());
 				}
 			} break;
 			default: { //if no changes are commited, then just parse the event
@@ -361,9 +350,5 @@ export class DataService {
 		}
 
 		self.transactions.push(transaction);
-	}
-
-	handleTestEvent = (event: any) => {
-		console.log(event);
 	}
 }

@@ -17,7 +17,7 @@ contract Obitcoin{
         bytes16 legalContract;
         bytes16 financialReports;
         uint16[] members; //memberIds
-        mapping (uint16 => uint128[2]) balance; //uint[0] = tokens, uint[1] = slices
+        mapping (uint16 => uint128[3]) balance; //uint[0] = tokens, uint[1] = slices, uint[2] = balance
         bool exists;
     }
     
@@ -32,12 +32,16 @@ contract Obitcoin{
     uint16 memberCounter;
     uint16 poolCounter;
     
-    uint32 firstBlockNumber;
+    uint firstBlockNumber;
     
-    //event for any coin transfers happening
+    //events for all actions made by the contract. They are fired by the contract, then catched and processed by the web application
+    //once an event is fired, it will always stay in the blockchain. This is the why our application can load all transactions that ever occurred within the contracy
+    //the contract has no access to previously fired events. That's why firing events is always cheaper than saving the same amount of data in contract storage
     event TokenTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time); //int256 because we can both remove and add tokens
     
-    event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time); //int128 because we can only add slices
+    event MoneyTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time);
+    
+    event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time); //uint128 because we can only add slices
     
     event TokenPurchase(uint16 indexed from, uint16 indexed pool, uint128 amount, uint time);
     
@@ -57,7 +61,7 @@ contract Obitcoin{
     function Obitcoin(){ //constructor
         owner = msg.sender;
         
-        firstBlockNumber = uint32 (block.number);
+        firstBlockNumber = block.number;
         
         memberCounter=1;
         poolCounter=1;
@@ -93,16 +97,6 @@ contract Obitcoin{
         _;
     }
     
-    /*modifier isPersonInPool(uint8 index, address person){ //checks if a said address is a participant of the certain debt pool
-        for(uint256 i=0; i<pools[index].people.length; i++){
-            if(pools[index].people[i]==person){
-                _;
-                return;
-            }
-        }
-        throw;
-    }*/
-    
     function addMember(bytes32 name, address adr, bool isAdmin) public onlyAdmin {
         if(adr == 0) throw; //don't want to add a null address
         
@@ -119,23 +113,19 @@ contract Obitcoin{
         if(!members[member].exists) throw;
         if(members[member].permLevel == PermLevel.owner) throw; //the owner should stay untouched
         
-        memberAddresses[members[member].adr] = 65535;
+        memberAddresses[members[member].adr] = 0;
         memberAddresses[adr] = member;
         
         members[member].name = name;
         members[member].adr = adr;
+        
+        if(members[member].permLevel == PermLevel.admin && !isAdmin || members[member].permLevel == PermLevel.member && isAdmin){ //if his admin state has changed
+            AdminChanged(memberAddresses[msg.sender], member, isAdmin, now);
+        }
+        
         members[member].permLevel = isAdmin ? PermLevel.admin : PermLevel.member;
         
         PersonChanged(memberAddresses[msg.sender], member, false, now);
-    }
-    
-    function setAdmin(uint16 id, bool admin) public onlyOwner {
-        if(!members[id].exists) throw;
-        if(members[id].permLevel == PermLevel.owner) throw; //shouldn't let the owner be changed
-        
-        members[id].permLevel = admin ? PermLevel.admin : PermLevel.member;
-        
-        AdminChanged(memberAddresses[msg.sender], id, admin, now);
     }
     
     function createDebtPool(bytes16 name, bytes16 legalContract, bytes16 financialReports) public onlyAdmin {
@@ -161,19 +151,13 @@ contract Obitcoin{
         
         PoolChanged(memberAddresses[msg.sender], pool, false, now);
     }
-    
-	//unable to make a good removal function, putting this on pause for now
-	/*function addPersonToPool(uint8 index, address person, uint initialDebt) public onlyAdmin indexInRange(index, pools.length) {
-		pools[index].people.push(person);
-		pools[index].debt[person] = initialDebt;
-	}*/
 	
-	function getContractAddress() public constant returns (address){
-	    return this;
+	function getContractAddress() public constant returns (address){ //this method is used to test if the web application is connecting to an actual contract
+        return this;
 	}
 	
-	function getPublishingBlockNumber() public constant returns (uint32){
-	    return firstBlockNumber;
+	function getPublishingBlockNumber() public constant returns (uint){
+        return firstBlockNumber;
 	}
 	
 	function getPoolCount() public constant returns (uint){
@@ -195,49 +179,32 @@ contract Obitcoin{
         return pools[pool].members;
     }
     
-    function getMemberBalance(uint16 pool, uint16 member) public constant returns (uint128[2]) {
+    function getMemberBalance(uint16 pool, uint16 member) public constant returns (uint128[3]) {
         if(!pools[pool].exists || !members[member].exists) throw;
         return pools[pool].balance[member];
     }
     
-    function getMembersBalance(uint16 pool) public constant returns (uint128[], uint128[], uint16[]) {
+    function getMembersBalance(uint16 pool) public constant returns (uint128[], uint128[], uint128[], uint16[]) {
         if(!pools[pool].exists) throw;
         
         uint128[] memory bal1 = new uint128[](pools[pool].members.length);
         uint128[] memory bal2 = new uint128[](pools[pool].members.length);
+        uint128[] memory bal3 = new uint128[](pools[pool].members.length);
         uint16 member;
         
         for(uint16 i=0; i<pools[pool].members.length; i++){
             member = pools[pool].members[i];
             bal1[i] = pools[pool].balance[member][0];
             bal2[i] = pools[pool].balance[member][1];
+            bal3[i] = pools[pool].balance[member][2];
         }
         
-        return (bal1, bal2, pools[pool].members);
+        return (bal1, bal2, bal3, pools[pool].members);
     }
     
     function getMembers() public constant returns (uint16[]){
         return memberIds;
     }
-    
-    /*function getMemberName(uint16 member) public constant returns (bytes32){
-        if(!members[member].exists) throw;
-        
-        return members[member].name;
-    }
-    
-    function getMemberAddress(uint16 member) public constant returns (address){
-        if(!members[member].exists) throw;
-        
-        return members[member].adr;
-    }
-    
-    function getMemberPermLevel(uint16 member) public constant returns (PermLevel){
-        if(!members[member].exists) throw;
-        
-        return members[member].permLevel;
-    }
-    */
     
     function getMemberDetails(uint16 member) public constant returns (bytes32, address, PermLevel){
         if(!members[member].exists) throw;
@@ -258,16 +225,17 @@ contract Obitcoin{
         if(amount == 0 || !pools[pool].exists || !members[member].exists) throw;
         
         if(pools[pool].balance[member][0] + amount < pools[pool].balance[member][0]) throw; //avoid the 16-byte INT overflow
+        if(pools[pool].balance[member][1] + amount < pools[pool].balance[member][1]) throw;
         
-        if(pools[pool].balance[member][0] == 0 && pools[pool].balance[member][1]==0) pools[pool].members.push(member);
+        if(pools[pool].balance[member][0] == 0 && pools[pool].balance[member][1]==0) pools[pool].members.push(member); //if the member is not a member of the pool, add him
         
         pools[pool].balance[member][0] += amount;
+        pools[pool].balance[member][1] += amount;
         
-        TokenTransfer(memberAddresses[msg.sender], member, pool, int256 (amount), now); //Log the transaction
+        TokenTransfer(memberAddresses[msg.sender], member, pool, int256 (amount), now); //add to the current amount of tokens of the person
+        SliceTransfer(memberAddresses[msg.sender], member, pool, amount, now); //add to the total amount of tokens of the person
     }
     
-	//track earned points overtime, if exess coins transferred, split them based on the total points.
-	
     function buyTokens(uint16 pool, uint128 amount) public onlyAdmin {
         if(amount == 0 || !pools[pool].exists || pools[pool].members.length==0) throw;
         
@@ -282,11 +250,13 @@ contract Obitcoin{
 		    sliceSum+=pools[pool].balance[pools[pool].members[i]][1];
 		}
 		
+		if(sliceSum==0) throw; //we cannot split if we don't have any slices to split based on!
+		
 		i=0;
 		
 		uint16 member;
 		uint128 debt;
-		uint128 slices;
+		uint128 money;
 		uint128 value;
 		
 	    //uint128[] memory slicesToApply = new uint128[](pools[pool].members.length);
@@ -296,57 +266,50 @@ contract Obitcoin{
 			for(i=0; i<pools[pool].members.length; i++){
 			    member = pools[pool].members[i];
 			    
-				debt = pools[pool].balance[member][0]; //get the debt of the indexed person
-				
-				slices = pools[pool].balance[member][1];
+				debt = pools[pool].balance[member][0]; //get the debt owed to the indexed person
+				money = pools[pool].balance[member][2]; //get his money
 				
 				value = (debt*amount)/tokenSum; //calculate what part of the coins to buy.
 				
-				if(value>0 && debt>0){
+				if(value>0){
     				if(debt-value>debt){ //if we're sending more than the token count of the person
         				TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(debt)), now);
-        				SliceTransfer(memberAddresses[msg.sender], member, pool, debt, now);
-        				totalSent+=debt;
-        				slices +=debt;
-        				sliceSum += debt;
+        				MoneyTransfer(memberAddresses[msg.sender], member, pool, debt, now);
+        				totalSent += debt;
+        				money += debt;
         				debt = 0; //only clear the debt of the person, nothing else.
     				}
     				else {
         				TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now);
-        				SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+        				MoneyTransfer(memberAddresses[msg.sender], member, pool, value, now);
     					debt -= value;
-    					slices += value;
-    					sliceSum += value;
-    					totalSent+=value;
+    					money += value;
+    					totalSent += value;
     				}
     				
     				pools[pool].balance[member][0] = debt;
-    				pools[pool].balance[member][1] = slices;
+    				pools[pool].balance[member][2] = money;
 				}
 			}
 		}
 		if(totalSent<amount){ //if there are leftover money, split them based on slice ratio
-	        if(sliceSum>0){
-    			for(i=0; i<pools[pool].members.length; i++){
-    			    member = pools[pool].members[i];
-    			    
-    				slices = pools[pool].balance[member][1]; //get the slices of the indexed person
+			for(i=0; i<pools[pool].members.length; i++){
+			    member = pools[pool].members[i];
+			    
+				money = pools[pool].balance[member][2]; //get the money of the indexed person
+				uint128 slices = pools[pool].balance[member][1]; //get his slices as well
+				
+				value = (slices*(amount-totalSent))/sliceSum; //calculate what part of the coins to buy.
+				
+				if(value>0){
+    				money+=value;
+    				totalSent+=value;
     				
-    				value = (slices*(amount-totalSent))/sliceSum; //calculate what part of the coins to buy.
+    				pools[pool].balance[member][2] = money;
     				
-    				if(value>0){
-        				slices+=value;
-        				totalSent+=value;
-        				
-        				pools[pool].balance[member][1] = slices;
-        				
-            			SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
-    				}
-    			}
-    		}
-    		else {
-    		    //log an error: unable to split 
-    		}
+        			MoneyTransfer(memberAddresses[msg.sender], member, pool, value, now);
+				}
+			}
 		}
 		
 		if(totalSent<amount){ //if there are still leftover money, just give them to the newest member of the pool
@@ -362,18 +325,12 @@ contract Obitcoin{
 		        debt=0;
 		    }
 		    
-		    pools[pool].balance[member][1]+=value;
+		    pools[pool].balance[member][2]+=value;
 		    pools[pool].balance[member][0]=debt;
-		    SliceTransfer(memberAddresses[msg.sender], member, pool, value, now);
+		    MoneyTransfer(memberAddresses[msg.sender], member, pool, value, now);
 		    totalSent = amount;
 		}
-		
-		/*for(i=0; i<pools[pool].members.length; i++){
-		    //SliceTransfer(memberAddresses[msg.sender], pools[pool].members[i], pool, slicesToApply[i]-pools[pool].balance[pools[pool].members[i]][1], now);
-		    
-		    pools[pool].balance[pools[pool].members[i]][1] = slicesToApply[i];
-		}*/
-		
+        
 		if(totalSent>amount) throw; //theorertically impossible
 		TokenPurchase(memberAddresses[msg.sender], pool, totalSent, now);
     }

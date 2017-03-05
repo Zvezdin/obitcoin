@@ -6,8 +6,6 @@ import {LoginComponent} from "./login/login.component";
 import {RegisterComponent} from "./register/register.component";
 import {GetMetamaskComponent} from "./get-metamask/get-metamask.component";
 
-import { MemberDetailsComponent } from './member-details/member-details.component';
-
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { MemberEditComponent } from './member-edit/member-edit.component';
 import { MembersComponent } from './members/members.component';
