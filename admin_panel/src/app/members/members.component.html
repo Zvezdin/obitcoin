@@ -11,6 +11,7 @@
 			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
 			<p-column field="totalTokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
 			<p-column field="totalSlices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
+			<p-column field="totalMoney" [sortable]="true" header="Money" [style]="{'width':'100px'}"></p-column>
 			<p-column>
 				<template let-member="rowData" pTemplate="body">
 					<button md-raised-button (click) = gotoDetail(member)>Details</button>

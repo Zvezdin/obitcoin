@@ -26,6 +26,7 @@
 			<div>Member since: {{member.memberSince}}</div>
 			<div>Total tokens: {{member.totalTokens}}</div>
 			<div>Total shares: {{member.totalSlices}}</div>
+			<div>Money: {{member.totalMoney}}</div>
 			</md-card-content>
 		</md-card>
 		</div>
@@ -48,6 +49,8 @@
 			<p-column field= "tokensShare" [sortable]="true" header="Tokens (%)"></p-column>
 			<p-column field="totalSlices" [sortable]="true" header="Slice count"></p-column>
 			<p-column field="slicesShare" [sortable]="true" header="Slices (%)"></p-column>
+			<p-column field="totalMoney" [sortable]="true" header="Money"></p-column>
+			<p-column field="moneyShare" [sortable]="true" header="Money (%)"></p-column>
 		</p-dataTable>
 
 		<md-divider></md-divider>

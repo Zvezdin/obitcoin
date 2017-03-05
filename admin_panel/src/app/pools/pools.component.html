@@ -10,6 +10,7 @@
         <p-column field="members.length" [sortable]="true" header="Member count"></p-column>
         <p-column field="totalTokens" [sortable]="true" header="Token count"></p-column>
         <p-column field="totalSlices" [sortable]="true" header="Slice count"></p-column>
+        <p-column field="totalMoney" [sortable]="true" header="Money"></p-column>
         <p-column>
             <template let-pool="rowData" pTemplate="body">
                 <button md-raised-button (click) = onSelect(pool)>Details</button>

@@ -63,6 +63,7 @@ export class PoolDetailComponent implements OnInit {
 		this.members.forEach(member => {
 			(member as any).tokens = this.pool.tokens[member.id] == undefined ? 0 : this.pool.tokens[member.id];
 			(member as any).slices = this.pool.slices[member.id] == undefined ? 0 : this.pool.slices[member.id];
+			(member as any).money = this.pool.money[member.id] == undefined ? 0 : this.pool.money[member.id];
 		});
 
 		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);

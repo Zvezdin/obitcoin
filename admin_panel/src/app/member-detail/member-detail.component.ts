@@ -78,6 +78,8 @@ export class MemberDetailComponent implements OnInit {
 				(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";
 			if(pool.totalSlices>0)
 				(pool as any).slicesShare = ((pool.slices[this.member.id]/pool.totalSlices)* 100 ).toFixed(2) + "%";
+			if(pool.totalMoney>0)
+				(pool as any).moneyShare = ((pool.money[this.member.id]/pool.totalMoney)* 100 ).toFixed(2) + "%";
 		});
 	}
 

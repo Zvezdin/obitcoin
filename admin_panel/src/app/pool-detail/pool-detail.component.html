@@ -29,6 +29,7 @@
 			<md-card-content>
 			<div>Total tokens: {{pool.totalTokens}}</div>
 			<div>Total slices: {{pool.totalSlices}}</div>
+			<div>Money: {{pool.totalMoney}}</div>
 			</md-card-content>
 		</md-card>
 
@@ -51,6 +52,7 @@
 			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
 			<p-column field="tokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
 			<p-column field="slices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
+			<p-column field="money" [sortable]="true" header="Money" [style]="{'width':'100px'}"></p-column>
 		</p-dataTable>
 
 		<md-divider></md-divider>
