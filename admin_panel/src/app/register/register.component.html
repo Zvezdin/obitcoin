@@ -15,6 +15,10 @@
           <button md-raised-button (click)="connectToContract()">Login to contract</button>
         </div>
 
+    <div>
+      <p class="note"> <a href="https://docs.google.com/document/d/1lHQIQRQNa_2zp1j7d296UnXa0ZQSr_D6_2NTmTRFois/edit?usp=sharing" target="_blank">Legal contract template</a></p>
+    </div>
+
 		<div *ngIf="!contractAddress">
         	<p class="note">Already have a contract?<br/> <a [routerLink]="['/login']">Sign in here</a></p>
 		</div>

@@ -169,13 +169,13 @@ export class DataService {
 		});
 	}
 
-	initData(callback){
+	/*initData(callback){
 		var self = this;
 		self.getMembers(true).then(members => {
 			self.contract.startListeningForEvents(self.handleEvent);
 			callback();
 		});
-	}
+	}*/
 
 	deployNewContract(callback){
 		var self = this;
@@ -188,7 +188,10 @@ export class DataService {
 				return;
 			}
 
-			callback(error, address);
+			self.getMembers(true).then(members => {
+				self.contract.startListeningForEvents(self.handleEvent);
+				callback(error, address);
+			});
 		};
 
 		this.contract.init(function(error: string){

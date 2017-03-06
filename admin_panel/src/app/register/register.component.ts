@@ -51,9 +51,7 @@ export class RegisterComponent implements OnInit {
 
 	connectToContract(){
 		var self = this;
-		this.dataService.initData(function(){
-			self.router.navigate(['/dashboard']);
-		});
+		self.router.navigate(['/dashboard']);
 	}
 	
 }

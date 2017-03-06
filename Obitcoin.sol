@@ -99,6 +99,7 @@ contract Obitcoin{
     
     function addMember(bytes32 name, address adr, bool isAdmin) public onlyAdmin {
         if(adr == 0) throw; //don't want to add a null address
+        if(memberAddresses[adr] != 0) throw; //can't add this person if the same address is already in the system.
         
         members[memberCounter] = Member(name, adr, isAdmin ? PermLevel.admin : PermLevel.member, true);
         memberAddresses[adr] = memberCounter;
@@ -112,6 +113,7 @@ contract Obitcoin{
     function updateMember(uint16 member, bytes32 name, address adr, bool isAdmin) public onlyAdmin {
         if(!members[member].exists) throw;
         if(members[member].permLevel == PermLevel.owner) throw; //the owner should stay untouched
+        if(memberAddresses[adr] != 0) throw; //can't add this person if the same address is already in the system.
         
         memberAddresses[members[member].adr] = 0;
         memberAddresses[adr] = member;

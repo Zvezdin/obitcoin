@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { fadeInAnimation } from '../route.animation';
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { SelectItem} from 'primeng/primeng';
 
 import 'rxjs/add/operator/switchMap';
 
@@ -29,6 +30,7 @@ import { Transaction } from '../transaction';
 export class MemberDetailComponent implements OnInit {
 	member: Member;
 	pools: Pool[];
+	poolLabels: SelectItem[];
 	transactions: Transaction[];
 
 	userPermissionLevel: number;
@@ -72,7 +74,10 @@ export class MemberDetailComponent implements OnInit {
 	totalTokens: number;
 
 	initData(){
+		this.poolLabels = [];
+		this.poolLabels.push({label: "All pools", value: null});
 		this.pools.forEach(pool => {
+			this.poolLabels.push({label: pool.name, value: pool.name})
 			pool.init();
 			if(pool.totalTokens>0)
 				(pool as any).tokensShare = ((pool.tokens[this.member.id]/pool.totalTokens)* 100 ).toFixed(2) + "%";

@@ -25,7 +25,7 @@
 			<md-card-content>
 			<div>Member since: {{member.memberSince}}</div>
 			<div>Total tokens: {{member.totalTokens}}</div>
-			<div>Total shares: {{member.totalSlices}}</div>
+			<div>Total slices: {{member.totalSlices}}</div>
 			<div>Money: {{member.totalMoney}}</div>
 			</md-card-content>
 		</md-card>
@@ -64,7 +64,7 @@
 			<p-column field="toName" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Receiver"></p-column>
 			<p-column field="poolName" [sortable]="false" [filter]="true" [style]="{'overflow':'visible'}" filterMatchMode="equals" header="Pool">
 				<template pTemplate="filter" let-col>
-					<p-dropdown [options]="pools" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value,col.field,col.filterMatchMode)" styleClass="ui-column-filter"></p-dropdown>
+					<p-dropdown [options]="poolLabels" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value,col.field,col.filterMatchMode)" styleClass="ui-column-filter"></p-dropdown>
 				</template>
 			</p-column>
 			<p-column field="data" [sortable]="true" header="Data"></p-column>
