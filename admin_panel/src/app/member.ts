@@ -5,7 +5,7 @@ export class Member {
 	name: string;
 	address: string;
 	permissionLevel: number;
-	memberSince: string;
+	memberSince: string = "unknown";
 	totalTokens: number;
 	totalSlices: number;
 	totalMoney: number;

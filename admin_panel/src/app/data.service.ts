@@ -22,10 +22,6 @@ export class DataService {
 	members: Member[];
 	pools: Pool[];
 	transactions: Transaction[];
-	mockPools: MockPools;
-
-	accounts: string[];
-	account: string;
 
 	notificationCallback: Function;
 
@@ -34,8 +30,7 @@ export class DataService {
 	lastTransactionHash: string = "";
 
 	constructor(private contract : contractintegration) {
-		this.transactions = [];
-		this.membersSince = new Map<number, string>();
+		this.init();
 	}
 
 	getUser(): Promise<Member> {
@@ -52,7 +47,8 @@ export class DataService {
 				self.members = members;
 
 				self.members.forEach(member => {
-					member.memberSince = self.membersSince[member.id];
+					if(self.membersSince[member.id]  != undefined)
+						member.memberSince = self.membersSince[member.id];
 				});
 
 				self.getPools(forceReload).then(pools => {
@@ -169,13 +165,14 @@ export class DataService {
 		});
 	}
 
-	/*initData(callback){
-		var self = this;
-		self.getMembers(true).then(members => {
-			self.contract.startListeningForEvents(self.handleEvent);
-			callback();
-		});
-	}*/
+	init(){
+		this.notificationCallback = undefined;
+		this.members = undefined;
+		this.pools = undefined;
+		this.lastTransactionHash = "";
+		this.transactions = [];
+		this.membersSince = new Map<number, string>();
+	}
 
 	deployNewContract(callback){
 		var self = this;
