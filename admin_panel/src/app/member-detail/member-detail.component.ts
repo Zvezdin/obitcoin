@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { fadeInAnimation } from '../route.animation';
@@ -24,7 +24,7 @@ import { Transaction } from '../transaction';
 	host: {
     '[@fadeInAnimation]': 'true'
 	},
-	animations: [ fadeInAnimation ]
+	animations: [ fadeInAnimation ],
 })
 
 export class MemberDetailComponent implements OnInit {
@@ -40,7 +40,11 @@ export class MemberDetailComponent implements OnInit {
 		private route: ActivatedRoute,
 		private location: Location,
         private router: Router,
-	) {}
+		private cdRef: ChangeDetectorRef,
+		private appRef: ApplicationRef,
+	) {
+		this.dataService.addDataChangeCallback(this.onDataUpdate);
+	}
 	
 	ngOnInit(): void {
 		var self = this;
@@ -86,6 +90,14 @@ export class MemberDetailComponent implements OnInit {
 			if(pool.totalMoney>0)
 				(pool as any).moneyShare = ((pool.money[this.member.id]/pool.totalMoney)* 100 ).toFixed(2) + "%";
 		});
+		try{
+			this.cdRef.detectChanges();
+			console.log("Detected changes");
+		} catch (e) {console.log("Error while updating view", e)}
+	}
+
+	onDataUpdate = () => {
+		this.ngOnInit();
 	}
 
 	goBack(): void {

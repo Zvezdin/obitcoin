@@ -25,9 +25,12 @@ export class DataService {
 
 	notificationCallback: Function;
 
+	dataChangeCallback: Function;
+
 	self: any;
 
-	lastTransactionHash: string = "";
+	lastTransactionHash: string;
+	lastTransactionIndex: number;
 
 	constructor(private contract : contractintegration) {
 		this.init();
@@ -170,8 +173,10 @@ export class DataService {
 		this.members = undefined;
 		this.pools = undefined;
 		this.lastTransactionHash = "";
+		this.lastTransactionIndex = 0;
 		this.transactions = [];
 		this.membersSince = new Map<number, string>();
+		this.dataChangeCallback = undefined;
 	}
 
 	deployNewContract(callback){
@@ -231,6 +236,41 @@ export class DataService {
 		this.notificationCallback = callback;
 	}
 
+	addDataChangeCallback(callback: Function){
+		/*var added : boolean = false;
+		this.dataChangeCallbacks.forEach(cb =>{
+			if(cb == undefined){
+				cb = callback;
+				added = true;
+			}
+		});
+
+		if(!added) this.dataChangeCallbacks.push(callback);*/
+		this.dataChangeCallback = callback;
+	}
+
+	onDataChange(){
+		/*this.dataChangeCallbacks.forEach(cb => {
+			try{
+				if(cb!=undefined){
+					console.log("calling ", cb);
+					cb();
+				}
+			} catch (e) {
+				cb = undefined;
+				console.log("removed a cb",e);
+			}
+		});*/
+		if(this.dataChangeCallback != undefined){
+			try{
+				this.dataChangeCallback();
+			} catch (e) {
+				this.dataChangeCallback = undefined;
+				console.log("Removed callback", e);
+			}
+		}
+	}
+
 	handleEvent = (event: any) => {
 		var self = this;
 
@@ -261,8 +301,6 @@ export class DataService {
 
 				self.getPools().then(pools => {
 					pools.forEach(pool => {if(pool.id == transaction.pool) transaction.poolName = pool.name});
-
-					console.log("Extracting "+event.event);
 
 					switch(event.event){
 						case "PoolChanged": {
@@ -336,13 +374,19 @@ export class DataService {
 			case "PoolChanged":
 			case "AdminChanged":
 			case "PersonChanged": { //if there are any changes to the contract's state, reload everything and parse the event
-				if(self.lastTransactionHash == event.transactionHash){
-					console.log("Skipping data extraction due to same transaction");
+				/*if(self.lastTransactionHash == event.transactionHash){
+					//console.log("Skipping data extraction due to same transaction");
 					self.getMembers(isNew).then(members => eventDataExtraction()); //problematic when a newer event comes from the same transaction and the data loading is not completed
-				} else {
+				} else {*/
 					self.lastTransactionHash = event.transactionHash;
-					self.getMembers(isNew).then(members => eventDataExtraction());
-				}
+					self.getMembers(isNew).then(members => {
+						eventDataExtraction();
+						var tmp = ++self.lastTransactionIndex;
+						window.setTimeout(function(){
+							if(tmp == self.lastTransactionIndex) self.onDataChange();
+						}, 1000);
+					});
+				//}
 			} break;
 			default: { //if no changes are commited, then just parse the event
 				eventDataExtraction();
