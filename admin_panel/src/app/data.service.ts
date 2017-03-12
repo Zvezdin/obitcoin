@@ -177,6 +177,7 @@ export class DataService {
 		this.transactions = [];
 		this.membersSince = new Map<number, string>();
 		this.dataChangeCallback = undefined;
+		this.eventQueue = [];
 	}
 
 	deployNewContract(callback){
@@ -237,30 +238,10 @@ export class DataService {
 	}
 
 	addDataChangeCallback(callback: Function){
-		/*var added : boolean = false;
-		this.dataChangeCallbacks.forEach(cb =>{
-			if(cb == undefined){
-				cb = callback;
-				added = true;
-			}
-		});
-
-		if(!added) this.dataChangeCallbacks.push(callback);*/
 		this.dataChangeCallback = callback;
 	}
 
 	onDataChange(){
-		/*this.dataChangeCallbacks.forEach(cb => {
-			try{
-				if(cb!=undefined){
-					console.log("calling ", cb);
-					cb();
-				}
-			} catch (e) {
-				cb = undefined;
-				console.log("removed a cb",e);
-			}
-		});*/
 		if(this.dataChangeCallback != undefined){
 			try{
 				this.dataChangeCallback();
@@ -271,7 +252,46 @@ export class DataService {
 		}
 	}
 
+	eventQueue : any[];
+
 	handleEvent = (event: any) => {
+		var self = this;
+
+		var isNew = this.contract.getLastBlockNumber() < event.blockNumber;
+
+		var transaction;
+
+
+		self.eventQueue.push(event);
+
+		console.log("New events: ", self.eventQueue);
+
+		if(self.lastTransactionHash == event.transactionHash){
+			//self.eventQueue.push(event);
+		}
+		else{
+			self.lastTransactionHash = event.transactionHash;
+			self.getMembers(isNew).then(members => {
+				self.getPools().then(pools => {
+					for(var i = 0; i<self.eventQueue.length; i++){
+						transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
+						console.log("Extracted ", self.eventQueue[i]);
+						self.transactions.push(transaction);
+					}
+					self.eventQueue = [];
+					
+					var tmp = ++self.lastTransactionIndex;
+					window.setTimeout(function(){
+						if(tmp == self.lastTransactionIndex) self.onDataChange();
+					}, 1000);
+				});
+			});
+		}
+
+		//self.transactions.push(transaction);
+	}
+
+	extractDataFromEvent(event: any, members: Member[], pools: Pool[]) : Transaction{
 		var self = this;
 
 		var d = new Date(0);
@@ -291,108 +311,73 @@ export class DataService {
 
 		let message : string;
 
-		let eventDataExtraction : Function = function(){
-			self.getMembers().then(members => {
-				members.forEach(member => {
-					if(member == undefined) return;
-					if(member.id == Number(transaction.from)) transaction.fromName = member.name;
-					if(member.id == Number(transaction.to)) transaction.toName = member.name;
-				});
-
-				self.getPools().then(pools => {
-					pools.forEach(pool => {if(pool.id == transaction.pool) transaction.poolName = pool.name});
-
-					switch(event.event){
-						case "PoolChanged": {
-							transaction.data = event.args.added ? "Pool created" : "Pool modified";
-							if(isNew) message = (event.args.added ? "Created pool " : "Modified pool ") + transaction.poolName;
-						} break;
-
-						case "PersonChanged": {
-							transaction.data = event.args.added ? "Added member" : "Member modified";
-							if(isNew) message = (event.args.added ? "Added " : "Modified ") + transaction.toName;
-
-							if(event.args.added){
-								var date = new Date(0);
-								date.setUTCSeconds(event.args.time);
-								self.membersSince[Number(event.args.to)] = date.toLocaleString();
-								members.forEach(member => member.id == Number(event.args.to) ? member.memberSince = date.toLocaleString() : false);
-							}
-						} break;
-						
-
-						case "TokenTransfer":
-						case "SliceTransfer":
-						case "MoneyTransfer": {
-							var units = "";
-							switch(event.event){
-								case "TokenTransfer": units = "tokens"; break;
-								case "SliceTransfer": units = "slices"; break;
-								case "MoneyTransfer": units = "money units"; break;
-							}
-
-							transaction.data = event.args.amount+" "+units;
-
-							if(isNew){
-								message = "";
-								if(event.args.amount.valueOf() > 0) message +="+";
-								message += event.args.amount+" "+units+" to ";
-								message += transaction.toName;
-								message += " in pool "+transaction.poolName;
-							}
-						} break;
-
-						case "TokenPurchase": {
-							transaction.data = event.args.amount+" tokens";
-
-							if(isNew) message = "Split "+event.args.amount+" total tokens in pool "+transaction.poolName;
-						} break;
-
-						case "UnauthorizedAccess": {
-							transaction.data = "From address: "+event.args.fromAddress;
-							if(isNew) message = "Unauthorized access from address "+event.args.fromAddress;
-						} break;
-
-						case "AdminChanged": {
-							transaction.data = event.args.added ? "Admin added" : "Admin removed";
-
-							if(isNew) message = transaction.toName + (event.args.added ? " became an admin" : " is no longer admin");
-						} break;
-					}
-
-					if(message != undefined && self.notificationCallback != undefined) self.notificationCallback(message);
-				});
-			});
-
-		}
+		members.forEach(member => {
+			if(member == undefined) return;
+			if(member.id == Number(transaction.from)) transaction.fromName = member.name;
+			if(member.id == Number(transaction.to)) transaction.toName = member.name;
+		});
+		pools.forEach(pool => {if(pool.id == transaction.pool) transaction.poolName = pool.name});
 
 		switch(event.event){
+			case "PoolChanged": {
+				transaction.data = event.args.added ? "Pool created" : "Pool modified";
+				if(isNew) message = (event.args.added ? "Created pool " : "Modified pool ") + transaction.poolName;
+			} break;
+
+			case "PersonChanged": {
+				transaction.data = event.args.added ? "Added member" : "Member modified";
+				if(isNew) message = (event.args.added ? "Added " : "Modified ") + transaction.toName;
+
+				if(event.args.added){
+					var date = new Date(0);
+					date.setUTCSeconds(event.args.time);
+					self.membersSince[Number(event.args.to)] = date.toLocaleString();
+					members.forEach(member => member.id == Number(event.args.to) ? member.memberSince = date.toLocaleString() : false);
+				}
+			} break;
+			
+
 			case "TokenTransfer":
 			case "SliceTransfer":
-			case "MoneyTransfer":
-			case "TokenPurchase":
-			case "PoolChanged":
-			case "AdminChanged":
-			case "PersonChanged": { //if there are any changes to the contract's state, reload everything and parse the event
-				/*if(self.lastTransactionHash == event.transactionHash){
-					//console.log("Skipping data extraction due to same transaction");
-					self.getMembers(isNew).then(members => eventDataExtraction()); //problematic when a newer event comes from the same transaction and the data loading is not completed
-				} else {*/
-					self.lastTransactionHash = event.transactionHash;
-					self.getMembers(isNew).then(members => {
-						eventDataExtraction();
-						var tmp = ++self.lastTransactionIndex;
-						window.setTimeout(function(){
-							if(tmp == self.lastTransactionIndex) self.onDataChange();
-						}, 1000);
-					});
-				//}
+			case "MoneyTransfer": {
+				var units = "";
+				switch(event.event){
+					case "TokenTransfer": units = "tokens"; break;
+					case "SliceTransfer": units = "slices"; break;
+					case "MoneyTransfer": units = "money units"; break;
+				}
+
+				transaction.data = event.args.amount+" "+units;
+
+				if(isNew){
+					message = "";
+					if(event.args.amount.valueOf() > 0) message +="+";
+					message += event.args.amount+" "+units+" to ";
+					message += transaction.toName;
+					message += " in pool "+transaction.poolName;
+				}
 			} break;
-			default: { //if no changes are commited, then just parse the event
-				eventDataExtraction();
+
+			case "TokenPurchase": {
+				transaction.data = event.args.amount+" tokens";
+
+				if(isNew) message = "Split "+event.args.amount+" total tokens in pool "+transaction.poolName;
+			} break;
+
+			case "UnauthorizedAccess": {
+				transaction.data = "From address: "+event.args.fromAddress;
+				if(isNew) message = "Unauthorized access from address "+event.args.fromAddress;
+			} break;
+
+			case "AdminChanged": {
+				transaction.data = event.args.added ? "Admin added" : "Admin removed";
+
+				if(isNew) message = transaction.toName + (event.args.added ? " became an admin" : " is no longer admin");
 			} break;
 		}
 
-		self.transactions.push(transaction);
+		if(message != undefined && self.notificationCallback != undefined) self.notificationCallback(message);
+
+		return transaction;
 	}
 }

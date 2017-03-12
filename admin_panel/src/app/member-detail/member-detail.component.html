@@ -57,7 +57,7 @@
 
 		<h2>Transactions</h2>
 
-		<p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [globalFilter]="gb" #dt>
+		<p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [responsive]="true" [globalFilter]="gb" #dt>
 			<p-column field="type" [sortable]="true" header="Type"></p-column>
 			<p-column field="date" [sortable]="true" header="Date"></p-column>
 			<p-column field="fromName" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Initiator"></p-column>
