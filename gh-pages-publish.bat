@@ -1,4 +1,4 @@
 cd admin_panel
-ng build --prod --base-href "https://kingofallchunks.github.io/obitcoin/"
-ngh
+START /B /wait ng build --prod --base-href "https://kingofallchunks.github.io/obitcoin/"
+START /B /wait ngh
 pause
