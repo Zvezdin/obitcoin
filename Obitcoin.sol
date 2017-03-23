@@ -18,7 +18,7 @@ contract Obitcoin{
         bytes16 financialReports;
         uint16[] members; //memberIds
         mapping (uint16 => uint128[3]) balance; //uint[0] = tokens, uint[1] = slices, uint[2] = balance
-        uint[3] totalBalance;
+        uint128[3] totalBalance;
         bool exists;
     }
     
@@ -40,7 +40,7 @@ contract Obitcoin{
         
         bool finished;
         
-        uint timeLimit;
+        uint endTime;
     }
     
     Vote[] activeVotes;
@@ -67,7 +67,7 @@ contract Obitcoin{
     
     event MoneyTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time);
     
-    event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time); //uint128 because we can only add slices
+    event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time); //uint128 because we can only add slices
     
     event TokenPurchase(uint16 indexed from, uint16 indexed pool, uint128 amount, uint time);
     
@@ -81,22 +81,40 @@ contract Obitcoin{
 	event AdminChanged(uint16 indexed from, uint16 indexed to, bool added, uint time);
 	
 	//event to notify the removal or addition of a person
-	//unused as of now
 	event PersonChanged(uint16 indexed from, uint16 indexed to, bool added, uint time);
+	
+	event VoteStarted(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, uint endTime, uint time);
+	
+	event VoteEnded(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, bool result, uint time);
+	
+	event Voted(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, bool vote, uint time);
 	
     function Obitcoin(){ //constructor
         owner = msg.sender;
         
         firstBlockNumber = block.number;
         
-        memberCounter=1;
+        memberCounter=1; //All IDs start from one to avoid the nature of solidity and it's uninitialized variables
         poolCounter=1;
         
-        members[memberCounter] = Member("Owner", msg.sender, PermLevel.owner, true);
-        memberIds.push(memberCounter);
-        memberAddresses[msg.sender] = memberCounter;
+        members[memberAddresses[owner]].permLevel = PermLevel.owner;
+        addMember("Owner", owner, true);
+        members[memberAddresses[owner]].permLevel = PermLevel.owner;
         
-        memberCounter++;
+        /*addMember("Pesho", 0x2e9Cf98A103148172B4e773F0ed2C58269A3fbd6, false);
+        addMember("Georgi", 0xa0323703351Bc5e4905A5080d0f1e3fc4e57220f, false);
+        
+        createDebtPool("Save pesho", "ayy", "lmao");
+        
+        uint16[] memory toMembers = new uint16[](3);
+        toMembers[0] = 1;
+        toMembers[1] = 2;
+        toMembers[2] = 3;
+        int256[] memory amount = new int256[](3);
+        amount[0] = 10;
+        amount[1] = 20;
+        amount[2] = 30;
+        sendTokens(1, toMembers, amount);*/
     }
     
     
@@ -127,6 +145,10 @@ contract Obitcoin{
     modifier indexInRange(uint index, uint max) { //checks if a given index as a fuction argument is correct and doesn't cause exceptions
         if(index>=max)
             throw;
+        _;
+    }
+    
+    modifier checkActiveVotes(){
         _;
     }
     
@@ -195,89 +217,94 @@ contract Obitcoin{
         return firstBlockNumber;
 	}
 	
-	function getPoolCount() public constant returns (uint){
-		return poolIds.length;
-	}
-	
 	function getPools() public constant returns (uint16[]){
 	    return poolIds;
 	}
 	
-	function getPoolData(uint16 pool) public constant returns(bytes16[3]){
+	function getPool(uint16 pool) public constant returns (bytes16[3], uint16[], uint128[3][]){
 	    if(!pools[pool].exists) throw;
-	    return [pools[pool].name, pools[pool].legalContract, pools[pool].financialReports];
+	    
+	    bytes16[3] memory data;
+	    uint128[3][] memory membersBalance = new uint128[3][](pools[pool].members.length);
+	    
+	    data[0] = pools[pool].name;
+	    data[1] = pools[pool].legalContract;
+	    data[2] = pools[pool].financialReports;
+	    
+	    for(uint16 i = 0; i<pools[pool].members.length; i++){
+	        membersBalance[i] = pools[pool].balance[pools[pool].members[i]];
+	    }
+	    
+	    return(data, pools[pool].members, membersBalance);
 	}
-	
-	//returns a dynamic array. Due to EVM restrictions, this should only be called from web3.js and not other contracts!
-    function getPoolParticipants(uint16 pool) public constant returns (uint16[]) {
-        if(!pools[pool].exists) throw;
-        return pools[pool].members;
-    }
     
-    function getMemberBalance(uint16 pool, uint16 member) public constant returns (uint128[3]) {
-        if(!pools[pool].exists || !members[member].exists) throw;
-        return pools[pool].balance[member];
-    }
-    
-    function getMembersBalance(uint16 pool) public constant returns (uint128[], uint128[], uint128[], uint16[]) {
-        if(!pools[pool].exists) throw;
+    function getMembers() public constant returns (uint16[], bytes32[], address[], PermLevel[]){
+        bytes32[] memory names = new bytes32[](memberIds.length);
+        address[] memory addresses = new address[](memberIds.length);
+        PermLevel[] memory permLevels = new PermLevel[](memberIds.length);
         
-        uint128[] memory bal1 = new uint128[](pools[pool].members.length);
-        uint128[] memory bal2 = new uint128[](pools[pool].members.length);
-        uint128[] memory bal3 = new uint128[](pools[pool].members.length);
-        uint16 member;
-        
-        for(uint16 i=0; i<pools[pool].members.length; i++){
-            member = pools[pool].members[i];
-            bal1[i] = pools[pool].balance[member][0];
-            bal2[i] = pools[pool].balance[member][1];
-            bal3[i] = pools[pool].balance[member][2];
+        for(uint16 i = 0 ; i<memberIds.length; i++){
+            names[i] = members[memberIds[i]].name;
+            addresses[i] = members[memberIds[i]].adr;
+            permLevels[i] = members[memberIds[i]].permLevel;
         }
         
-        return (bal1, bal2, bal3, pools[pool].members);
+        return (memberIds, names, addresses, permLevels);
     }
     
-    function getMembers() public constant returns (uint16[]){
-        return memberIds;
+    function getVotesLength() public constant returns (uint){
+        return activeVotes.length;
     }
     
-    function getMemberDetails(uint16 member) public constant returns (bytes32, address, PermLevel){
-        if(!members[member].exists) throw;
+    function getVote(uint16 voteIndex) public constant returns (VoteType, uint16, uint16[], int[], uint16, bool, uint, uint, uint, bool[] voted){
+        Vote vote = activeVotes[voteIndex];
         
-        return (members[member].name, members[member].adr, members[member].permLevel);
+        voted = new bool[](pools[vote.pool].members.length);
+        
+        for(uint16 i = 0; i<pools[vote.pool].members.length; i++){
+            voted[i] = vote.voted[pools[vote.pool].members[i]];
+        }
+        
+        return (vote.voteType, vote.pool, vote.arg1, vote.arg2, vote.startedBy, vote.finished, vote.endTime, vote.votedFor, vote.votedAgainst, voted);
     }
     
     function vote(uint16 voteIndex, bool voteFor) public onlyPoolMember(activeVotes[voteIndex].pool){
         Vote vote = activeVotes[voteIndex];
         uint16 member = memberAddresses[msg.sender];
         
-        if(vote.voted[member]) throw;
+        if(vote.voted[member] || vote.finished) throw;
         vote.voted[member] = true;
         if(voteFor){
             vote.votedFor += pools[vote.pool].balance[member][0];
+        
+            Voted(memberAddresses[msg.sender], voteIndex, vote.voteType, voteFor, now);
             
             if(vote.votedFor >= pools[vote.pool].totalBalance[0]/2 + 1){ //if the vote has been reached successively
                 vote.finished = true;
                 
                 if(vote.voteType == VoteType.TokenIssue){ //execute the transaction that was voted
-                    for(uint16 i = 0; i<vote.arg1.length; i++){
-                        sendTokens(vote.pool, vote.arg1[i], (uint128)(vote.arg2[i]), vote.arg2[i]>= 0);
-                    }
+                    executeTokenSending(vote.pool, vote.arg1, vote.arg2);
                 }
+                
+                VoteEnded(vote.startedBy, voteIndex, vote.voteType, true, now);
             }
         }
         else{
             vote.votedAgainst += pools[vote.pool].balance[member][0];
             
+            Voted(memberAddresses[msg.sender], voteIndex, vote.voteType, voteFor, now);
+            
             if(vote.votedAgainst >= pools[vote.pool].totalBalance[0]/2 + 1){ //if the vote hasn't been reached successively
                 vote.finished = true;
+                
+                VoteEnded(vote.startedBy, voteIndex, vote.voteType, false, now);
             }
         }
         
         
     }
     
-    function sendTokensBulk(uint16 pool, uint16[] toMembers, int[] amount) public onlyOwner{
+    function sendTokens(uint16 pool, uint16[] toMembers, int[] amount) public onlyOwner{
         //check to see if the data is valid. The function sendTokens will further check if every pool and member exists.
         if(toMembers.length == 0 || amount.length == 0 || amount.length != toMembers.length) throw;
         if(!pools[pool].exists) throw;
@@ -286,37 +313,65 @@ contract Obitcoin{
             if(amount[i] == 0 || !members[toMembers[i]].exists) throw;
         }
         
+        if(pools[pool].members.length == 0){ //if there are no pool members, apply the changes without voting
+            executeTokenSending(pool, toMembers, amount);
+            return;
+        }
+        
         activeVotes.length++;
         Vote vote = activeVotes[activeVotes.length-1];
         
         vote.exists = true;
         vote.voteType = VoteType.TokenIssue;
         vote.startedBy = memberAddresses[msg.sender];
-        vote.timeLimit = (now + 1 weeks);
+        vote.endTime = now + 1 weeks;
         vote.arg1 = toMembers;
         vote.pool = pool;
         vote.arg2 = amount;
-        //TODO vote created event
+        
+        VoteStarted(vote.startedBy, (uint16)(activeVotes.length)-1, vote.voteType, vote.endTime, now);
     }
     
-    function sendTokens(uint16 pool, uint16 member, uint128 amount, bool positiveAmount) private{
-        if(pools[pool].balance[member][0] + amount < pools[pool].balance[member][0]) throw; //avoid the 16-byte INT overflow
-        if(pools[pool].balance[member][1] + amount < pools[pool].balance[member][1]) throw;
+    function executeTokenSending(uint16 pool, uint16[] toMembers, int[] totalAmount) private{
+        if(totalAmount.length != toMembers.length) throw;
         
-        if(pools[pool].balance[member][0] == 0 && pools[pool].balance[member][1]==0) pools[pool].members.push(member); //if the member is not a member of the pool, add him
-        
-        pools[pool].balance[member][0] += positiveAmount ? amount : - amount;
-        pools[pool].balance[member][1] += amount;
-        
-        TokenTransfer(memberAddresses[msg.sender], member, pool, int256 (amount), now); //add to the current amount of tokens of the person
-        SliceTransfer(memberAddresses[msg.sender], member, pool, amount, now); //add to the total amount of tokens of the person
+        uint16 member;
+        int amount;
+        for(uint16 i=0; i< toMembers.length; i++){
+            member = toMembers[i];
+            amount = totalAmount[i];
+            
+            if(pools[pool].balance[member][0] + amount < pools[pool].balance[member][0]) throw; //avoid the 16-byte INT overflow
+            if(pools[pool].balance[member][1] + amount < pools[pool].balance[member][1]) throw;
+            if(-amount > pools[pool].balance[member][0]) throw; //if we'll have to subtract more tokens than available
+            
+            if(pools[pool].balance[member][0] == 0 && pools[pool].balance[member][1]==0) pools[pool].members.push(member); //if the member is not a member of the pool, add him
+            
+            if(amount>0){
+                pools[pool].balance[member][0] += uint128(amount);
+                pools[pool].balance[member][1] += uint128(amount);
+                
+                pools[pool].totalBalance[0] += uint128(amount);
+                pools[pool].totalBalance[1] += uint128(amount);
+            } else {
+                pools[pool].balance[member][0] -= uint128(-amount);
+                pools[pool].balance[member][1] -= uint128(-amount);
+                
+                pools[pool].totalBalance[0] -= uint128(-amount);
+                pools[pool].totalBalance[1] -= uint128(-amount);
+            }
+            
+            TokenTransfer(memberAddresses[msg.sender], member, pool, amount, now); //add to the current amount of tokens of the person
+            SliceTransfer(memberAddresses[msg.sender], member, pool, amount, now); //add to the total amount of tokens of the person
+        }
     }
     
     function buyTokens(uint16 pool, uint128 amount) public onlyAdmin {
         if(amount == 0 || !pools[pool].exists || pools[pool].members.length==0) throw;
         
-        uint128 tokenSum = 0;
-        uint128 sliceSum = 0;
+        uint128 tokenSum = pools[pool].totalBalance[0];
+        uint128 sliceSum = pools[pool].totalBalance[1];
+        uint128 moneySum = pools[pool].totalBalance[2];
         uint128 totalSent = 0; //tracking how much is actually sent.
 		
 		uint i=0;
@@ -408,6 +463,19 @@ contract Obitcoin{
 		}
         
 		if(totalSent>amount) throw; //theorertically impossible
+		
+		tokenSum = 0;
+		sliceSum = 0;
+		moneySum = 0;
+        for(i=0; i<pools[pool].members.length; i++){
+            tokenSum+=pools[pool].balance[pools[pool].members[i]][0]; //get the sum of the tokens in the pool.
+            sliceSum+=pools[pool].balance[pools[pool].members[i]][1];
+            moneySum+=pools[pool].balance[pools[pool].members[i]][2];
+        }
+        pools[pool].totalBalance[0] = tokenSum;
+        pools[pool].totalBalance[1] = sliceSum;
+        pools[pool].totalBalance[2] = moneySum;
+		
 		TokenPurchase(memberAddresses[msg.sender], pool, totalSent, now);
     }
 }
