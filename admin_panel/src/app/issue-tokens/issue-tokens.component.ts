@@ -21,6 +21,7 @@ export class IssueTokensComponent implements OnInit {
 	pools: Pool[];
 	members: Member[];
 	inputs: Input[];
+	pool: number;
 
 	constructor(private dataService: DataService, private snackBar: MdSnackBar, private location: Location) { }
 
@@ -57,6 +58,8 @@ export class IssueTokensComponent implements OnInit {
 		var members = [];
 		var amount = [];
 
+		if(this.pool == undefined) valid = false;
+		if(!this.isPool(this.pool)) valid = false;
 
 		this.inputs.forEach(input => { //check the input for validity. It is extremely important to have everything valid for a successful transaciton
 			input.amount = Math.round(input.amount);
@@ -64,12 +67,10 @@ export class IssueTokensComponent implements OnInit {
 			if(input.amount > Math.pow(2, 16)) valid = false;
 			if(isNaN(input.amount)) valid = false;
 			if(input.member == undefined) valid = false;
-			if(input.pool == undefined) valid = false;
+			if(this.pool == undefined) valid = false;
 
-			if(!this.isPool(input.pool)) valid = false;
 			if(!this.isMember(input.member)) valid = false;
 
-			pools.push(input.pool);
 			members.push(input.member);
 			amount.push(input.amount);
 		});
@@ -83,7 +84,7 @@ export class IssueTokensComponent implements OnInit {
 
 		var self = this;
 
-		this.dataService.sendTokens(pools, members, amount, function(result){
+		this.dataService.sendTokens(this.pool, members, amount, function(result){
 			if(result!=undefined){
 				console.log("showing notification");
 				self.snackBar.open("Sent transaction. May take up to a minute to apply.", "Close", {
@@ -108,6 +109,5 @@ export class IssueTokensComponent implements OnInit {
 
 class Input {
 	member: number;
-	pool: number;
 	amount: number;
 }

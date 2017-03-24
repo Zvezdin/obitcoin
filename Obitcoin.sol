@@ -23,6 +23,7 @@ contract Obitcoin{
     }
     
     enum VoteType { ParameterChange, TokenIssue, PullRequest }
+    enum VoteState { Pending, Successful, Unsuccessful }
     
     struct Vote {
         bool exists;
@@ -38,7 +39,7 @@ contract Obitcoin{
         
         uint16 startedBy;
         
-        bool finished;
+        VoteState voteState;
         
         uint endTime;
     }
@@ -83,9 +84,7 @@ contract Obitcoin{
 	//event to notify the removal or addition of a person
 	event PersonChanged(uint16 indexed from, uint16 indexed to, bool added, uint time);
 	
-	event VoteStarted(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, uint endTime, uint time);
-	
-	event VoteEnded(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, bool result, uint time);
+	event VoteChanged(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, VoteState voteState, uint time);
 	
 	event Voted(uint16 indexed from, uint16 indexed voteIndex, VoteType voteType, bool vote, uint time);
 	
@@ -256,7 +255,7 @@ contract Obitcoin{
         return activeVotes.length;
     }
     
-    function getVote(uint16 voteIndex) public constant returns (VoteType, uint16, uint16[], int[], uint16, bool, uint, uint, uint, bool[] voted){
+    function getVote(uint16 voteIndex) public constant returns (VoteType, uint16, uint16[], int[], uint16, VoteState, uint, uint, uint, bool[] voted, uint16[] poolMembers){
         Vote vote = activeVotes[voteIndex];
         
         voted = new bool[](pools[vote.pool].members.length);
@@ -265,14 +264,14 @@ contract Obitcoin{
             voted[i] = vote.voted[pools[vote.pool].members[i]];
         }
         
-        return (vote.voteType, vote.pool, vote.arg1, vote.arg2, vote.startedBy, vote.finished, vote.endTime, vote.votedFor, vote.votedAgainst, voted);
+        return (vote.voteType, vote.pool, vote.arg1, vote.arg2, vote.startedBy, vote.voteState, vote.endTime, vote.votedFor, vote.votedAgainst, voted, pools[vote.pool].members);
     }
     
     function vote(uint16 voteIndex, bool voteFor) public onlyPoolMember(activeVotes[voteIndex].pool){
         Vote vote = activeVotes[voteIndex];
         uint16 member = memberAddresses[msg.sender];
         
-        if(vote.voted[member] || vote.finished) throw;
+        if(vote.voted[member] || vote.voteState != VoteState.Pending) throw;
         vote.voted[member] = true;
         if(voteFor){
             vote.votedFor += pools[vote.pool].balance[member][0];
@@ -280,13 +279,13 @@ contract Obitcoin{
             Voted(memberAddresses[msg.sender], voteIndex, vote.voteType, voteFor, now);
             
             if(vote.votedFor >= pools[vote.pool].totalBalance[0]/2 + 1){ //if the vote has been reached successively
-                vote.finished = true;
+                vote.voteState = VoteState.Successful;
                 
                 if(vote.voteType == VoteType.TokenIssue){ //execute the transaction that was voted
                     executeTokenSending(vote.pool, vote.arg1, vote.arg2);
                 }
                 
-                VoteEnded(vote.startedBy, voteIndex, vote.voteType, true, now);
+                VoteChanged(vote.startedBy, voteIndex, vote.voteType, vote.voteState, now);
             }
         }
         else{
@@ -295,9 +294,9 @@ contract Obitcoin{
             Voted(memberAddresses[msg.sender], voteIndex, vote.voteType, voteFor, now);
             
             if(vote.votedAgainst >= pools[vote.pool].totalBalance[0]/2 + 1){ //if the vote hasn't been reached successively
-                vote.finished = true;
+                vote.voteState = VoteState.Unsuccessful;
                 
-                VoteEnded(vote.startedBy, voteIndex, vote.voteType, false, now);
+                VoteChanged(vote.startedBy, voteIndex, vote.voteType, vote.voteState, now);
             }
         }
         
@@ -323,13 +322,14 @@ contract Obitcoin{
         
         vote.exists = true;
         vote.voteType = VoteType.TokenIssue;
+        vote.voteState = VoteState.Pending;
         vote.startedBy = memberAddresses[msg.sender];
         vote.endTime = now + 1 weeks;
         vote.arg1 = toMembers;
         vote.pool = pool;
         vote.arg2 = amount;
         
-        VoteStarted(vote.startedBy, (uint16)(activeVotes.length)-1, vote.voteType, vote.endTime, now);
+        VoteChanged(vote.startedBy, (uint16)(activeVotes.length)-1, vote.voteType, vote.voteState, now);
     }
     
     function executeTokenSending(uint16 pool, uint16[] toMembers, int[] totalAmount) private{

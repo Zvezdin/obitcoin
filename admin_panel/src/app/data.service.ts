@@ -154,8 +154,8 @@ export class DataService {
 		});
 	}
 
-	sendTokens(pools: number[], members: number[], amount: number[], callback){
-		this.contract.sendTokensBulk(pools, members, amount, function(result){
+	sendTokens(pool: number, members: number[], amount: number[], callback){
+		this.contract.sendTokens(pool, members, amount, function(result){
 			console.log("Transaction hash:"+result);
 			callback(result);
 		});
