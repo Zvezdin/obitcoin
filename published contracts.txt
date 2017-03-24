@@ -13,4 +13,4 @@ newest for public testing:
 
 priv net:
 
-0x26d64240f9903b8b14e6960fb68507c6e7c722af
+0xa3ba9b11ec0f8a500073c81a956c12af12394b3a

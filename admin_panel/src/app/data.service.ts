@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Member } from './member';
 import { Pool } from './pool';
+import { Vote } from './vote';
 import { Transaction } from './transaction';
 import { MEMBERS } from './mock-members';
 import { TRANSACTIONS } from './mock-transactions';
@@ -21,6 +22,7 @@ export class DataService {
 	membersSince: Map<number, string>
 	members: Member[];
 	pools: Pool[];
+	votes: Vote[];
 	transactions: Transaction[];
 
 	notificationCallback: Function;
@@ -102,6 +104,24 @@ export class DataService {
 		return this.getPools().then(pools => pools.find(pool => pool.id == id));
 	}
 
+	getVotes(forceReload: boolean = false): Promise<Vote[]> {
+		var self = this;
+
+		return new Promise(resolve => {
+			this.contract.getWholeVotes(function(votes: Vote[]){
+				self.votes = votes;
+				console.log("got votes",votes);
+				resolve(self.votes);
+			});
+		});
+	}
+
+	getPoolVotes(pool: number): Promise<Vote[]> {
+		var self = this;
+
+		return this.getVotes().then(votes => votes.filter(vote => vote.pool == pool));
+	}
+
 	getTransactions(): Promise<Transaction[]> {
 		return Promise.resolve(this.transactions);
 	}
@@ -154,7 +174,14 @@ export class DataService {
 		});
 	}
 
-	sendTokens(pool: number, members: number[], amount: number[], callback){
+	vote(voteIndex: number, voteFor: boolean, callback: Function){
+		this.contract.vote(voteIndex, voteFor, function(result){
+			console.log("Transaction hash:"+result);
+			callback(result);
+		});
+	}
+
+	sendTokens(pool: number, members: number[], amount: number[], callback: Function){
 		this.contract.sendTokens(pool, members, amount, function(result){
 			console.log("Transaction hash:"+result);
 			callback(result);
@@ -172,12 +199,24 @@ export class DataService {
 		this.notificationCallback = undefined;
 		this.members = undefined;
 		this.pools = undefined;
+		this.votes = undefined;
 		this.lastTransactionHash = "";
 		this.lastTransactionIndex = 0;
 		this.transactions = [];
 		this.membersSince = new Map<number, string>();
 		this.dataChangeCallback = undefined;
 		this.eventQueue = [];
+	}
+
+	reload =  (callback: Function) => {
+		this.getMembers(true).then(members => {
+			this.getPools().then(pools => {
+				this.getVotes(true).then(votes => {
+					console.log(votes);
+					callback(members, pools, votes);
+				});
+			});
+		});
 	}
 
 	deployNewContract(callback){
@@ -191,7 +230,7 @@ export class DataService {
 				return;
 			}
 
-			self.getMembers(true).then(members => {
+			self.reload(function(){
 				self.contract.startListeningForEvents(self.handleEvent);
 				callback(error, address);
 			});
@@ -215,7 +254,7 @@ export class DataService {
 				callback(error, address);
 				return;
 			} else {
-				self.getMembers(true).then(members => {
+				self.reload(function(){
 					self.contract.startListeningForEvents(self.handleEvent);
 					callback(error, address);
 				});
@@ -271,20 +310,19 @@ export class DataService {
 		}
 		else{
 			self.lastTransactionHash = event.transactionHash;
-			self.getMembers(isNew).then(members => {
-				self.getPools().then(pools => {
-					for(var i = 0; i<self.eventQueue.length; i++){
-						transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
-						console.log("Extracted ", self.eventQueue[i]);
-						self.transactions.push(transaction);
-					}
-					self.eventQueue = [];
-					
-					var tmp = ++self.lastTransactionIndex;
-					window.setTimeout(function(){
-						if(tmp == self.lastTransactionIndex) self.onDataChange();
-					}, 1000);
-				});
+
+			self.reload(function(members, pools, votes){
+				for(var i = 0; i<self.eventQueue.length; i++){
+					transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
+					console.log("Extracted ", self.eventQueue[i]);
+					self.transactions.push(transaction);
+				}
+				self.eventQueue = [];
+				
+				var tmp = ++self.lastTransactionIndex;
+				window.setTimeout(function(){
+					if(tmp == self.lastTransactionIndex) self.onDataChange();
+				}, 1000);
 			});
 		}
 
@@ -373,6 +411,25 @@ export class DataService {
 				transaction.data = event.args.added ? "Admin added" : "Admin removed";
 
 				if(isNew) message = transaction.toName + (event.args.added ? " became an admin" : " is no longer admin");
+			} break;
+
+			case "VoteChanged": {
+				transaction.data = "";
+				var state = event.args.voteState.valueOf();
+
+				if(state == 0) transaction.data+="Started";
+				else if(state == 1) transaction.data+="Successful";
+				else if(state == 2) transaction.data+="Unsuccessful";
+
+				transaction.data += " voting at ID "+event.args.voteIndex;
+
+				if(isNew) message = transaction.data;
+			} break;
+
+			case "Voted": {
+				transaction.data = "Voted "+(event.args.vote ? "for" : "against")+" vote at ID "+event.args.voteIndex;
+
+				if(isNew) message = transaction.fromName + " voted "+(event.args.vote ? "for" : "against")+" voting at ID "+event.args.voteIndex;
 			} break;
 		}
 

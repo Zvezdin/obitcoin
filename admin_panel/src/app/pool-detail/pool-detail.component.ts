@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import {fadeInAnimation} from "../route.animation";
+import { MdSnackBar } from "@angular/material";
 
 import 'rxjs/add/operator/switchMap';
 
 import { Member } from '../member';
 import { Pool } from '../pool';
+import { Vote } from '../vote';
 import { DataService } from '../data.service';
 import { Transaction } from '../transaction';
 
@@ -26,6 +28,8 @@ import { Transaction } from '../transaction';
 export class PoolDetailComponent implements OnInit {
 	members: Member[];
 	pool : Pool;
+	votes: Vote[];
+	user: Member;
 	transactions: Transaction[];
 	userPermissionLevel: number;
 
@@ -34,7 +38,11 @@ export class PoolDetailComponent implements OnInit {
 		private route: ActivatedRoute,
 		private location: Location,
         private router: Router,
-	) {}
+		private cdRef: ChangeDetectorRef,
+		private snackBar: MdSnackBar,
+	) {
+		this.dataService.addDataChangeCallback(this.onDataUpdate);
+	}
 	
 	ngOnInit(): void {
 		var self = this;
@@ -47,7 +55,13 @@ export class PoolDetailComponent implements OnInit {
 					self.members=members;
 					self.dataService.getTransactionsForPool(pool.id).then(transactions => {
 						self.transactions = transactions;
-						self.initData();
+						self.dataService.getPoolVotes(pool.id).then(votes => {
+							self.votes = votes;
+							self.dataService.getUser().then(user => {
+								self.user = user;
+								self.initData();
+							});
+						});
 					});
 				}
 			)
@@ -67,6 +81,11 @@ export class PoolDetailComponent implements OnInit {
 		});
 
 		this.dataService.getUser().then(user => user == undefined ? this.userPermissionLevel = 0 : this.userPermissionLevel = user.permissionLevel);
+
+		try{
+			this.cdRef.detectChanges();
+			console.log("Detected changes");
+		} catch (e) {console.log("Error while updating view", e)}
 	}
 
 	goBack(): void {
@@ -76,4 +95,21 @@ export class PoolDetailComponent implements OnInit {
     edit(): void {
         this.router.navigate(['/edit_pool', this.pool.id]);
     }
+
+	submitVote(vote: Vote, voteFor: boolean): void {
+		console.log("Voing for ", vote, " and status ", voteFor);
+
+		var self = this;
+		
+		this.dataService.vote(vote.id, voteFor, function(result){
+			if(result!=undefined){
+				console.log("showing notification");
+				self.snackBar.open("Successfully voted.", "Close", {});
+			}
+		});
+	}
+
+	onDataUpdate = () => {
+		this.ngOnInit();
+	}
 }
