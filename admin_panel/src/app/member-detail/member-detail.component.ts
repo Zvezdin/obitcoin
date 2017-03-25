@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ApplicationRef } from '@angular/c
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { fadeInAnimation } from '../route.animation';
+import { MdSnackBar } from "@angular/material";
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { SelectItem} from 'primeng/primeng';
@@ -33,7 +34,7 @@ export class MemberDetailComponent implements OnInit {
 	poolLabels: SelectItem[];
 	transactions: Transaction[];
 
-	userPermissionLevel: number;
+	user: Member;
 
 	constructor(
 		private dataService: DataService,
@@ -42,6 +43,7 @@ export class MemberDetailComponent implements OnInit {
         private router: Router,
 		private cdRef: ChangeDetectorRef,
 		private appRef: ApplicationRef,
+		private snackBar: MdSnackBar,
 	) {
 		this.dataService.addDataChangeCallback(this.onDataUpdate);
 	}
@@ -49,7 +51,7 @@ export class MemberDetailComponent implements OnInit {
 	ngOnInit(): void {
 		var self = this;
 
-		this.dataService.getUser().then(user => user == undefined ? self.userPermissionLevel = 0 : self.userPermissionLevel = user.permissionLevel);
+		this.dataService.getUser().then(user => self.user = user);
 
 		this.route.params
 			.switchMap((params: Params) =>
@@ -107,4 +109,14 @@ export class MemberDetailComponent implements OnInit {
     edit(): void {
         this.router.navigate(['/edit_member', this.member.id]);
     }
+
+	delegate(): void {
+		if(this.user == undefined || this.user.id == this.member.id) return;
+		var instance = this;
+		this.dataService.delegateVote(this.member.id, function(result){
+			if(result!=undefined){
+				instance.snackBar.open("Submitted changes. May take up to a minute to apply.", "Close", {});
+			}
+		});
+	}
 }

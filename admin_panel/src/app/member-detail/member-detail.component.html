@@ -9,6 +9,7 @@
 				<div *ngIf="member.permissionLevel==1">Contract member</div>
 				<div *ngIf="member.permissionLevel==2">Contract admin</div>
 				<div *ngIf="member.permissionLevel==3">Contract owner</div>
+				<div *ngIf="member.delegateTo != 0 && member.delegateTo != undefined">Delegates to {{member.delegateTo}}</div>
 			</md-card-content>
 		</md-card>
 
@@ -35,11 +36,15 @@
 
 		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
 			<button md-raised-button (click)="goBack()">Back</button>
-			<button md-raised-button color="primary" [disabled]="userPermissionLevel<=1 || member.permissionLevel == 3" (click)="edit()">Edit</button>
+			<button md-raised-button color="primary" [disabled]="user == undefined || user.permissionLevel<=1 || member.permissionLevel == 3" (click)="edit()">Edit</button>
 		</div>
 
 		<md-divider></md-divider>
 		
+		<div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+			<button md-raised-button (click)="delegate()" color="primary" [disabled]="user == undefined || user.id == member.id || user.delegateTo == member.id">Delegate your voting rights to this member</button>
+		</div>
+
 		<h2>Debt pools</h2>
 
 		<p-dataTable [value]="pools">

@@ -63,9 +63,13 @@ export class PoolEditComponent implements OnInit {
 
 	save(): void {
 		var self = this;
+		try{
         this.pool.name = this.pool.name.trim(); //error checking
         this.pool.legalContract = this.pool.legalContract.trim();
         this.pool.financialReports = this.pool.financialReports.trim();
+		} catch(e){
+			return;
+		}
 
         if(this.pool.name.length<=0) return;
         if(this.pool.legalContract.length<=0) return;

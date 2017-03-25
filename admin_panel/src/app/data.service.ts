@@ -110,7 +110,6 @@ export class DataService {
 		return new Promise(resolve => {
 			this.contract.getWholeVotes(function(votes: Vote[]){
 				self.votes = votes;
-				console.log("got votes",votes);
 				resolve(self.votes);
 			});
 		});
@@ -174,6 +173,13 @@ export class DataService {
 		});
 	}
 
+	delegateVote(to: number, callback: Function){
+		this.contract.delegateVote(to, function(result){
+			console.log("Transaction hash:"+result);
+			callback(result);
+		});
+	}
+
 	vote(voteIndex: number, voteFor: boolean, callback: Function){
 		this.contract.vote(voteIndex, voteFor, function(result){
 			console.log("Transaction hash:"+result);
@@ -212,7 +218,7 @@ export class DataService {
 		this.getMembers(true).then(members => {
 			this.getPools().then(pools => {
 				this.getVotes(true).then(votes => {
-					console.log(votes);
+					console.log("Extracted contract data:", members, pools, votes);
 					callback(members, pools, votes);
 				});
 			});
@@ -311,7 +317,7 @@ export class DataService {
 		else{
 			self.lastTransactionHash = event.transactionHash;
 
-			self.reload(function(members, pools, votes){
+			let eventHandler : Function = function(members, pools, votes){
 				for(var i = 0; i<self.eventQueue.length; i++){
 					transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
 					console.log("Extracted ", self.eventQueue[i]);
@@ -323,7 +329,10 @@ export class DataService {
 				window.setTimeout(function(){
 					if(tmp == self.lastTransactionIndex) self.onDataChange();
 				}, 1000);
-			});
+			}
+
+			if(isNew) self.reload(eventHandler);
+			else eventHandler(self.members, self.pools, self.votes);
 		}
 
 		//self.transactions.push(transaction);
@@ -430,6 +439,10 @@ export class DataService {
 				transaction.data = "Voted "+(event.args.vote ? "for" : "against")+" vote at ID "+event.args.voteIndex;
 
 				if(isNew) message = transaction.fromName + " voted "+(event.args.vote ? "for" : "against")+" voting at ID "+event.args.voteIndex;
+			} break;
+
+			case "Delegation": {
+				if(isNew) message = transaction.fromName +" delegated to "+transaction.toName;
 			} break;
 		}
 
