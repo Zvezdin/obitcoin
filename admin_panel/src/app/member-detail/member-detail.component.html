@@ -8,7 +8,7 @@
 				<div *ngIf="member.permissionLevel==0">No permissions</div>
 				<div *ngIf="member.permissionLevel==1">Contract member</div>
 				<div *ngIf="member.permissionLevel==2">Contract admin</div>
-				<div *ngIf="member.permissionLevel==3">Contract owner</div>
+				<div *ngIf="member.permissionLevel==3">Contract coordinator</div>
 				<div *ngIf="member.delegateTo != 0 && member.delegateTo != undefined">Delegates to {{member.delegateTo}}</div>
 			</md-card-content>
 		</md-card>
