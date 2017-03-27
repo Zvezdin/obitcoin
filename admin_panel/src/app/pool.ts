@@ -14,17 +14,18 @@ export class Pool{
     totalMoney: number;
 
     init(){
-        this.totalSlices=0;
-		this.totalTokens=0;
-        this.totalMoney=0;
+        let totalMoney, totalTokens, totalSlices : number;
 		this.members.forEach(member =>{
 			if(this.slices[member]!=undefined)
-				this.totalSlices+=this.slices[member];
+				totalSlices+=this.slices[member];
 			if(this.tokens[member]!=undefined)
-				this.totalTokens+=this.tokens[member];
+				totalTokens+=this.tokens[member];
             if(this.money[member]!=undefined)
-				this.totalMoney+=this.money[member]
+				totalMoney+=this.money[member]
 		});
+
+        if(this.totalSlices != totalSlices || this.totalMoney != totalMoney || this.totalTokens != totalTokens) console.error("Error! Total balance count mismatch at pool", this);
+
 		console.log("Balance for pool "+this.name+" - "+this.totalSlices+" slices, "+this.totalTokens+" tokens and "+this.totalMoney+" money uints");
     }
 }
