@@ -173,8 +173,8 @@ export class DataService {
 		});
 	}
 
-	delegateVote(to: number, callback: Function){
-		this.contract.delegateVote(to, function(result){
+	delegateVote(pool: number, to: number, callback: Function){
+		this.contract.delegateVote(pool, to, function(result){
 			console.log("Transaction hash:"+result);
 			callback(result);
 		});
@@ -236,10 +236,7 @@ export class DataService {
 				return;
 			}
 
-			self.reload(function(){
-				self.contract.startListeningForEvents(self.handleEvent);
-				callback(error, address);
-			});
+			callback(error, address);
 		};
 
 		this.contract.init(function(error: string){
@@ -248,6 +245,17 @@ export class DataService {
 			} else callback(error, undefined);
 		})
 
+	}
+
+	initContract(callback: Function){
+		var self = this;
+
+		this.contract.initContract(function(error, result){
+			self.reload(function(){
+				self.contract.startListeningForEvents(self.handleEvent);
+				callback(error, result);
+			});
+		});
 	}
 
 	connectToContract(contractAddress: string, callback){
@@ -299,6 +307,8 @@ export class DataService {
 
 	eventQueue : any[];
 
+	extractingEvents: boolean = false;
+
 	handleEvent = (event: any) => {
 		var self = this;
 
@@ -311,13 +321,11 @@ export class DataService {
 
 		console.log("New events: ", self.eventQueue);
 
-		if(self.lastTransactionHash == event.transactionHash){
-			//self.eventQueue.push(event);
-		}
-		else{
+		if(!self.extractingEvents){
 			self.lastTransactionHash = event.transactionHash;
 
 			let eventHandler : Function = function(members, pools, votes){
+				self.extractingEvents = true;
 				for(var i = 0; i<self.eventQueue.length; i++){
 					transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
 					console.log("Extracted ", self.eventQueue[i]);
@@ -325,6 +333,8 @@ export class DataService {
 				}
 				self.eventQueue = [];
 				
+				self.extractingEvents = false;
+
 				var tmp = ++self.lastTransactionIndex;
 				window.setTimeout(function(){
 					if(tmp == self.lastTransactionIndex) self.onDataChange();

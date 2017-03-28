@@ -18,6 +18,7 @@ import { DataService } from '../data.service';
 export class RegisterComponent implements OnInit {
 	
 	contractAddress: string;
+	contractInitialized: boolean = false;
 	
 	constructor(
 	private router: Router,
@@ -42,9 +43,16 @@ export class RegisterComponent implements OnInit {
 				self.snackBar.open("There was an error", "Close", {});
 			}
 			else {
-				self.snackBar.open("Contract created! Address: "+address, "Close");
+				self.snackBar.open("Contract created!", "Close");
 				self.contractAddress = address;
 			}
+
+			self.dataService.initContract(function(error, result){
+				self.contractInitialized = true;
+				self.snackBar.open("Contract initialized!", "Close");
+				self.cdRef.detectChanges();
+			});
+
 			self.cdRef.detectChanges();
 		});
 	}

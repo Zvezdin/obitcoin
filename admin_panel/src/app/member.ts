@@ -9,7 +9,6 @@ export class Member {
 	totalTokens: number;
 	totalSlices: number;
 	totalMoney: number;
-	delegateTo: number;
 
 	init(pools: Pool[]){
 		this.totalTokens = 0;

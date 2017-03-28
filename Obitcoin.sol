@@ -16,6 +16,7 @@ contract Obitcoin{
     struct Pool {
         uint16[] members; //memberIds
         mapping (uint16 => uint128[3]) balance; //uint[0] = tokens, uint[1] = slices, uint[2] = balance
+        mapping (uint16 => uint16) delegations;
         uint128[3] totalBalance;
         bool exists;
         bytes16 name;
@@ -45,7 +46,7 @@ contract Obitcoin{
     //the contract has no access to previously fired events. That's why firing events is always cheaper than saving the same amount of data in contract storage
     event TokenTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time); //int256 because we can both remove and add tokens
     
-    event MoneyTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint128 amount, uint time);
+    event MoneyTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time);
     
     event SliceTransfer(uint16 indexed from, uint16 indexed to, uint16 indexed pool, int256 amount, uint time); //uint128 because we can only add slices
     
@@ -67,11 +68,9 @@ contract Obitcoin{
 	
 	event Voted(uint16 indexed from, uint16 indexed voteIndex, uint16 pool, bool vote, uint time);
 	
-	event Delegation(uint16 indexed from, uint16 indexed to, uint time);
+	event Delegation(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint time);
     
     Vote[] activeVotes;
-    
-    mapping(uint16 => uint16) delegations;
     
     mapping(uint16 => Member) members;
     uint16[] memberIds;
@@ -219,37 +218,40 @@ contract Obitcoin{
 	    return poolIds;
 	}
 	
-	function getPool(uint16 pool) public constant returns (bytes16[3], uint16[], uint128[3][], uint128[3]){
-	    if(!pools[pool].exists) throw;
+	function getPool(uint16 poolId) public constant returns (bytes16[3], uint16[], uint16[], uint128[3], uint128[3][]){
+	    Pool pool = pools[poolId];
+	    
+	    if(!pool.exists) throw;
+	    
 	    
 	    bytes16[3] memory data;
-	    uint128[3][] memory membersBalance = new uint128[3][](pools[pool].members.length);
+	    uint128[3][] memory membersBalance = new uint128[3][](pool.members.length);
+	    uint16[] memory delegations = new uint16[](pool.members.length);
 	    
-	    data[0] = pools[pool].name;
-	    data[1] = pools[pool].legalContract;
-	    data[2] = pools[pool].financialReports;
+	    data[0] = pool.name;
+	    data[1] = pool.legalContract;
+	    data[2] = pool.financialReports;
 	    
-	    for(uint16 i = 0; i<pools[pool].members.length; i++){
-	        membersBalance[i] = pools[pool].balance[pools[pool].members[i]];
+	    for(uint16 i = 0; i<pool.members.length; i++){
+	        membersBalance[i] = pool.balance[pool.members[i]];
+	        delegations[i] = pool.delegations[pool.members[i]];
 	    }
 	    
-	    return(data, pools[pool].members, membersBalance, pools[pool].totalBalance);
+	    return(data, pool.members, delegations, pool.totalBalance, membersBalance);
 	}
     
-    function getMembers() public constant returns (uint16[], bytes32[], address[], PermLevel[], uint16[]){
+    function getMembers() public constant returns (uint16[], bytes32[], address[], PermLevel[]){
         bytes32[] memory names = new bytes32[](memberIds.length);
         address[] memory addresses = new address[](memberIds.length);
         PermLevel[] memory permLevels = new PermLevel[](memberIds.length);
-        uint16[] memory delegateTo = new uint16[](memberIds.length);
         
         for(uint16 i = 0 ; i<memberIds.length; i++){
             names[i] = members[memberIds[i]].name;
             addresses[i] = members[memberIds[i]].adr;
             permLevels[i] = members[memberIds[i]].permLevel;
-            delegateTo[i] = delegations[memberIds[i]];
         }
         
-        return (memberIds, names, addresses, permLevels, delegateTo);
+        return (memberIds, names, addresses, permLevels);
     }
     
     function getVotesLength() public constant returns (uint){
@@ -269,21 +271,24 @@ contract Obitcoin{
     }
     
     //TODO check if the "to" is a valid member
-    function delegateVote(uint16 to) public only(PermLevel.member){
+    function delegateVote(uint16 poolId, uint16 to) public only(PermLevel.member){
         uint16 member = memberAddresses[msg.sender]; //get the ID of the caller
+        Pool pool = pools[poolId];
         
-        if(delegations[to] != 0) delegations[member] = delegations[to]; //if the person we're delegating to has delegated
-        else delegations[member] = to; //just delegate otherwise
+        if(pool.balance[to][1] == 0) throw; //if 'to' is not a member of the pool (aka has no slices in it)
         
-        if(member == delegations[member]) throw; //we cannot let the caller delegate to himself
+        if(pool.delegations[to] != 0) pool.delegations[member] = pool.delegations[to]; //if the person we're delegating to has delegated
+        else pool.delegations[member] = to; //just delegate otherwise
         
-        Delegation(member, delegations[member], now);
+        if(member == pool.delegations[member]) throw; //we cannot let the caller delegate to himself
+        
+        Delegation(member, pool.delegations[member], poolId, now);
         
         //if there are people delegating to us, delegate their vote to whoever we just delegated to
         for(uint i = 0; i<memberIds.length; i++){
-            if(delegations[memberIds[i]] == member){
-                delegations[memberIds[i]] = delegations[member];
-                Delegation(memberIds[i], delegations[member],now);
+            if(pool.delegations[memberIds[i]] == member){
+                pool.delegations[memberIds[i]] = pool.delegations[member];
+                Delegation(memberIds[i], pool.delegations[member], poolId, now);
             }
         }
         
@@ -298,9 +303,8 @@ contract Obitcoin{
         uint16 member = memberAddresses[msg.sender];
         
         if(vote.voted[member] || vote.voteState != VoteState.Pending) throw; //if the person has voted or the voting is closed
-        if(delegations[member] != 0 && delegations[member] != member) throw; //you cannot vote if you've delegated
+        if(pool.delegations[member] != 0 && pool.delegations[member] != member) throw; //you cannot vote if you've delegated
         vote.voted[member] = true;
-        
         
         
         uint128 weight = pool.balance[member][0]; //the member's current tokens;
@@ -308,10 +312,10 @@ contract Obitcoin{
         Voted(memberAddresses[msg.sender], voteIndex, vote.pool, voteFor, now);
         
         for(uint i = 0; i<pool.members.length; i++){
-            if(delegations[pool.members[i]] == member && pool.members[i] != member){
+            if(pool.delegations[pool.members[i]] == member && pool.members[i] != member){
                 if(vote.voted[pool.members[i]]) continue; //if the person has already voted...somehow
                 
-                weight += pool.balance[pool.members[i]][0];
+                weight += pool.balance[pool.members[i]][0]; //add the person's tokens to the total weight of the vote
                 vote.voted[pool.members[i]] = true;
                 
                 Voted(pool.members[i], voteIndex, vote.pool, voteFor, now);
@@ -353,10 +357,10 @@ contract Obitcoin{
             if(amount[i] == 0 || !members[toMembers[i]].exists) throw;
         }
         
-        //if(pools[pool].members.length == 0){ //if there are no pool members, apply the changes without voting
+        if(pools[pool].members.length == 0){ //if there are no pool members, apply the changes without voting
             executeTokenSending(pool, toMembers, amount);
             return;
-        //}
+        }
         
         activeVotes.length++;
         Vote vote = activeVotes[activeVotes.length-1];
@@ -434,6 +438,8 @@ contract Obitcoin{
 		
 	    int256[] memory moneyToApply = new int256[](pools[pool].members.length); //to avoid additional writes to storage, we're doing everything on memory and applying it afterwards in storage
 		int256[] memory tokensToApply = new int256[](pools[pool].members.length);
+		
+		bool stage1 = sum[0] > 0;
 		    
 	    while(amount>totalSent){ //ideally the loop should terminate after 1 to 3 iterations
 	        leftToSplit = amount - totalSent; //what is left to split for this iteration of the loop
@@ -441,84 +447,58 @@ contract Obitcoin{
     		for(i=0; i<debtPool.members.length; i++){
     		    member = debtPool.members[i];
     		    
-    			share = sum[0] > 0 ? debtPool.balance[member][0] : debtPool.balance[member][1]; //get the tokens or slices of that person
+    			share = stage1 ? debtPool.balance[member][0] : debtPool.balance[member][1]; //get the tokens or slices of that person
     			
-    			value = (share*leftToSplit)/(sum[0] > 0 ? debtPool.totalBalance[0] : sum[1]); //get the value that we're going to send to the member. Either buying coins or sending money directly. We're reading the token sum from there, because our local one is being modified constantly
+    			value = (share*leftToSplit)/(stage1 ? debtPool.totalBalance[0] : sum[1]); //get the value that we're going to send to the member. Either buying coins or sending money directly. We're reading the token sum from there, because our local one is being modified constantly
     			
-    			if(value == 0){
-    			    if(share > 0) value = 1;
-    			    else continue;
+    			if(i == debtPool.members.length-1 && (!stage1 || amount-totalSent <= sum[0]) ){ //if we're at the last iteration of the main and inner loop
+    			    value = amount-totalSent; //transfer what's left from integer arithmetics inaccuracies
     			}
     			
-    			if(tokensToApply[i] == 0) tokensToApply[i] = debtPool.balance[member][0] + 1; //copy the member's balance to memory if we haven't already
-    			if(moneyToApply[i] == 0) moneyToApply[i] = debtPool.balance[member][2] + 1; //offset by one so it's impossible to have a value zero in our memory array
     			
-				if(sum[0] > 0){ //if we're buying tokens
+    			if(tokensToApply[i] == 0 && moneyToApply[i] == 0){ //copy the member's balance to memory if we haven't already
+    			    tokensToApply[i] = debtPool.balance[member][0]; //this is done to avoid expensive excessive storage I/O
+    			    moneyToApply[i] = debtPool.balance[member][2];
+    			}
+    			
+    			if(value == 0){
+                    continue; //no need to waste gas if we're not doing anything
+    			}
+    			
+				if(stage1){ //if we're buying tokens
 				    if(value>share) value = share; //We can't buy more tokens than available
 				    
-				    TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now); //buy the tokens
 				    sum[0] -= value; //update the total balance of the pool
 				    tokensToApply[i] -= value; //subtract the tokens from the member
 				}
 				
-				MoneyTransfer(memberAddresses[msg.sender], member, pool, value, now); //transfer the money
 				totalSent += value; //track how much was sent
 				sum[2] += value; //update the total balance of the pool
 				
 				moneyToApply[i] += value; //update the member's money
 				
+				if(!stage1 || amount-totalSent <= sum[0]){ //if we're at the last iteration of the main loop and we need to write the changes to storage
+				    if(tokensToApply[i] != debtPool.balance[member][0]){ //if we've removed any tokens of that person
+				        TokenTransfer(memberAddresses[msg.sender], member, pool, tokensToApply[i] - int256(debtPool.balance[member][0]), now); //send the event
+				    }
+				    if(moneyToApply[i] != debtPool.balance[member][2]){ //if this person's money have changed
+				        MoneyTransfer(memberAddresses[msg.sender], member, pool, moneyToApply[i] - int256(debtPool.balance[member][2]), now); //send the event
+				    }
+				    
+				    debtPool.balance[member][0] = uint128(tokensToApply[i]);
+				    debtPool.balance[member][2] = uint128(moneyToApply[i]);
+				}
+				
 				if(totalSent >= amount) break; //avoid useless looping if we're done
     		}
+    		
+    		stage1 = false;
 	    }
         
         debtPool.totalBalance = sum;
-        
-        for(i = 0; i<debtPool.members.length; i++){ //finally, write the changes to storage
-            member = debtPool.members[i];
-            
-            debtPool.balance[member][0] = uint128(tokensToApply[i] - 1); //TODO problematic conversion
-            debtPool.balance[member][2] = uint128(moneyToApply[i] - 1);
-        }
         
 		if(totalSent!=amount) throw; //if there was an error in the splitting algorithm
 		
 		TokenPurchase(memberAddresses[msg.sender], pool, totalSent, now);
     }
-    
-    /*function splitFunds(Pool debtPool, uint128 leftToSplit, uint128[3] sum){
-        uint16 member;
-        uint128 share;
-        uint128 money;
-        uint128 value;
-        
-		for(uint i=0; i<debtPool.members.length; i++){
-		    member = debtPool.members[i];
-		    
-			share = sum[0] > 0 ? debtPool.balance[member][0] : debtPool.balance[member][1]; //get the tokens or slices of that person
-			money = debtPool.balance[member][2]; //get his money
-			
-			value = (share*leftToSplit)/(sum[0] > 0 ? debtPool.totalBalance[0] : sum[1]); //get the value that we're going to send to the member. Either buying coins or sending money directly. We're reading the token sum from there, because our local one is being modified constantly
-			
-			if(value == 0 && share > 0) value = 1; 
-			
-			if(value>0){
-				if(sum[0] > 0){ //if we're buying tokens
-				    if(value>share) value = share; //We can't buy more tokens than available
-				    
-				    TokenTransfer(memberAddresses[msg.sender], member, pool, -(int(value)), now); //buy the tokens
-				    sum[0] -= value;
-				    debtPool.balance[member][0] -= value;
-				}
-				
-				MoneyTransfer(memberAddresses[msg.sender], member, pool, value, now); //transfer the money
-				totalSent += value;
-				money += value;
-				sum[2] += value;
-				
-				debtPool.balance[member][2] = money;
-				
-				if(totalSent >= amount) break;
-			}
-		}
-    }*/
 }
