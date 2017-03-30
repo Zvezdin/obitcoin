@@ -47,6 +47,7 @@ import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
 import { DialogComponent } from './dialog/dialog.component';
 
 import { contractintegration } from './contractintegration';
+import { VotingComponent } from './voting/voting.component';
 
 const perfectScrollbarConfig: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -81,6 +82,7 @@ const sortablejsConfig: SortablejsOptions = {
     IssueTokensComponent,
     BuyTokensComponent,
     DialogComponent,
+    VotingComponent,
   ],
   entryComponents: [
     DialogComponent

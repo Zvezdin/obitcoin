@@ -1,0 +1,37 @@
+<div class="voting-container" fxLayout="column" fxLayoutAlign="start stretch">
+	<div fxLayout="row" fxLayoutAlign="center" fxLayoutWrap="wrap">
+		<h3>Delegate your vote</h3>
+		<div *ngFor="let pool of userPools">
+			<h4>Delegate in pool{{pool.name}}</h4>
+
+			<md-select placeholder="Select member" [(ngModel)]="input.member" name="member">
+				<md-option *ngFor="let member of members" *ngIf="member." [value]="member.id">
+					{{member.name}}
+				</md-option>
+			</md-select>
+		</div>
+		</div>
+
+	<div fxLayout="column" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+	<div *ngFor="let vote of votes">
+
+		<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+			<md-card-title>Vote #{{vote.id}}</md-card-title>
+			<md-card-content>
+				<div>{{vote.getType()}}</div>
+				<div>Suggesting: {{vote.getSuggestion()}}</div>
+				<div>Voted tokens: {{vote.getTotalVotes()}} ({{(vote.getTotalVotes() / pool.totalTokens * 100).toFixed(2)}}%)</div>
+				<div>For: {{vote.votedFor}} ({{vote.getForPercentage()}}%)</div>
+				<div>Against: {{vote.votedAgainst}} ({{vote.getAgainstPercentage()}}%)</div>
+
+				<div *ngIf="vote.isOpen()" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
+					<button md-raised-button color="primary" [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, true)">Accept</button>
+					<button md-raised-button [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, false)">Reject</button>
+				</div>
+			</md-card-content>
+		</md-card>
+
+	</div>
+
+	</div>
+</div>

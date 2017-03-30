@@ -44,29 +44,6 @@
 
 		<md-divider></md-divider>
 
-		<div fxLayout="column" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
-		<div *ngFor="let vote of votes">
-
-			<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
-				<md-card-title>Vote #{{vote.id}}</md-card-title>
-				<md-card-content>
-					<div>{{vote.getType()}}</div>
-					<div>Suggesting: {{vote.getSuggestion()}}</div>
-					<div>Voted tokens: {{vote.getTotalVotes()}} ({{(vote.getTotalVotes() / pool.totalTokens * 100).toFixed(2)}}%)</div>
-					<div>For: {{vote.votedFor}} ({{vote.getForPercentage()}}%)</div>
-					<div>Against: {{vote.votedAgainst}} ({{vote.getAgainstPercentage()}}%)</div>
-
-					<div *ngIf="vote.isOpen()" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
-						<button md-raised-button color="primary" [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, true)">Accept</button>
-						<button md-raised-button [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, false)">Reject</button>
-					</div>
-				</md-card-content>
-			</md-card>
-
-		</div>
-
-		</div>
-
 		<h2>Pool members</h2>
 
 		<p-dataTable [value]="members">

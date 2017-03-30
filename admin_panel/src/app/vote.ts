@@ -1,3 +1,5 @@
+import {Member} from './member';
+
 export class Vote{
     voteType: Number;
     pool: number;
@@ -10,19 +12,35 @@ export class Vote{
     votedAgainst: number;
     id: number;
 
+    suggestion: string;
+
     voted : Map<number, boolean>;
 
     getSuggestion(): string{
+        return this.suggestion;
+    }
+
+    generateSuggestion(members: Member[]): string{
         let suggestion : string = "";
 
         if(this.voteType == 1){
             suggestion+= "";
             for(var i = 0; i<this.arg1.length; i++){
-                suggestion += " +"+this.arg2[i]+" tokens to "+this.arg1[i];
+                suggestion += " +"+this.getMemberName(members, this.arg2[i])+" tokens to "+this.getMemberName(members, this.arg1[i]);
             }
         }
 
+        this.suggestion = suggestion;
+
         return suggestion;
+    }
+
+    getMemberName(members: Member[], id: number): string{
+        members.forEach(member => {
+            if (member.id == id) return member.name;
+        });
+
+        return id.toString();
     }
 
     getType(): string{

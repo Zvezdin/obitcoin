@@ -70,15 +70,8 @@ export class DataService {
 		return this.getMembers()
 			.then(members => members.filter(member => pool.members.find(member2 => member2 == member.id)));
 	}
-
-	getMembersSlowly(): Promise<Member[]> {
-		return new Promise(resolve => {
-			setTimeout(() => resolve(this.getMembers()), 2000);
-		});
-	}
 	
 	getMember(id: number, forceReload: boolean = false): Promise<Member> {
-		//console.log("Getting member with id "+id);
 		return this.getMembers(forceReload)
 			.then(members => members.find(member => member.id == id));
 	}
@@ -102,6 +95,16 @@ export class DataService {
 
 	getPool(id: number): Promise<Pool> {
 		return this.getPools().then(pools => pools.find(pool => pool.id == id));
+	}
+
+	getUserPools(): Promise<Pool[]> {
+		return new Promise(resolve => {
+			this.getUser().then(user => {
+				this.getPools().then(pools => {
+					resolve(pools.filter(pool => pool.members.find(member => member == user.id)));
+				});
+			});
+		});
 	}
 
 	getVotes(forceReload: boolean = false): Promise<Vote[]> {
