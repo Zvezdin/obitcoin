@@ -26,19 +26,24 @@ export class Vote{
         if(this.voteType == 1){
             suggestion+= "";
             for(var i = 0; i<this.arg1.length; i++){
-                suggestion += " +"+this.getMemberName(members, this.arg2[i])+" tokens to "+this.getMemberName(members, this.arg1[i]);
+                suggestion += " +"+this.arg2[i]+" tokens to "+this.getMemberName(members, this.arg1[i]);
+                if(i != this.arg1.length-1){
+                    suggestion += (i == this.arg1.length-2 ? " and" : ",");
+                }
             }
         }
 
         this.suggestion = suggestion;
 
+        console.log("Generated suggestion "+suggestion);
+
         return suggestion;
     }
 
     getMemberName(members: Member[], id: number): string{
-        members.forEach(member => {
-            if (member.id == id) return member.name;
-        });
+        for(var i = 0; i<members.length; i++){
+            if (members[i].id == id) return members[i].name;
+        }
 
         return id.toString();
     }

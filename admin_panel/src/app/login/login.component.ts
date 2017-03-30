@@ -25,10 +25,14 @@ export class LoginComponent implements OnInit {
 
 	ngOnInit() {
 		var self = this;
+
+		self.address = "0xa3ba9b11ec0f8a500073c81a956c12af12394b3a";
+
 		self.dataService.disconnect();
 		self.dataService.init();
 		window.addEventListener('load', function() {
 			if(!self.dataService.isWeb3Available()) self.router.navigate(['/getMetamask']);
+			else self.login();
 		});
 	}
 

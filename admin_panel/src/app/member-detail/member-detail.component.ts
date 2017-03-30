@@ -109,14 +109,4 @@ export class MemberDetailComponent implements OnInit {
     edit(): void {
         this.router.navigate(['/edit_member', this.member.id]);
     }
-
-	delegate(): void {
-		if(this.user == undefined || this.user.id == this.member.id) return;
-		var instance = this;
-		/*this.dataService.delegateVote(this.member.id, function(result){
-			if(result!=undefined){
-				instance.snackBar.open("Submitted changes. May take up to a minute to apply.", "Close", {});
-			}
-		});*/
-	}
 }

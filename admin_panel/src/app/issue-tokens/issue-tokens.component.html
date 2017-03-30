@@ -7,7 +7,7 @@
 					<div>Please select the pool and member and input the amount for each transaction</div>
 
 					<md-select placeholder="Select pool" [(ngModel)]="pool" name="pool">
-						<md-option *ngFor="let pool of pools" [value]="pool.id">
+						<md-option *ngFor="let pool of pools" [value]="pool">
 							{{pool.name}}
 						</md-option>
 					</md-select>
@@ -15,7 +15,7 @@
 					<div *ngFor="let input of inputs">
 
 						<md-select placeholder="Select member" [(ngModel)]="input.member" name="member">
-							<md-option *ngFor="let member of members" [value]="member.id">
+							<md-option *ngFor="let member of members" [value]="member">
 								{{member.name}}
 							</md-option>
 						</md-select>

@@ -21,7 +21,7 @@ export class IssueTokensComponent implements OnInit {
 	pools: Pool[];
 	members: Member[];
 	inputs: Input[];
-	pool: number;
+	pool: Pool;
 
 	constructor(private dataService: DataService, private snackBar: MdSnackBar, private location: Location) { }
 
@@ -32,9 +32,8 @@ export class IssueTokensComponent implements OnInit {
 
 		self.newInput();
 
-		this.dataService.getMembers().then(members => {
+		self.dataService.getMembers().then(members => {
 			self.members = members;
-
 			self.dataService.getPools().then(pools => {
 				self.pools = pools;
 			});
@@ -59,7 +58,6 @@ export class IssueTokensComponent implements OnInit {
 		var amount = [];
 
 		if(this.pool == undefined) valid = false;
-		if(!this.isPool(this.pool)) valid = false;
 
 		this.inputs.forEach(input => { //check the input for validity. It is extremely important to have everything valid for a successful transaciton
 			input.amount = Math.round(input.amount);
@@ -69,9 +67,9 @@ export class IssueTokensComponent implements OnInit {
 			if(input.member == undefined) valid = false;
 			if(this.pool == undefined) valid = false;
 
-			if(!this.isMember(input.member)) valid = false;
+			if(input.member == undefined) valid = false;
 
-			members.push(input.member);
+			members.push(input.member.id);
 			amount.push(input.amount);
 		});
 
@@ -84,7 +82,7 @@ export class IssueTokensComponent implements OnInit {
 
 		var self = this;
 
-		this.dataService.sendTokens(this.pool, members, amount, function(result){
+		this.dataService.sendTokens(this.pool.id, members, amount, function(result){
 			if(result!=undefined){
 				console.log("showing notification");
 				self.snackBar.open("Sent transaction. May take up to a minute to apply.", "Close", {
@@ -97,10 +95,6 @@ export class IssueTokensComponent implements OnInit {
 		return this.pools.find(pool => pool.id == id) != undefined;
 	}
 
-	isMember(id: Number): boolean{
-		return this.members.find(member => member.id == id) != undefined;
-	}
-
 	back(): void {
 		this.location.back();
 	}
@@ -108,6 +102,6 @@ export class IssueTokensComponent implements OnInit {
 }
 
 class Input {
-	member: number;
+	member: Member;
 	amount: number;
 }

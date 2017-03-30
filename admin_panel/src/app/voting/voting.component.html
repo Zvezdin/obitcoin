@@ -1,26 +1,31 @@
 <div class="voting-container" fxLayout="column" fxLayoutAlign="start stretch">
-	<div fxLayout="row" fxLayoutAlign="center" fxLayoutWrap="wrap">
-		<h3>Delegate your vote</h3>
-		<div *ngFor="let pool of userPools">
-			<h4>Delegate in pool{{pool.name}}</h4>
+	<div fxLayout="column" fxLayoutAlign="center" fxLayoutWrap="wrap">
+		<h3 class="title">Delegate your vote</h3>
+		<div fxLayout="row" *ngFor="let delegation of delegations">
+			<h4 class="info">Delegate in pool {{delegation.pool.name}}</h4>
 
-			<md-select placeholder="Select member" [(ngModel)]="input.member" name="member">
-				<md-option *ngFor="let member of members" *ngIf="member." [value]="member.id">
+			<md-select placeholder="Delegate to" name="member" [(ngModel)] = "delegation.member">
+				<md-option *ngFor="let member of delegation.pool.memberObjects" [value]="member">
 					{{member.name}}
 				</md-option>
+				<md-option [value]="null">
+					Nobody
+				</md-option>
 			</md-select>
+
+			<button md-raised-button color="primary" (click)="delegate(delegation)">Delegate</button>
 		</div>
-		</div>
+	</div>
 
 	<div fxLayout="column" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
 	<div *ngFor="let vote of votes">
 
 		<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
-			<md-card-title>Vote #{{vote.id}}</md-card-title>
+			<md-card-title>Vote #{{vote.id}} in pool {{getPool(vote.pool).name}}</md-card-title>
 			<md-card-content>
 				<div>{{vote.getType()}}</div>
 				<div>Suggesting: {{vote.getSuggestion()}}</div>
-				<div>Voted tokens: {{vote.getTotalVotes()}} ({{(vote.getTotalVotes() / pool.totalTokens * 100).toFixed(2)}}%)</div>
+				<div>Voted tokens: {{vote.getTotalVotes()}} ({{(vote.getTotalVotes() / getPool(vote.pool).totalTokens * 100).toFixed(2)}}% currently)</div>
 				<div>For: {{vote.votedFor}} ({{vote.getForPercentage()}}%)</div>
 				<div>Against: {{vote.votedAgainst}} ({{vote.getAgainstPercentage()}}%)</div>
 

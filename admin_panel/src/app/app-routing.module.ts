@@ -16,6 +16,7 @@ import { PoolsComponent } from './pools/pools.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { IssueTokensComponent } from './issue-tokens/issue-tokens.component';
 import { BuyTokensComponent } from './buy-tokens/buy-tokens.component';
+import { VotingComponent } from './voting/voting.component';
 
 const routes: Routes = [
   {
@@ -93,6 +94,10 @@ const routes: Routes = [
       {
         path: 'issue_tokens',
         component: IssueTokensComponent,
+      },
+      {
+        path: 'voting',
+        component: VotingComponent,
       },
     ]
   }
