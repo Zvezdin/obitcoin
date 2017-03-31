@@ -1,45 +1,6 @@
 pragma solidity ^0.4.9;
 
 contract Obitcoin{
-    enum PermLevel { none, member, admin, owner }
-
-    enum VoteType { ParameterChange, TokenIssue, PullRequest }
-    enum VoteState { Pending, Successful, Unsuccessful }
-
-	struct Member {
-	    bytes32 name; //maximum name length = 32 bytes. This is to avoid dynamic string, which is resource heavy. Can be changed
-	    PermLevel permLevel; //current permission level. Can be changed to everything but owner.
-	    bool exists;
-	    address adr; //current address of the person. Can be changed.
-	}
-	
-    struct Pool {
-        uint16[] members; //memberIds
-        mapping (uint16 => uint128[3]) balance; //uint[0] = tokens, uint[1] = slices, uint[2] = balance
-        mapping (uint16 => uint16) delegations;
-        uint128[3] totalBalance;
-        bool exists;
-        bytes16 name;
-        bytes16 legalContract;
-        bytes16 financialReports;
-    }
-    
-    struct Vote {
-        int[] arg2;
-        uint votedFor;
-        uint votedAgainst;
-        uint endTime;
-        
-        uint16[] arg1;
-        
-        VoteType voteType;
-        VoteState voteState;
-        bool exists;
-        
-        mapping(uint16 => bool) voted;
-        uint16 pool;
-        uint16 startedBy;
-    }
     
     //events for all actions made by the contract. They are fired by the contract, then catched and processed by the web application
     //once an event is fired, it will always stay in the blockchain. This is the why our application can load all transactions that ever occurred within the contracy
@@ -69,6 +30,51 @@ contract Obitcoin{
 	event Voted(uint16 indexed from, uint16 indexed voteIndex, uint16 pool, bool vote, uint time);
 	
 	event Delegation(uint16 indexed from, uint16 indexed to, uint16 indexed pool, uint time);
+	
+	
+    enum PermLevel { none, member, admin, owner } //permission levels of contract members
+
+    enum VoteType { ParameterChange, TokenIssue, PullRequest } //shows the type of a certain vote action
+    enum VoteState { Pending, Successful, Unsuccessful } //if the voting is collecting votes, has finished successfully or unsuccessfully
+
+	struct Member { //the struct of a contract (and cooperative) member
+	    bytes32 name; //maximum name length = 32 bytes. This is to avoid dynamic string, which is resource heavy.
+	    PermLevel permLevel; //current permission level. Can be changed to everything but owner.
+	    bool exists; //used to check if this struct is initialized
+	    address adr; //current address of the person. Can be changed.
+	}
+	//Each contract member has an ID of type uint16
+	
+    struct Pool { //the struct of a cooperative debt pool (containing members working on a certain action)
+        uint16[] members; //memberIds
+        mapping (uint16 => uint128[3]) balance; //the balance of each member
+        //uint[0] = tokens, uint[1] = slices, uint[2] = balance
+        mapping (uint16 => uint16) delegations; //who to who is delegating his voting rights
+        uint128[3] totalBalance; //sum of balance for all pool members
+        bool exists;
+        bytes16 name;
+        bytes16 legalContract;
+        bytes16 financialReports;
+    }
+    //Each Pool has an ID of type uint16
+    
+    //A vote struct that indicates a certain action needs to be voted on to be successfully executed
+    struct Vote {
+        int[] arg2; //store data of the action
+        uint votedFor; //sum of votes FOR
+        uint votedAgainst; //sum of votes AGAINST
+        uint endTime; //deadline for voting
+        
+        uint16[] arg1; //more data of the action
+        
+        VoteType voteType;
+        VoteState voteState;
+        bool exists;
+        
+        mapping(uint16 => bool) voted; //who has voted
+        uint16 pool; //votes can only be inside a certain pool
+        uint16 startedBy; //the initiator's ID
+    }
     
     Vote[] activeVotes;
     
@@ -80,10 +86,10 @@ contract Obitcoin{
     
     mapping(address => uint16) memberAddresses; //to access the member id from his current address. Must be updated if a member's address changes
     
-    uint16 memberCounter;
+    uint16 memberCounter; //used to generate IDs
     uint16 poolCounter;
     
-    uint firstBlockNumber;
+    uint firstBlockNumber; //used so that web3 knows from which block to start to scan for contract events (and extract them faster)
     
     address owner;
     
