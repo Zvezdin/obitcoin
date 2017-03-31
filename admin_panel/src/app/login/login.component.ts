@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
 	ngOnInit() {
 		var self = this;
 
-		self.address = "0xa3ba9b11ec0f8a500073c81a956c12af12394b3a";
+		self.address = "0x546eb1b4361645de25a748bdc9ee95ab42556657";
 
 		self.dataService.disconnect();
 		self.dataService.init();

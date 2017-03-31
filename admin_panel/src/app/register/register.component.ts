@@ -47,12 +47,6 @@ export class RegisterComponent implements OnInit {
 				self.contractAddress = address;
 			}
 
-			self.dataService.initContract(function(error, result){
-				self.contractInitialized = true;
-				self.snackBar.open("Contract initialized!", "Close");
-				self.cdRef.detectChanges();
-			});
-
 			self.cdRef.detectChanges();
 		});
 	}
@@ -62,4 +56,13 @@ export class RegisterComponent implements OnInit {
 		self.router.navigate(['/dashboard']);
 	}
 	
+	initContract(){
+		var self= this;
+
+		self.dataService.initContract(function(error, result){
+			self.contractInitialized = true;
+			self.snackBar.open("Contract initialized!", "Close");
+			self.cdRef.detectChanges();
+		});
+	}
 }

@@ -11,7 +11,7 @@
           <p class="address"><b>{{contractAddress}}</b></p>
           <p class="warning">You must remmeber the contract address. Without it, you cannot access your contract!</p>
 
-          <p *ngIf="!contractInitialized" class="info">Your contract must be initialized. Please accept the next transaction</p>
+          <button *ngIf="!contractInitialized" md-raised-button color="primary" (click)="initContract()">Initialize contract</button>
           <button *ngIf="contractInitialized" md-raised-button (click)="connectToContract()">Login to contract</button>
         </div>
 

@@ -455,7 +455,7 @@ export class DataService {
 			} break;
 
 			case "Delegation": {
-				if(isNew) message = transaction.fromName +" delegated to "+transaction.toName;
+				if(isNew) message = transaction.fromName + (transaction.toName == undefined ? " removed his delegation" : " delegated to "+transaction.toName);
 			} break;
 		}
 

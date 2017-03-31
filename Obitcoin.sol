@@ -275,10 +275,12 @@ contract Obitcoin{
         uint16 member = memberAddresses[msg.sender]; //get the ID of the caller
         Pool pool = pools[poolId];
         
-        if(pool.balance[to][1] == 0) throw; //if 'to' is not a member of the pool (aka has no slices in it)
-        
-        if(pool.delegations[to] != 0) pool.delegations[member] = pool.delegations[to]; //if the person we're delegating to has delegated
-        else pool.delegations[member] = to; //just delegate otherwise
+        if(to != 0){
+            if(pool.balance[to][1] == 0) throw; //if 'to' is not a member of the pool (aka has no slices in it)
+            
+            if(pool.delegations[to] != 0) pool.delegations[member] = pool.delegations[to]; //if the person we're delegating to has delegated
+            else pool.delegations[member] = to; //just delegate otherwise
+        } else pool.delegations[member] = 0;
         
         if(member == pool.delegations[member]) throw; //we cannot let the caller delegate to himself
         
@@ -338,7 +340,7 @@ contract Obitcoin{
         else{
             vote.votedAgainst += weight;
             
-            if(vote.votedAgainst >= pool.totalBalance[0]/2 + 1){ //if the vote hasn't been reached successively
+            if(vote.votedAgainst >= pool.totalBalance[0]/2 - pool.totalBalance[0]%2){ //if the vote hasn't been reached successively
                 vote.voteState = VoteState.Unsuccessful;
                 
                 VoteChanged(vote.startedBy, voteIndex, vote.pool, vote.voteState, now);

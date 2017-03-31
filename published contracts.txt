@@ -1,8 +1,6 @@
 in NEW Kovan test net:
 
-0xa3ba9b11ec0f8a500073c81a956c12af12394b3a
-0x8c9ed50915d031ce0719f641ad345cf97eab644c
-
+0x546eb1b4361645de25a748bdc9ee95ab42556657
 
 in OLD TEST NET:
 
