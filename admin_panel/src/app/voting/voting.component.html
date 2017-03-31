@@ -1,26 +1,31 @@
 <div class="voting-container" fxLayout="column" fxLayoutAlign="start stretch">
 	<div fxLayout="column" fxLayoutAlign="center" fxLayoutWrap="wrap">
-		<h3 class="title">Delegate your vote</h3>
-		<div fxLayout="row" *ngFor="let delegation of delegations">
-			<h4 class="info">Delegate in pool {{delegation.pool.name}}</h4>
+		<md-card fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md>
+			<md-card-title>Manage your delegations</md-card-title>
+			<md-card-content>
+				<div fxLayout="row" *ngFor="let delegation of delegations">
+					<div class="text">Delegating in pool {{delegation.pool.name}} to</div>
 
-			<md-select placeholder="Delegate to" name="member" [(ngModel)] = "delegation.member">
-				<md-option *ngFor="let member of delegation.pool.memberObjects" [value]="member">
-					{{member.name}}
-				</md-option>
-				<md-option [value]="null">
-					Nobody
-				</md-option>
-			</md-select>
+					<md-select placeholder="Delegate to" name="member" [(ngModel)] = "delegation.member">
+						<md-option *ngFor="let member of delegation.pool.memberObjects" [value]="member">
+							{{member.name}}
+						</md-option>
+						<md-option [value]="null">
+							Nobody
+						</md-option>
+					</md-select>
 
-			<button md-raised-button color="primary" (click)="delegate(delegation)">Delegate</button>
-		</div>
+					<button md-raised-button color="primary" (click)="delegate(delegation)">Delegate</button>
+				</div>
+			</md-card-content>
+		</md-card>
+
 	</div>
 
 	<div fxLayout="column" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
 	<div *ngFor="let vote of votes">
 
-		<md-card fxFlex="100%" fxFlex.md="49.5%" fxFlex.sm="100%" fxFlex.gt-md class="social-card">
+		<md-card>
 			<md-card-title>Vote #{{vote.id}} in pool {{getPool(vote.pool).name}}</md-card-title>
 			<md-card-content>
 				<div>{{vote.getType()}}</div>
@@ -30,8 +35,8 @@
 				<div>Against: {{vote.votedAgainst}} ({{vote.getAgainstPercentage()}}%)</div>
 
 				<div *ngIf="vote.isOpen()" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutWrap="wrap">
-					<button md-raised-button color="primary" [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, true)">Accept</button>
-					<button md-raised-button [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, false)">Reject</button>
+					<button md-raised-button class="action" color="primary" [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, true)">Accept</button>
+					<button md-raised-button class="action" [disabled]="user == undefined ? true : vote.hasVoted(user.id)" (click)="submitVote(vote, false)">Reject</button>
 				</div>
 			</md-card-content>
 		</md-card>

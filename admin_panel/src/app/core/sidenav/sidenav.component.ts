@@ -55,7 +55,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
     this.breadcrumbService.addFriendlyNameForRoute('/transactions', "Global transaction list");
     this.breadcrumbService.addFriendlyNameForRoute('/buy_tokens', "Buy tokens");
     this.breadcrumbService.addFriendlyNameForRoute('/issue_tokens', "Issue tokens");
-    this.breadcrumbService.addFriendlyNameForRoute('/votes', "Votes page");
+    this.breadcrumbService.addFriendlyNameForRoute('/voting', "Voting page");
   }
 
   toggleIconSidenav() {
