@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
 	ngOnInit() {
 		var self = this;
 
-		self.address = "0x546eb1b4361645de25a748bdc9ee95ab42556657";
+		//self.address = "0x546eb1b4361645de25a748bdc9ee95ab42556657";
 
 		self.dataService.disconnect();
 		self.dataService.init();
@@ -38,6 +38,9 @@ export class LoginComponent implements OnInit {
 
 	login() {
 		var self = this;
+
+		if(this.address == undefined || this.address.trim().length == 0) return;
+
 		this.dataService.connectToContract(this.address, function(error){
 			if(error!=undefined){
 				self.snackBar.open(error, "Close", {});
