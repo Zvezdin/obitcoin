@@ -5,13 +5,13 @@
 	<button fxFlexAlign="end" md-raised-button color="primary" [disabled]="userPermissionLevel<=1" (click) = addMember()>Add member</button>
 	</div>
 
-		<p-dataTable [value]="members">
+		<p-dataTable [value]="members" [rows]="10" [paginator]="true" [responsive]="true">
 			<p-column field="name" [sortable]="true" header="Name"></p-column>
-			<p-column field="address" [sortable]="true" header="Address" [style]="{'width':'500px'}"></p-column>
+			<p-column field="address" [sortable]="true" header="Address" [style]="{'text-overflow':'ellipsis'}"></p-column>
 			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
-			<p-column field="totalTokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
-			<p-column field="totalSlices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
-			<p-column field="totalMoney" [sortable]="true" header="Money" [style]="{'width':'100px'}"></p-column>
+			<p-column field="totalTokens" [sortable]="true" header="Tokens"></p-column>
+			<p-column field="totalSlices" [sortable]="true" header="Slices"></p-column>
+			<p-column field="totalMoney" [sortable]="true" header="Money"></p-column>
 			<p-column>
 				<template let-member="rowData" pTemplate="body">
 					<button md-raised-button (click) = gotoDetail(member)>Details</button>

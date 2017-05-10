@@ -46,20 +46,20 @@
 
 		<h2>Pool members</h2>
 
-		<p-dataTable [value]="members">
+		<p-dataTable [value]="members" [rows]="10" [paginator]="true" [responsive]="true">
 			<p-column field="name" [sortable]="true" header="Name"></p-column>
-			<p-column field="address" [sortable]="true" header="Address" [style]="{'width':'500px'}"></p-column>
+			<p-column field="address" [sortable]="true" header="Address" [style]="{'text-overflow':'ellipsis'}"></p-column>
 			<p-column field="memberSince" [sortable]="true" header="Member since"></p-column>
-			<p-column field="tokens" [sortable]="true" header="Tokens" [style]="{'width':'100px'}"></p-column>
-			<p-column field="slices" [sortable]="true" header="Slices" [style]="{'width':'100px'}"></p-column>
-			<p-column field="money" [sortable]="true" header="Money" [style]="{'width':'100px'}"></p-column>
+			<p-column field="tokens" [sortable]="true" header="Tokens"></p-column>
+			<p-column field="slices" [sortable]="true" header="Slices"></p-column>
+			<p-column field="money" [sortable]="true" header="Money"></p-column>
 		</p-dataTable>
 
 		<md-divider></md-divider>
 
 		<h2>Pool transactions</h2>
 
-		<p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [globalFilter]="gb" #dt>
+		<p-dataTable [value]="transactions" [rows]="10" [paginator]="true" [responsive]="true" [globalFilter]="gb" #dt>
 			<p-column field="type" [sortable]="true" header="Type"></p-column>
 			<p-column field="date" [sortable]="true" header="Date"></p-column>
 			<p-column field="fromName" [sortable]="true" [filter]="true" filterPlaceholder="Search" header="Initiator"></p-column>

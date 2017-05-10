@@ -322,7 +322,7 @@ export class DataService {
 
 		self.eventQueue.push(event);
 
-		console.log("New events: ", self.eventQueue);
+		if(isNew) console.log("New events: ", self.eventQueue);
 
 		if(!self.extractingEvents){
 			self.lastTransactionHash = event.transactionHash;
@@ -331,7 +331,7 @@ export class DataService {
 				self.extractingEvents = true;
 				for(var i = 0; i<self.eventQueue.length; i++){
 					transaction = self.extractDataFromEvent(self.eventQueue[i], members, pools);
-					console.log("Extracted ", self.eventQueue[i]);
+					if(isNew) console.log("Extracted ", self.eventQueue[i]);
 					self.transactions.push(transaction);
 				}
 				self.eventQueue = [];

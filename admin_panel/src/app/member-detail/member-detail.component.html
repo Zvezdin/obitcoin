@@ -42,7 +42,7 @@
 
 		<h2>Debt pools</h2>
 
-		<p-dataTable [value]="pools">
+		<p-dataTable [value]="pools" [rows]="10" [paginator]="true" [responsive]="true">
 			<p-column field="name" [sortable]="true" header="Name"></p-column>
 			<p-column field="members.length" [sortable]="true" header="Member count"></p-column>
 			<p-column field="totalTokens" [sortable]="true" header="Token count"></p-column>
