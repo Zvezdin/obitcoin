@@ -18,11 +18,11 @@
 
 - Свържете се до "Kovan Test Network" от горния ъгъл вляво.
 
-![alt tag](https://github.com/KingOfAllChunks/obitcoin/blob/master/screenshots/setup/choose_network.png)
+![alt tag](https://github.com/KingOfAllChunks/obitcoin/blob/master/screenshots/setup/select_network.png)
 
 - След повторно въвеждане на вашата избрана парола получавате достъп до следния акаунт с ненулев баланс от Ether.
 
-![alt tag](https://github.com/KingOfAllChunks/obitcoin/blob/master/screenshots/setup/done.png)
+![alt tag](https://github.com/KingOfAllChunks/obitcoin/blob/master/screenshots/setup/account.png)
 
 
 Настройката е готова. [Можете да посетите тестовата версия на проекта][prj]. Имате възможността да си създадете собствена инстанция на криптодоговора. За ваше удобство е създаден вече настроен тестов криптодоговор в мрежата от името на Ethereum акаунта който преди малко настроихте. Може да го достъпите като въведете следния адрес в login формата (в тестовата версия на уеб приложението това става автоматично):
